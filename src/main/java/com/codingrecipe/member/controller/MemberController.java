@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -56,13 +55,5 @@ public class MemberController {
                 return "login";
             }
         }
-    }
-    @GetMapping("/projects")
-    public String project_get(HttpSession session, Model model){
-        if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("userid", session.getAttribute("userid"));
-        return "projects";
     }
 }

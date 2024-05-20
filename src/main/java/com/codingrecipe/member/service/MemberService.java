@@ -3,11 +3,9 @@ package com.codingrecipe.member.service;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import com.codingrecipe.member.repository.MemberRepository;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.dto.MemberDTO;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

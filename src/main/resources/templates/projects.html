@@ -21,9 +21,23 @@
 <div class="user-info">
     <p th:text="${userid}"></p>
 </div>
+<div>
+    <a href="addproject">프로젝트 추가</a>
+</div>
 <div class="project">
     <h2>프로젝트</h2>
     <!-- 프로젝트 관련 내용을 여기에 추가하세요 -->
+    <table>
+        <tr>
+            <th>프로젝트 이름</th>
+            <th>프로젝트 설명</th>
+            <th>생성 시간</th>
+        </tr>
+        <tr th:each="project : ${projects}">
+            <td><a th:href="@{'/project/' + ${project.projectname}}" th:text="${project.projectname}"></a></td>
+            <td th:text="${project.projectdescription}"></td>
+            <td th:text="${project.projectcreatedtime}"></td>
+        </tr>
 </div>
 </body>
 </html>
