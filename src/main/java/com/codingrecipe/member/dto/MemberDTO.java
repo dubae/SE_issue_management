@@ -9,17 +9,19 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class MemberDTO {
-    private Long id;
-    private String memberEmail;
-    private String memberPassword;
-    private String memberName;
+    public Long num;
+    public String userid;
+    public String username;
+    public String email;
+    public String password;
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {
         MemberDTO memberDTO = new MemberDTO();
-        memberDTO.setId(memberEntity.getId());
-        memberDTO.setMemberEmail(memberEntity.getMemberEmail());
-        memberDTO.setMemberPassword(memberEntity.getMemberPassword());
-        memberDTO.setMemberName(memberEntity.getMemberName());
+        memberDTO.setNum(memberEntity.getNum());
+        memberDTO.setUserid(memberEntity.getUserid());
+        memberDTO.setUsername(memberEntity.getUsername());
+        memberDTO.setEmail(memberEntity.getEmail());
+        memberDTO.setPassword(memberEntity.getPassword());
         return memberDTO;
     }
 }

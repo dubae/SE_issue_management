@@ -1,14 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>login</title>
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .login-box {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-<form action="/member/login" method="post">
-  이메일: <input type="text" name="memberEmail"> <br>
-  비밀번호: <input type="password" name="memberPassword"> <br>
-  <input type="submit" value="로그인">
-</form>
+    <div class="login-box">
+        <h2>로그인</h2>
+        <form action="/login" method="post">
+            <div class="input-group">
+                <label for="userid">사용자 ID:</label>
+                <input type="text" id="userid" name="userid" placeholder="사용자 ID" required>
+            </div>
+            <div class="input-group">
+                <label for="password">비밀번호:</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호" required>
+            </div>
+            <button type="submit">로그인</button>
+        </form>
+    </div>
 </body>
 </html>

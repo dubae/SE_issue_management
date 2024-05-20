@@ -9,36 +9,26 @@ import javax.persistence.*;
 @Entity
 @Setter
 @Getter
-@Table(name = "member_table")
+@Table(name = "member")
 public class MemberEntity {
-    @Id // pk 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment
-    private Long id;
-
-    @Column(unique = true) // unique 제약조건 추가
-    private String memberEmail;
-
-    @Column
-    private String memberPassword;
-
-    @Column
-    private String memberName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long num;
+    @Column(name = "userid", unique = true)
+    private String userid;
+    @Column(name = "username")
+    private String username;
+    @Column(name = "email", unique = true)
+    private String email;
+    @Column(name = "password")
+    private String password;
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {
-        MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setMemberEmail(memberDTO.getMemberEmail());
-        memberEntity.setMemberPassword(memberDTO.getMemberPassword());
-        memberEntity.setMemberName(memberDTO.getMemberName());
-        return memberEntity;
+        MemberEntity memberentity = new MemberEntity();
+        memberentity.setUserid(memberDTO.getUserid());
+        memberentity.setUsername(memberDTO.getUsername());
+        memberentity.setEmail(memberDTO.getEmail());
+        memberentity.setPassword(memberDTO.getPassword());
+        return memberentity;
     }
-
-    public static MemberEntity toUpdateMemberEntity(MemberDTO memberDTO) {
-        MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setId(memberDTO.getId());
-        memberEntity.setMemberEmail(memberDTO.getMemberEmail());
-        memberEntity.setMemberPassword(memberDTO.getMemberPassword());
-        memberEntity.setMemberName(memberDTO.getMemberName());
-        return memberEntity;
-    }
-
 }
