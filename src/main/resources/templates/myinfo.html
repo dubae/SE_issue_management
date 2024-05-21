@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 정보</title>
+</head>
+<body>
+    <h2>내 정보</h2>
+    <div th:if="${member != null}">
+        <p>내 ID: <span th:text="${member.userid}"></span></p>
+        <p>내 이름: <span th:text="${member.username}"></span></p>
+        <p>내 이메일: <span th:text="${member.email}"></span></p>
+    </div>
+    <div th:if="${member == null}">
+        <p>사용자를 찾을 수 없습니다.</p>
+    </div>
+</body>
+</html>

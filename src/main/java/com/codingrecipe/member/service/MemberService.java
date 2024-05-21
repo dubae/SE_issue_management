@@ -1,5 +1,7 @@
 package com.codingrecipe.member.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -31,5 +33,13 @@ public class MemberService {
     public boolean isExistId(String userid) {
         Optional<MemberEntity> optionalMemberEntity = memberRepository.findByUserid(userid);
         return optionalMemberEntity.isPresent();
+    }
+    public List<MemberDTO> findAll() {
+        List<MemberEntity> memberEntities = memberRepository.findAll();
+        List<MemberDTO> memberDTOs = new ArrayList<>();
+        for (MemberEntity memberEntity : memberEntities) {
+            memberDTOs.add(MemberDTO.toMemberDTO(memberEntity));
+        }
+        return memberDTOs;
     }
 }

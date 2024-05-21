@@ -7,7 +7,12 @@ import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
 
 @Controller
 @RequiredArgsConstructor
@@ -19,19 +24,20 @@ public class MemberController {
         System.out.println("회원가입 페이지");
         return "register";
     }
-    
+
     @ModelAttribute
     @PostMapping("/register")
     public String register(@ModelAttribute MemberDTO memberDTO) {
         if (memberService.isExistId(memberDTO.getUserid()) || memberService.isExistEmail(memberDTO.getEmail())){
             System.out.println("회원가입 실패");
-            return "register";
+            return "redirect:/login";
         } else {
             memberService.register(memberDTO);
             System.out.println("회원가입 성공");
             return "redirect:/login";
         }
     }
+        
 
     @GetMapping("/login")
     public String login_get() {
@@ -56,4 +62,33 @@ public class MemberController {
             }
         }
     }
+
+    @GetMapping("/member/{userid}")
+    public String member_detail(@PathVariable String userid, Model model, HttpSession session){
+        if (session.getAttribute("userid") == null) {
+            return "redirect:/login";
+        }
+        System.out.println(session.getAttribute("userid"));
+        MemberDTO memberDTO = memberService.findByUserId(userid);
+        model.addAttribute("member", memberDTO);
+        System.out.println(memberDTO.getUserid());
+        if (session.getAttribute("userid").equals(memberDTO.getUserid())) {
+            System.out.println("내 정보");
+            return "redirect:/myinfo";
+        }
+        else {
+            return "memberdetail";
+        }
+    }
+
+    @GetMapping("/myinfo")
+    public String myinfo(HttpSession session, Model model) {
+        if (session.getAttribute("userid") == null) {
+            return "redirect:/login";
+        }
+        MemberDTO memberDTO = memberService.findByUserId((String)session.getAttribute("userid"));
+        model.addAttribute("member", memberDTO);
+        return "myinfo";
+    }
+    
 }
