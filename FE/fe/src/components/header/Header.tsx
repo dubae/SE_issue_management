@@ -1,8 +1,8 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles'
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-const useStyle = makeStyles(()=>({
+import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem } from '@mui/core';
+import { styled } from '@mui/material/styles'
+import AccountCircleIcon from '@mui/icons-materials/AccountCircle';
+const useStyle = styled(()=>({
   typographyStyles: {
     flex: 1,
   }}))

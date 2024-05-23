@@ -15,7 +15,7 @@ function List({type, modal}:ListProps){
     //수정해야됨
 
   return (
-    <ListBlock ref={modal} className={'showing'} >
+    <ListBlock ref={modal} >
       <ListHead>{type} 선택</ListHead>
       <ListBody><div>dddd</div><RadionBtn/></ListBody>
       <ListBody><div>ddddsf</div><RadionBtn/></ListBody>  
