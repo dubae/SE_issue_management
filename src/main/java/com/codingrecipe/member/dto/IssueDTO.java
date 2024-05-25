@@ -1,10 +1,13 @@
 package com.codingrecipe.member.dto;
 
 
+import com.codingrecipe.member.entity.IssueCommentEntity;
 import com.codingrecipe.member.entity.IssueEntity;
 import lombok.*;
 
 import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,8 +26,10 @@ public class IssueDTO {
     private String significance;
     private String description;
 
+    private List<IssueCommentDTO> issueCommentDTOList=new ArrayList<>();
+
     /**
-     * 생성자
+     * 생성자 방식
      */
     public IssueDTO(IssueEntity issueEntity){
         this.id=issueEntity.getId();
@@ -37,6 +42,9 @@ public class IssueDTO {
         this.priority= issueEntity.getPriority();
         this.significance= issueEntity.getSignificance();
         this.description=issueEntity.getDescription();
+        for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
+            issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
+        }
     }
 
     /**
@@ -55,6 +63,9 @@ public class IssueDTO {
         issueDTO.setPriority(issueEntity.getPriority());
         issueDTO.setSignificance(issueEntity.getSignificance());
         issueDTO.setDescription(issueEntity.getDescription());
+        for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
+            issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
+        }
 
         return issueDTO;
     }

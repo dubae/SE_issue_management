@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class IssueService {
@@ -59,6 +60,30 @@ public class IssueService {
      */
     public void deleteIssue(IssueDTO issueDTO){
         issueRepository.delete(IssueEntity.toIssueEntity(issueDTO));
+    }
+
+    /**
+     * 프로젝트id로 이슈 반환하기
+     */
+    public List<IssueDTO> findByProjectId(Long projectId){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            //모든 리스트 중 projectId가 일치하는 이슈만 리스트에 추가함.
+            if(issueEntity.getProjectId().equals(projectId)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+            }
+        }
+        return issueDTOList;
+    }
+
+    /**
+     * id로 이슈 찾기
+     */
+    public IssueDTO findById(Long id){
+        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
+        IssueDTO issueDTO=new IssueDTO(issueEntity.get());
+        return issueDTO;
     }
 
 }

@@ -54,8 +54,8 @@ public class IssueEntity extends BaseEntity{
     @Column(nullable = false, length = 20)
     private String description;
 
-    @OneToMany(mappedBy = "issue_comment_entity", cascade = CascadeType.ALL)
-    private List<IssueCommentEntity> comments=new ArrayList<>();
+    @OneToMany(mappedBy = "issueEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IssueCommentEntity> comments = new ArrayList<>();
 
     public static IssueEntity toIssueEntity(IssueDTO issueDTO){
         IssueEntity issueEntity=new IssueEntity();

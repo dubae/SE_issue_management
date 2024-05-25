@@ -24,6 +24,7 @@ public class ProjectEntity {
     @Column(name = "createdtime")
     private String projectcreatedtime;
 
+
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setProjectname(projectDTO.getProjectname());

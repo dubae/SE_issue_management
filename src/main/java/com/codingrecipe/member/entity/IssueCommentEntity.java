@@ -26,4 +26,8 @@ public class IssueCommentEntity extends BaseEntity{
     @Column(nullable = false, length = 20)
     private Long issueId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issueId", insertable = false, updatable = false)
+    private IssueEntity issueEntity;
+
 }
