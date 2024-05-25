@@ -1,5 +1,6 @@
 package com.codingrecipe.member.entity;
 
+import com.codingrecipe.member.dto.IssueDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,6 +14,11 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Setter
+/**
+ * 한 프로젝트 내 다수의 이슈 존재.
+ * 1:n관계 설정 필요.
+ */
 public class IssueEntity extends BaseEntity{
 
     @Id
@@ -48,6 +54,24 @@ public class IssueEntity extends BaseEntity{
     @Column(nullable = false, length = 20)
     private String description;
 
+    @OneToMany(mappedBy = "issue_comment_entity", cascade = CascadeType.ALL)
+    private List<IssueCommentEntity> comments=new ArrayList<>();
 
+    public static IssueEntity toIssueEntity(IssueDTO issueDTO){
+        IssueEntity issueEntity=new IssueEntity();
+
+        issueEntity.setId(issueDTO.getId());
+        issueEntity.setWriterId(issueDTO.getWriterId());
+        issueEntity.setProjectId(issueDTO.getProjectId());
+        issueEntity.setDevId(issueDTO.getDevId());
+        issueEntity.setTitle(issueDTO.getTitle());
+        issueEntity.setStatus(issueDTO.getStatus());
+        issueEntity.setComponent(issueDTO.getComponent());
+        issueEntity.setPriority(issueDTO.getPriority());
+        issueEntity.setSignificance(issueDTO.getSignificance());
+        issueEntity.setDescription(issueDTO.getDescription());
+
+        return issueEntity;
+    }
 
 }

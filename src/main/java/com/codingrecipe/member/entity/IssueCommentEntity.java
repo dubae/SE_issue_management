@@ -3,16 +3,15 @@ package com.codingrecipe.member.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.swing.*;
-import java.util.*;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+/**
+ * 하나의 티켓 내에 다수의 댓글(comment)을 담당하는 개체.
+ */
 public class IssueCommentEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
