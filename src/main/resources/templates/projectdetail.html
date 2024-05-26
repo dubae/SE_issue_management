@@ -3,12 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>프로젝트 상세 정보</title>
+    <style>
+        .username:not(:last-child)::after {
+            content: ', ';
+        }
+    </style>
 </head>
 <body>
     <h2>프로젝트 상세 정보</h2>
     <div th:if="${project != null}">
         <p>프로젝트 이름: <span th:text="${project.projectname}"></span></p>
         <p>프로젝트 설명: <span th:text="${project.projectdescription}"></span></p>
+
+        <p th:if="${PL != null && !PL.isEmpty()}">
+            PL: <span th:each="userRole : ${PL}" class="username" th:text="${userRole.username}"></span>
+        </p>
+        <p th:if="${DEV != null && !DEV.isEmpty()}">
+            DEV: <span th:each="userRole : ${DEV}" class="username" th:text="${userRole.username}"></span>
+        </p>
+        <p th:if="${PM != null && !PM.isEmpty()}">
+            PM: <span th:each="userRole : ${PM}" class="username" th:text="${userRole.username}"></span>
+        </p>
+        <p th:if="${TESTER != null && !TESTER.isEmpty()}">
+            TESTER: <span th:each="userRole : ${TESTER}" class="username" th:text="${userRole.username}"></span>
+        </p>
     </div>
     <div th:if="${project == null}">
         <p>프로젝트를 찾을 수 없습니다.</p>

@@ -9,8 +9,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -46,10 +44,11 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session) {
+    public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
+            model.addAttribute("Error", "아이디가 존재하지 않습니다.");
             return "login";
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
@@ -58,6 +57,7 @@ public class MemberController {
                 return "redirect:/projects";
             } else {
                 System.out.println("로그인 실패");
+                model.addAttribute("Error", "비밀번호가 일치하지 않습니다.");
                 return "login";
             }
         }

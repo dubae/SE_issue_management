@@ -2,8 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>프로젝트에 사용자 추가</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loginError = /*[[${Error}]]*/ '';
+        /*]]>*/
+    </script>
+    <script>
+        function showAlert() {
+            if (loginError) {
+                alert(loginError);
+            }
+        }
+    </script>
 </head>
-<body>
+<body onload="showAlert()">
     <h1>프로젝트에 사용자 추가</h1>
     <form action="#" th:action="@{/adduser}" method="post">
         <label for="projectid">프로젝트 선택:</label>
@@ -16,6 +28,15 @@
         <select id="userid" name="userid" required>
             <option value="" selected disabled hidden>사용자 선택</option>
             <option th:each="user : ${users}" th:value="${user.userid}" th:text="${user.username}"></option>
+        </select>
+
+        <label for="role">역할 선택:</label>
+        <select id="role" name="role" required>
+            <option value="" selected disabled hidden>역할 선택</option>
+            <option value="PL">PL</option>
+            <option value="DEV">DEV</option>
+            <option value="PM">PM</option>
+            <option value="TESTER">TESTER</option>
         </select>
 
         <button type="submit">추가</button>

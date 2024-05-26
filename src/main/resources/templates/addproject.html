@@ -1,26 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>프로젝트 추가</title>
-</head>
-<body>
-    <h2>프로젝트 추가</h2>
-    <form id="projectForm" action="/addproject" method="post">
-        <label for="projectname">프로젝트 이름:</label>
-        <input type="text" id="projectname" name="projectname" placeholder="프로젝트 이름" required /><br>
-
-        <label for="projectdescription">프로젝트 설명:</label>
-        <input type="text" id="projectdescription" name="projectdescription" placeholder="프로젝트 설명" required /><br>
-
-        <!-- projectcreatedtime을 자동으로 생성하는 hidden input -->
-        <input type="hidden" id="projectcreatedtime" name="projectcreatedtime" />
-
-        <button type="submit">추가</button><br>
-    </form>
-
+    <title>Add Project</title>
     <script>
-        // 현재 시간을 가져오는 함수
+        function addUserInput(role) {
+            const container = document.getElementById(role + '-container');
+            const select = document.createElement('select');
+            select.name = role;
+            select.innerHTML = document.getElementById('user-options').innerHTML;
+            container.appendChild(select);
+            container.appendChild(document.createElement('br'));
+        }
         function getCurrentDateTime() {
             var now = new Date();
             var year = now.getFullYear();
@@ -31,12 +22,68 @@
             var seconds = ('0' + now.getSeconds()).slice(-2);
             return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
         }
-
-        // 폼이 제출될 때 projectcreatedtime을 설정하는 함수
-        document.getElementById('projectForm').addEventListener('submit', function(event) {
-            var currentTime = getCurrentDateTime();
-            document.getElementById('projectcreatedtime').value = currentTime;
-        });
+        window.onload = function() {
+            document.getElementById('projectForm').addEventListener('submit', function(event) {
+                var currentTime = getCurrentDateTime();
+                console.log(currentTime);
+                document.getElementById('projectcreatedtime').value = currentTime;
+            });
+        };
     </script>
+</head>
+<body>
+    <form id = "projectForm" action="/addproject" method="post">
+        <label for="projectname">Project Name:</label>
+        <input type="text" id="projectname" name="projectname" required><br><br>
+
+        <label for="projectdescription">Project Description:</label>
+        <textarea id="projectdescription" name="projectdescription" required></textarea><br><br>
+        
+        <label>Project Leaders (PL):</label>
+        <div id="pl-container">
+            <select name="pl" required>
+                <option value="">Select a user</option>
+                <option id="user-options" style="display:none;">
+                    <!-- User options will be populated here dynamically -->
+                    <option th:each="user : ${users}" th:value="${user.userid}" th:text="${{user.userid}}"></option></option>
+            </select><br>
+        </div>
+        <button type="button" onclick="addUserInput('pl')">Add PL</button><br><br>
+
+        <label>Developers (DEV):</label>
+        <div id="dev-container">
+            <select name="dev" required>
+                <option value="">Select a user</option>
+                <option id="user-options" style="display:none;">
+                    <!-- User options will be populated here dynamically -->
+                    <option th:each="user : ${users}" th:value="${user.userid}" th:text="${{user.userid}}"></option></option>
+            </select><br>
+        </div>
+        <button type="button" onclick="addUserInput('dev')">Add Developer</button><br><br>
+
+        <label>Testers (TESTER):</label>
+        <div id="tester-container">
+            <select name="tester" required>
+                <option value="">Select a user</option>
+                <option id="user-options" style="display:none;">
+                    <!-- User options will be populated here dynamically -->
+                    <option th:each="user : ${users}" th:value="${user.userid}" th:text="${{user.userid}}"></option></option>
+            </select><br>
+        </div>
+        <button type="button" onclick="addUserInput('tester')">Add Tester</button><br><br>
+
+        <label>Project Managers (PM):</label>
+        <div id="pm-container">
+            <select name="pm" required>
+                <option value="">Select a user</option>
+                <option id="user-options" style="display:none;">
+                    <!-- User options will be populated here dynamically -->
+                    <option th:each="user : ${users}" th:value="${user.userid}" th:text="${{user.userid}}"></option></option>
+            </select><br>
+        </div>
+        <button type="button" onclick="addUserInput('pm')">Add PM</button><br><br>
+        <input type="hidden" id="projectcreatedtime" name="projectcreatedtime" />
+        <button type="submit">Submit</button>
+    </form>
 </body>
 </html>

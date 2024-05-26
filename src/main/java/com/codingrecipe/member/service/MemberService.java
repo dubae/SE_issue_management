@@ -42,4 +42,12 @@ public class MemberService {
         }
         return memberDTOs;
     }
+    public MemberDTO findByUserid(String userid) {
+        Optional<MemberEntity> memberEntities = memberRepository.findByUserid(userid);
+        if (memberEntities.isPresent()) {
+            return MemberDTO.toMemberDTO(memberEntities.get());
+        } else {
+            return null;
+        }
+    }
 }
