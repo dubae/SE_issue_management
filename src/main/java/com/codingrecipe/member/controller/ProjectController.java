@@ -39,9 +39,31 @@ public class ProjectController {
         if (session.getAttribute("userid") == null) {
             return "redirect:/login";
         }
+
+
+        List<ProjectDTO> projects;
+        if (session.getAttribute("userid").equals("admin")) {
+            projects = projectService.findAll();
+        }
+        else{
+            String userId = (String) session.getAttribute("userid");
+            Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();
+            projects = new ArrayList<>();
+            List<UserRoleDTO> userRoleDTO = userRoleService.findByUserId(userId);
+            for (UserRoleDTO userRole : userRoleDTO) {//현재 어떤 역할인지 알 수 없음
+                userRole.setRole(null);
+                roles.add(userRole);
+            }
+            for (UserRoleDTO userRole : new ArrayList<>(roles)){
+                projects.add(projectService.findByProjectId(userRole.getProjectid()));
+            }
+        }
+
+
+
+
+
         List<ProjectInfoDTO> projects_info = new ArrayList<>();
-        List<ProjectDTO> projects = new ArrayList<>();
-        projects = projectService.findAll();
         List<UserRoleDTO> projectUserDTO;
         List<MemberDTO> members;
         ProjectInfoDTO projectinfoDTO;

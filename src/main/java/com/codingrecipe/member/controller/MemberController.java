@@ -59,6 +59,9 @@ public class MemberController {
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
+                if (session.getAttribute("userid") != null) {
+                    session.invalidate();
+                }
                 session.setAttribute("userid", findMember.getUserid());
                 return "redirect:/projects";
             } else {
