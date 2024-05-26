@@ -2,7 +2,6 @@ package com.codingrecipe.member.controller;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -19,7 +18,6 @@ import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.dto.ProjectInfoDTO;
 import com.codingrecipe.member.dto.UserRoleDTO;
-import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.UserRoleService;
@@ -88,6 +86,7 @@ public class ProjectController {
         else {
             if (projectService.isExistProjectName(projectDTO.getProjectname())) {
                 model.addAttribute("errorMessage", "프로젝트 이름이 이미 존재합니다.");
+                return "addproject";
             }
             else{
                 projectService.register(projectDTO);
@@ -113,11 +112,10 @@ public class ProjectController {
                     userRoleDTO.setUserid(userid);
                     userRoleDTO.setRole("PM");
                     userRoleService.add_user_role(userRoleDTO);
-                return "redirect:/projects";
                 }
+                return "redirect:/projects";
             }
         }
-        return "addproject";
     }
 
     @GetMapping("/project/{projectname}")
@@ -163,6 +161,11 @@ public class ProjectController {
     public String add_user_get(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         if (session.getAttribute("userid") == null) {
             return "redirect:/login";
+        }
+        if (session.getAttribute("userid").equals("admin")) {
+            model.addAttribute("projects", projectService.findAll());
+            model.addAttribute("users", memberService.findAll());
+            return "adduser";
         }
         String userId = (String) session.getAttribute("userid");
         Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();

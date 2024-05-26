@@ -2,11 +2,7 @@ package com.codingrecipe.member.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-
 import javax.persistence.*;
-
 import com.codingrecipe.member.dto.ProjectDTO;
 
 @Entity

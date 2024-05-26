@@ -38,13 +38,19 @@ public class MemberController {
         
 
     @GetMapping("/login")
-    public String login_get() {
+    public String login_get(HttpSession session) {
+        if (session.getAttribute("userid") != null) {
+            return "redirect:/projects";
+        }
         System.out.println("로그인 페이지");
         return "login";
     }
 
     @PostMapping("/login")
     public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
+        if (session.getAttribute("userid") != null) {
+            return "redirect:/projects";
+        }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
