@@ -25,7 +25,7 @@ public class IssueCommentDTO {
         this.id=issueCommentEntity.getId();
         this.writerId=issueCommentEntity.getWriterId();
         this.content=issueCommentEntity.getContent();
-        this.issueId=issueCommentEntity.getIssueId();
+        this.issueId=issueCommentEntity.getIssueEntity().getId();
     }
 
     /**
@@ -36,7 +36,7 @@ public class IssueCommentDTO {
 
         issueCommentDTO.setId(issueCommentEntity.getId());
         issueCommentDTO.setWriterId(issueCommentEntity.getWriterId());
-        issueCommentDTO.setIssueId(issueCommentEntity.getIssueId());
+       issueCommentDTO.setIssueId(issueCommentEntity.getIssueEntity().getId());
         issueCommentDTO.setContent(issueCommentEntity.getContent());
 
         return issueCommentDTO;

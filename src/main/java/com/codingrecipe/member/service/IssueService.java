@@ -86,4 +86,13 @@ public class IssueService {
         return issueDTO;
     }
 
+    /**
+     * 이슈의 상태 변경하기. (new->assigned ->..)
+     */
+    public void changeStatus(Long id,String status){
+        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
+        issueEntity.get().setStatus(status);
+        issueRepository.save(issueEntity.get()); //pk(id)값이 겹치면 그냥 변경하게 됨. 삭제 후 추가 구현 안 해도 됨.
+    }
+
 }

@@ -5,12 +5,14 @@ import com.codingrecipe.member.service.IssueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Controller
+@Transactional
 public class IssueController {
 
     private final IssueService issueService;
@@ -66,7 +68,26 @@ public class IssueController {
     @GetMapping("/project/{projectId}/issue/{issueId}")
     @ResponseBody
     public IssueDTO issue_info(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueID, Model model) {
-        IssueDTO issueDTO = issueService.findById(issueID);
-        return issueDTO;
+        return issueService.findById(issueID);
+
     }
+
+    /**
+     * 이름으로 이슈 찾기. issueDto의 리스트로 반환되며, 댓글 역시 같이 반환됨. fetch속도 ?
+     */
+    @GetMapping("/project/{projectId}/issue/find")
+    @ResponseBody
+    public List<IssueDTO> findByTitle(@PathVariable("projectId") Long projectId, @RequestParam String title) {
+        return issueService.findByTitle(title);
+    }
+
+    /**
+     * 이슈의 상태 변경하기(new->assigned ...)
+     */
+    @ModelAttribute
+    @PostMapping("/project/{projectId}/issue/{issueId}/status")
+    public void changeStatus(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,@RequestParam String status, Model model) {
+        issueService.changeStatus(issueId,status);
+    }
+
 }

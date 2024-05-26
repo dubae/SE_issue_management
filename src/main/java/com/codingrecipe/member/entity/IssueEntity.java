@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Builder
+//@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Setter
@@ -72,6 +72,14 @@ public class IssueEntity extends BaseEntity{
         issueEntity.setDescription(issueDTO.getDescription());
 
         return issueEntity;
+    }
+
+    /**
+     *  여기서부터 고민이 필요.
+     */
+    public void addComment(IssueCommentEntity commentEntity){
+        comments.add(commentEntity);
+        commentEntity.setIssueEntity(this);
     }
 
 }
