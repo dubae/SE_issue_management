@@ -101,14 +101,14 @@ public class ProjectController {
         return "addproject";
     }
     @PostMapping("/addproject")
-    public String add_project_post(@ModelAttribute ProjectDTO projectDTO,@RequestParam List<String> pl,@RequestParam List<String> dev, @RequestParam List<String> tester,@RequestParam List<String> pm, HttpSession session, Model model) {
+    public String add_project_post(@ModelAttribute ProjectDTO projectDTO,@RequestParam List<String> pl,@RequestParam List<String> dev, @RequestParam List<String> tester,@RequestParam List<String> pm, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         if (session.getAttribute("userid") == null) {
             return "redirect:/login";
         }
         else {
             if (projectService.isExistProjectName(projectDTO.getProjectname())) {
-                model.addAttribute("errorMessage", "프로젝트 이름이 이미 존재합니다.");
-                return "addproject";
+                redirectAttributes.addFlashAttribute("Error", "프로젝트 이름이 이미 존재합니다.");
+                return "redirect:/addproject";
             }
             else{
                 projectService.register(projectDTO);

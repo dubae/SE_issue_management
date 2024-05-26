@@ -30,8 +30,20 @@
             });
         };
     </script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var Error = /*[[${Error}]]*/ '';
+            /*]]>*/
+        </script>
+        <script>
+            function showAlert() {
+                if (Error) {
+                    alert(Error);
+                }
+            }
+        </script>
 </head>
-<body>
+<body onload="showAlert()">
     <form id = "projectForm" action="/addproject" method="post">
         <label for="projectname">Project Name:</label>
         <input type="text" id="projectname" name="projectname" required><br><br>
