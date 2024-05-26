@@ -1,7 +1,9 @@
 package com.codingrecipe.member.controller;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
@@ -58,6 +61,8 @@ public class ProjectController {
             for (UserRoleDTO projectUser: projectUserDTO){
                 members.add(memberService.findByUserId(projectUser.getUserid()));
             }
+            Set<MemberDTO> memberSet = new HashSet<>(members);
+            members = new ArrayList<>(memberSet);
             projectinfoDTO.setMembers(members);
             projects_info.add(projectinfoDTO);
         }
@@ -155,25 +160,44 @@ public class ProjectController {
     }
 
     @GetMapping("/adduser")
-    public String add_user_get(Model model) {
-        model.addAttribute("projects", projectService.findAll());
+    public String add_user_get(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("userid") == null) {
+            return "redirect:/login";
+        }
+        String userId = (String) session.getAttribute("userid");
+        Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();
+        List<ProjectDTO> projects = new ArrayList<>();
+        List<UserRoleDTO> userRoleDTO = userRoleService.findByUserId(userId);
+        for (UserRoleDTO userRole : userRoleDTO) {//현재 어떤 역할인지 알 수 없음
+            userRole.setRole(null);
+            roles.add(userRole);
+        }
+        for (UserRoleDTO userRole : new ArrayList<>(roles)){
+            projects.add(projectService.findByProjectId(userRole.getProjectid()));
+        }
+        
+        if (projects.size() == 0) {
+            redirectAttributes.addFlashAttribute("Error", "참여중인 프로젝트가 없습니다.");
+            return "redirect:/projects";
+        }
+        model.addAttribute("projects", new ArrayList<>(projects));//projectService.findAll()
         model.addAttribute("users", memberService.findAll());
         return "adduser";
     }
 
     @PostMapping("/adduser")
-    public String add_user_post(@ModelAttribute UserRoleDTO userRoleDTO, Model model) {
-        System.out.println(userRoleDTO);
+    public String add_user_post(HttpSession session, @ModelAttribute UserRoleDTO userRoleDTO, Model model, RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("userid") == null) {
+            return "redirect:/login";
+        }
         
         // 사용자 ID와 역할로 이미 존재하는 UserRole을 찾습니다.
         UserRoleDTO existingUserRoleDTO = userRoleService.findByProjectidAndUseridAndRole(userRoleDTO.getProjectid(), userRoleDTO.getUserid(), userRoleDTO.getRole());
         
         // 이미 존재하는 경우, 예외를 발생시킵니다.
         if (existingUserRoleDTO != null) {
-            model.addAttribute("projects", projectService.findAll());
-            model.addAttribute("users", memberService.findAll());
-            model.addAttribute("Error", "이미 같은 역할을 가진 사용자가 존재합니다.");
-            return "adduser";
+            redirectAttributes.addFlashAttribute("Error", "이미 같은 역할을 가진 사용자가 존재합니다.");
+            return "redirect:/adduser";
         }
         else{
             userRoleService.add_user_role(userRoleDTO);

@@ -4,13 +4,13 @@
     <title>프로젝트에 사용자 추가</title>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var loginError = /*[[${Error}]]*/ '';
+        var Error = /*[[${Error}]]*/ '';
         /*]]>*/
     </script>
     <script>
         function showAlert() {
-            if (loginError) {
-                alert(loginError);
+            if (Error) {
+                alert(Error);
             }
         }
     </script>

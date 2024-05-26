@@ -28,6 +28,14 @@ public class ProjectService {
             return null;
         }
     }
+    public ProjectDTO findByProjectId(Long projectid) {
+        ProjectEntity projectEntity = projectRepository.findByProjectid(projectid).orElse(null);
+        if (projectEntity != null) {
+            return ProjectDTO.toProjectDTO(projectEntity);
+        } else {
+            return null;
+        }
+    }
     public boolean isExistProjectName(String projectname) {
         return projectRepository.findByProjectname(projectname).isPresent();
     }
