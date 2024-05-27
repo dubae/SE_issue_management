@@ -11,12 +11,12 @@ function LoginPage() {
 
   const handleLogin = (e) => {
     e.preventDefault();
- 
+
     const isAuthenticated = true; 
     if (isAuthenticated) {
       alert('로그인이 완료되었습니다.');
       localStorage.setItem('userId', userId);
-      navigate('/'); // 홈화면으로 이동
+      navigate('/'); 
     } else {
       alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
     }

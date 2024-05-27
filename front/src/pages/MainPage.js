@@ -3,20 +3,15 @@ import { Button, Table, Modal, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
-import UserInfoModal from './UserInfoModal'; // UserInfoModal 컴포넌트 임포트
+import UserInfoModal from '../components/UserInfoModal'; 
 
 function MainPage() {
-    // 로그인 상태를 관리
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
-
-    // 사용자 정보를 저장할 상태
     const [userInfo, setUserInfo] = useState({
         userId: localStorage.getItem('userId') || '',
         email: localStorage.getItem('email') || '',
         name: localStorage.getItem('name') || ''
     });
-
-    // 내 정보 모달 상태 관리
     const [showUserInfo, setShowUserInfo] = useState(false);
     const handleCloseUserInfo = () => setShowUserInfo(false);
     const handleShowUserInfo = () => setShowUserInfo(true);
@@ -40,7 +35,7 @@ function MainPage() {
 
     const [projects, setProjects] = useState([
         {
-            id: 1, // id 추가
+            id: 1, 
             name: '프로젝트 1',
             plAccount: 'PL1',
             testerAccount: 'Tester1',
@@ -50,7 +45,7 @@ function MainPage() {
             status: '진행중'
         },
         {
-            id: 2, // id 추가
+            id: 2, 
             name: '프로젝트 2',
             plAccount: 'PL2',
             testerAccount: 'Tester2',
@@ -92,9 +87,9 @@ function MainPage() {
             return;
         }
         const projectWithDate = {
-            id: projects.length + 1, // 임의의 id 생성
+            id: projects.length + 1, 
             ...newProject,
-            createdAt: new Date().toISOString().split('T')[0], // 현재 날짜를 설정
+            createdAt: new Date().toISOString().split('T')[0],
             status: '진행중'
         };
         setProjects([...projects, projectWithDate]);
@@ -127,7 +122,7 @@ function MainPage() {
             <header className="header">
                 <h1>프로젝트</h1>
                 <div className="auth-buttons">
-                    {loggedIn ? ( // 로그인 상태에 따라 다른 버튼 렌더링
+                    {loggedIn ? (
                         <>
                             <Button variant="primary" onClick={handleShowUserInfo}>내 정보 보기</Button>
                             <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
@@ -140,7 +135,7 @@ function MainPage() {
                     )}
                 </div>
             </header>
-            {loggedIn && ( // 로그인 상태에 따라 테이블 렌더링 여부 결정
+            {loggedIn && (
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -175,7 +170,7 @@ function MainPage() {
                     </tbody>
                 </Table>
             )}
-            {loggedIn && ( // 로그인 상태에 따라 생성 버튼 렌더링 여부 결정
+            {loggedIn && (
                 <div className="create-button">
                     <Button variant="success" onClick={handleShow}>프로젝트 생성</Button>
                 </div>

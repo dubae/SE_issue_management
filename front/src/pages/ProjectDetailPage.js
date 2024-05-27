@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import './ProjectDetailPage.css';
 import Modal from 'react-modal';
-import IssueForm from './IssueForm';
+import IssueForm from '../components/IssueForm';
 
 function ProjectDetailPage() {
     const navigate = useNavigate();

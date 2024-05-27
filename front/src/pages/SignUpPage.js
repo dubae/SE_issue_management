@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-function SignUpPage({ switchToLoginPage }) {
+function SignUpPage() {
   const [userAccount, setUserAccount] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
+  
+  const navigate = useNavigate(); // Get the navigate function
 
   const handleSignUp = (e) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ function SignUpPage({ switchToLoginPage }) {
     }
     // 여기서 회원가입 처리 로직을 추가.
     alert('회원가입이 완료되었습니다.');
+    navigate('/login'); // Navigate to the login page
   };
 
   return (
