@@ -9,6 +9,9 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+
 
 
 
@@ -25,16 +28,25 @@ public class MemberController {
 
     @ModelAttribute
     @PostMapping("/register")
-    public String register(@ModelAttribute MemberDTO memberDTO) {
+    public RedirectView register(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
         if (memberService.isExistId(memberDTO.getUserid()) || memberService.isExistEmail(memberDTO.getEmail())){
             System.out.println("회원가입 실패");
-            return "redirect:/login";
+            redirectAttributes.addFlashAttribute("Error", "이미 존재하는 아이디 또는 이메일입니다.");
+            return new RedirectView("register");
         } else {
             memberService.register(memberDTO);
             System.out.println("회원가입 성공");
-            return "redirect:/login";
+            redirectAttributes.addFlashAttribute("Error", "회원가입이 완료되었습니다.");
+            return new RedirectView("login");
         }
     }
+
+    @GetMapping("registerdone")
+    public String register_done() {
+        System.out.println("회원가입 완료 페이지");
+        return "registerdone";
+    }
+    
 
     @PostMapping("/check_userid")
     @ResponseBody
