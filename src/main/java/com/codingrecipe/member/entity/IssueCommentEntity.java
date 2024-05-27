@@ -1,8 +1,10 @@
 package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.dto.IssueCommentDTO;
+import com.codingrecipe.member.repository.IssueCommentRepository;
 import com.codingrecipe.member.repository.IssueRepository;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 
@@ -36,11 +38,16 @@ public class IssueCommentEntity extends BaseEntity{
     public static IssueCommentEntity toIssueCommentEntity(IssueCommentDTO issueCommentDTO) {
         IssueCommentEntity issueCommentEntity = new IssueCommentEntity();
 
+       // IssueRepository issueRepository;
+
+
         issueCommentEntity.setId(issueCommentDTO.getId());
         issueCommentEntity.setContent(issueCommentDTO.getContent());
         issueCommentEntity.setWriterId(issueCommentDTO.getWriterId());
+       // issueCommentEntity.setIssueEntity(issueRepository.findById(issueCommentDTO.getId()));
 
         return issueCommentEntity;
     }
+    
 
 }

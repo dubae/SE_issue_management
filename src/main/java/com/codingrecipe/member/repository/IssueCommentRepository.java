@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface IssueCommentRepository extends JpaRepository<IssueCommentEntity, Long> {
-     List<IssueCommentEntity> findAll(); //모두 불러오기
+    List<IssueCommentEntity> findAll(); //모두 불러오기
 //    Optional<IssueCommentEntity> save(); //댓글 저장하기
 //    void deleteById(Long id); //댓글 삭제하기
 }
