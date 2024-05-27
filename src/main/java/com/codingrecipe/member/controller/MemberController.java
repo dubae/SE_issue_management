@@ -35,8 +35,13 @@ public class MemberController {
             return "redirect:/login";
         }
     }
-        
 
+    @PostMapping("/check_userid")
+    @ResponseBody
+    public boolean checkUserId(@RequestBody MemberDTO memberDTO) {
+        return memberService.isExistId(memberDTO.getUserid());
+    }
+        
     @GetMapping("/login")
     public String login_get(HttpSession session) {
         if (session.getAttribute("userid") != null) {

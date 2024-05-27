@@ -18,21 +18,23 @@ public class MemberService {
         memberRepository.save(MemberEntity.toMemberEntity(registerDTO));
     }
     public MemberDTO findByUserId(String userid) {
-        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByUserid(userid);
-        if (optionalMemberEntity.isPresent()) {
-            return MemberDTO.toMemberDTO(optionalMemberEntity.get());
+        Optional<MemberEntity> memberEntity = memberRepository.findByUserid(userid);
+        System.out.println(memberEntity);
+        if (memberEntity.isPresent()) {
+            return MemberDTO.toMemberDTO(memberEntity.get());
         } else {
             return null;
         }
     }
     public boolean isExistEmail(String email) {
-        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByEmail(email);
-        return optionalMemberEntity.isPresent();
+        Optional<MemberEntity> MemberEntity = memberRepository.findByEmail(email);
+        return MemberEntity.isPresent();
     }
 
     public boolean isExistId(String userid) {
-        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByUserid(userid);
-        return optionalMemberEntity.isPresent();
+        Optional<MemberEntity> memberEntity = memberRepository.findByUserid(userid);
+        System.out.println(memberEntity);
+        return memberEntity.isPresent();
     }
     public List<MemberDTO> findAll() {
         List<MemberEntity> memberEntities = memberRepository.findAll();
@@ -41,13 +43,5 @@ public class MemberService {
             memberDTOs.add(MemberDTO.toMemberDTO(memberEntity));
         }
         return memberDTOs;
-    }
-    public MemberDTO findByUserid(String userid) {
-        Optional<MemberEntity> memberEntities = memberRepository.findByUserid(userid);
-        if (memberEntities.isPresent()) {
-            return MemberDTO.toMemberDTO(memberEntities.get());
-        } else {
-            return null;
-        }
     }
 }
