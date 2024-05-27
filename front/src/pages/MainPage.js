@@ -3,17 +3,32 @@ import { Button, Table, Modal, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
+import UserInfoModal from './UserInfoModal'; // UserInfoModal 컴포넌트 임포트
 
 function MainPage() {
     // 로그인 상태를 관리
-    const [loggedIn, setLoggedIn] = useState(
-        true  // 일단 true로 해둠, 로그인 구현하고 밑에 코드 쓰기
-        //    localStorage.getItem('userId') ? true : false
-    );
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
+
+    // 사용자 정보를 저장할 상태
+    const [userInfo, setUserInfo] = useState({
+        userId: localStorage.getItem('userId') || '',
+        email: localStorage.getItem('email') || '',
+        name: localStorage.getItem('name') || ''
+    });
+
+    // 내 정보 모달 상태 관리
+    const [showUserInfo, setShowUserInfo] = useState(false);
+    const handleCloseUserInfo = () => setShowUserInfo(false);
+    const handleShowUserInfo = () => setShowUserInfo(true);
 
     useEffect(() => {
         const handleStorageChange = () => {
             setLoggedIn(localStorage.getItem('userId') ? true : false);
+            setUserInfo({
+                userId: localStorage.getItem('userId') || '',
+                email: localStorage.getItem('email') || '',
+                name: localStorage.getItem('name') || ''
+            });
         };
 
         window.addEventListener('storage', handleStorageChange);
@@ -103,6 +118,8 @@ function MainPage() {
     const handleLogout = () => {
         setLoggedIn(false);
         localStorage.removeItem('userId');
+        localStorage.removeItem('email');
+        localStorage.removeItem('name');
     };
 
     return (
@@ -111,7 +128,10 @@ function MainPage() {
                 <h1>프로젝트</h1>
                 <div className="auth-buttons">
                     {loggedIn ? ( // 로그인 상태에 따라 다른 버튼 렌더링
-                        <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
+                        <>
+                            <Button variant="primary" onClick={handleShowUserInfo}>내 정보 보기</Button>
+                            <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
+                        </>
                     ) : (
                         <>
                             <Link to="/login"><Button variant="primary">로그인</Button></Link>
@@ -148,7 +168,7 @@ function MainPage() {
                                 <td>{project.createdAt}</td>
                                 <td>{project.status}</td>
                                 <td>
-                                    <Button variant="danger" onClick={() => handleShowConfirm(index)}>...</Button>
+                                    <Button variant="danger" onClick={() => handleShowConfirm(index)}>삭제</Button>
                                 </td>
                             </tr>
                         ))}
@@ -237,6 +257,12 @@ function MainPage() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <UserInfoModal
+                show={showUserInfo}
+                handleClose={handleCloseUserInfo}
+                userInfo={userInfo}
+            />
         </div>
     );
 }

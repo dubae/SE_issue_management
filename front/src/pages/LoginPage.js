@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 
 function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // 로그인 처리 로직을 추가.
-    alert('로그인이 완료되었습니다.');
-    localStorage.setItem('userId', userId);
+ 
+    const isAuthenticated = true; 
+    if (isAuthenticated) {
+      alert('로그인이 완료되었습니다.');
+      localStorage.setItem('userId', userId);
+      navigate('/'); // 홈화면으로 이동
+    } else {
+      alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
+    }
   };
 
   return (
