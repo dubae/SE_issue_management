@@ -5,6 +5,7 @@ import './ProjectDetailPage.css';
 import Modal from 'react-modal';
 import IssueForm from '../components/IssueForm';
 
+
 function ProjectDetailPage() {
     const navigate = useNavigate();
     const { projectId } = useParams();
@@ -58,6 +59,7 @@ function ProjectDetailPage() {
             <header className="header">
                 <h1><Link to="/">프로젝트</Link>/{project.name}</h1>
                 <div className="logout-button">
+                    
                     <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
                 </div>
             </header>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Form } from 'react-bootstrap';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Pagination from '../components/Pagination';
 import './IssueListPage.css';
@@ -12,8 +12,8 @@ function IssueListPage() {
 
   const [searchOption, setSearchOption] = useState('');
   const [searchText, setSearchText] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [priorityFixer, setPriorityFixer] = useState('');
+  const [statusFixer, setStatusFixer] = useState('');
 
   const handleSearchOptionChange = (e) => {
     setSearchOption(e.target.value);
@@ -23,26 +23,26 @@ function IssueListPage() {
     setSearchText(e.target.value);
   };
 
-  const handlePriorityFilterChange = (e) => {
-    setPriorityFilter(e.target.value);
+  const handlePriorityFixerChange = (e) => {
+    setPriorityFixer(e.target.value);
   };
 
-  const handleStatusFilterChange = (e) => {
-    setStatusFilter(e.target.value);
+  const handleStatusFixerChange = (e) => {
+    setStatusFixer(e.target.value);
   };
 
   const [issues, setIssues] = useState([
-    { id: 1, title: 'issue#1', status: ['new'], priority: 'major', reportedDate: '2022-01-01', filter: 'filter1', assignee: 'dev1' },
-    { id: 2, title: 'issue#2', status: ['assigned'], priority: 'critical', reportedDate: '2022-01-02', filter: 'filter2', assignee: 'tester1' },
-    { id: 3, title: 'issue#3', status: ['new'], priority: 'major', reportedDate: '2022-01-03', filter: 'filter1', assignee: 'dev1' },
-    { id: 4, title: 'issue#4', status: ['new'], priority: 'minor', reportedDate: '2022-01-04', filter: 'filter1', assignee: 'dev1' },
-    { id: 5, title: 'issue#5', status: ['assigned'], priority: 'blocker', reportedDate: '2022-01-05', filter: 'filter2', assignee: 'tester1' },
-    { id: 6, title: 'issue#6', status: ['resolved'], priority: 'critical', reportedDate: '2022-01-06', filter: 'filter2', assignee: 'tester1' },
-    { id: 7, title: 'issue#7', status: ['reopened'], priority: 'trivial', reportedDate: '2022-01-07', filter: 'filter3', assignee: 'pl1' },
-    { id: 8, title: 'issue#8', status: ['closed'], priority: 'major', reportedDate: '2022-01-08', filter: 'filter3', assignee: 'pl1' },
-    { id: 9, title: 'issue#9', status: ['new'], priority: 'minor', reportedDate: '2022-01-09', filter: 'filter3', assignee: 'pl1' },
-    { id: 10, title: 'issue#10', status: ['new'], priority: 'critical', reportedDate: '2022-01-10', filter: 'filter1', assignee: 'dev1' },
-    { id: 11, title: 'issue#11', status: ['assigned'], priority: 'major', reportedDate: '2022-01-11', filter: 'filter2', assignee: 'tester1' }
+    { id: 1, title: 'issue#1', status: ['new'], priority: 'major', reportedDate: '2022-01-01', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 2, title: 'issue#2', status: ['assigned'], priority: 'critical', reportedDate: '2022-01-02', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 3, title: 'issue#3', status: ['new'], priority: 'major', reportedDate: '2022-01-03', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 4, title: 'issue#4', status: ['new'], priority: 'minor', reportedDate: '2022-01-04', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 5, title: 'issue#5', status: ['assigned'], priority: 'blocker', reportedDate: '2022-01-05', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 6, title: 'issue#6', status: ['resolved'], priority: 'critical', reportedDate: '2022-01-06', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 7, title: 'issue#7', status: ['reopened'], priority: 'trivial', reportedDate: '2022-01-07', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 8, title: 'issue#8', status: ['closed'], priority: 'major', reportedDate: '2022-01-08', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 9, title: 'issue#9', status: ['new'], priority: 'minor', reportedDate: '2022-01-09', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 10, title: 'issue#10', status: ['new'], priority: 'critical', reportedDate: '2022-01-10', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 11, title: 'issue#11', status: ['assigned'], priority: 'major', reportedDate: '2022-01-11', fixer: 'fixer2', assignee: 'tester1' }
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +56,7 @@ function IssueListPage() {
   const indexOfFirstIssue = indexOfLastIssue - issuesPerPage;
   const currentIssues = issues.slice(indexOfFirstIssue, indexOfLastIssue);
 
-  const filteredIssues = issues.filter(issue => {
+  const fixedIssues = issues.filter(issue => {
     let matchesSearchText = true;
     let matchesPriority = true;
     let matchesStatus = true;
@@ -77,18 +77,18 @@ function IssueListPage() {
       }
     }
 
-    if (priorityFilter) {
-      matchesPriority = issue.priority.toLowerCase() === priorityFilter.toLowerCase();
+    if (priorityFixer) {
+      matchesPriority = issue.priority.toLowerCase() === priorityFixer.toLowerCase();
     }
 
-    if (statusFilter) {
-      matchesStatus = issue.status.includes(statusFilter.toLowerCase());
+    if (statusFixer) {
+      matchesStatus = issue.status.includes(statusFixer.toLowerCase());
     }
 
     return matchesSearchText && matchesPriority && matchesStatus;
   });
 
-  const displayedIssues = filteredIssues.slice(indexOfFirstIssue, indexOfLastIssue);
+  const displayedIssues = fixedIssues.slice(indexOfFirstIssue, indexOfLastIssue);
 
   return (
     <div className="issue-list-container">
@@ -108,9 +108,9 @@ function IssueListPage() {
             onChange={handleSearchTextChange}
           />
         </Form.Group>
-        <Form.Group controlId="priorityFilter">
-          <Form.Label>우선순위 필터:</Form.Label>
-          <Form.Control as="select" onChange={handlePriorityFilterChange}>
+        <Form.Group controlId="priorityFixer">
+          <Form.Label>Priority:</Form.Label>
+          <Form.Control as="select" onChange={handlePriorityFixerChange}>
             <option value="">전체</option>
             <option value="blocker">Blocker</option>
             <option value="critical">Critical</option>
@@ -119,9 +119,9 @@ function IssueListPage() {
             <option value="trivial">Trivial</option>
           </Form.Control>
         </Form.Group>
-        <Form.Group controlId="statusFilter">
-          <Form.Label>상태 필터:</Form.Label>
-          <Form.Control as="select" onChange={handleStatusFilterChange}>
+        <Form.Group controlId="statusFixer">
+          <Form.Label>Status:</Form.Label>
+          <Form.Control as="select" onChange={handleStatusFixerChange}>
             <option value="">전체</option>
             <option value="new">New</option>
             <option value="assigned">Assigned</option>
@@ -140,64 +140,23 @@ function IssueListPage() {
               <th>Status</th>
               <th>Priority</th>
               <th>Reported Date</th>
-              <th>Filter</th>
+              <th>Fixer</th>
               <th>Assignee</th>
             </tr>
           </thead>
           <tbody>
             {displayedIssues.map((issue, index) => (
               <tr key={issue.id}>
-                <td>{issue.title}</td>
                 <td>
-                  <Form.Control as="select" multiple value={issue.status} onChange={(e) => {
-                    const updatedIssues = [...issues];
-                    updatedIssues[index].status = [...e.target.selectedOptions].map(option => option.value);
-                    setIssues(updatedIssues);
-                  }}>
-                    <option value="new">New</option>
-                    <option value="assigned">Assigned</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
-                    <option value="reopened">Reopened</option>
-                  </Form.Control>
+                  <Link to={`/project/${projectId}/issues/${issue.id}?projectName=${projectName}`}>
+                    {issue.title}
+                  </Link>
                 </td>
-                <td>
-                  <Form.Control as="select" value={issue.priority} onChange={(e) => {
-                    const updatedIssues = [...issues];
-                    updatedIssues[index].priority = e.target.value;
-                    setIssues(updatedIssues);
-                  }}>
-                    <option value="blocker">Blocker</option>
-                    <option value="critical">Critical</option>
-                    <option value="major">Major</option>
-                    <option value="minor">Minor</option>
-                    <option value="trivial">Trivial</option>
-                  </Form.Control>
-                </td>
+                <td>{issue.status.join(', ')}</td>
+                <td>{issue.priority}</td>
                 <td>{issue.reportedDate}</td>
-                <td>
-                  <Form.Control as="select" value={issue.filter} onChange={(e) => {
-                    const updatedIssues = [...issues];
-                    updatedIssues[index].filter = e.target.value;
-                    setIssues(updatedIssues);
-                  }}>
-                    <option value="filter1">Filter1</option>
-                    <option value="filter2">Filter2</option>
-                    <option value="filter3">Filter3</option>
-                  </Form.Control>
-                </td>
-                <td>
-                  <Form.Control as="select" value={issue.assignee} onChange={(e) => {
-                    const updatedIssues = [...issues];
-                    updatedIssues[indexOfFirstIssue + index].assignee = e.target.value;
-                    setIssues(updatedIssues);
-                  }}>
-                    <option value="dev1">Dev1</option>
-                    <option value="dev2">Dev2</option>
-                    <option value="pl1">PL1</option>
-                    <option value="tester1">Tester1</option>
-                  </Form.Control>
-                </td>
+                <td>{issue.fixer}</td>
+                <td>{issue.assignee}</td>
               </tr>
             ))}
           </tbody>
@@ -205,7 +164,7 @@ function IssueListPage() {
       </div>
       <Pagination
         currentPage={currentPage}
-        totalItems={filteredIssues.length}
+        totalItems={fixedIssues.length}
         itemsPerPage={issuesPerPage}
         onPageChange={handlePageChange}
       />
