@@ -1,0 +1,21 @@
+.auth-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+  
+  .auth-title {
+    text-align: center;
+  }
+  
+  .auth-form {
+    margin-top: 20px;
+  }
+  
+  .auth-footer {
+    margin-top: 20px;
+    text-align: center;
+  }
