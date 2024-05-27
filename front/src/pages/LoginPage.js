@@ -20,19 +20,21 @@ function LoginPage() {
       <h1 className="auth-title">로그인</h1>
       <Form className="auth-form" onSubmit={handleLogin}>
         <Form.Group controlId="formUserId">
-          <Form.Label>ID</Form.Label>
+          <Form.Label>ID *</Form.Label>
           <Form.Control
             type="text"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
+            required
           />
         </Form.Group>
         <Form.Group controlId="formPassword">
-          <Form.Label>Password</Form.Label>
+          <Form.Label>Password *</Form.Label>
           <Form.Control
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required    
           />
         </Form.Group>
         <Button variant="primary" type="submit" style={{ float: 'right' }}>
