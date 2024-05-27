@@ -3,6 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../api/memberApi'; // api.js 파일을 import
 
 function SignUpPage() {
   const [userAccount, setUserAccount] = useState('');
@@ -10,18 +11,30 @@ function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
-  
+
   const navigate = useNavigate(); // Get the navigate function
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert('Password와 Password 확인이 일치하지 않습니다.');
       return;
     }
-    // 여기서 회원가입 처리 로직을 추가.
-    alert('회원가입이 완료되었습니다.');
-    navigate('/login'); // Navigate to the login page
+
+    const memberData = {
+      userid: userAccount,
+      password: password,
+      name: userName,
+      email: email
+    };
+
+    try {
+      await register(memberData);
+      alert('회원가입이 완료되었습니다.');
+      navigate('/login'); // Navigate to the login page
+    } catch (error) {
+      alert(error);
+    }
   };
 
   return (
