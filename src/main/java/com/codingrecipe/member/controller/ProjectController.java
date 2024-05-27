@@ -58,11 +58,7 @@ public class ProjectController {
                 projects.add(projectService.findByProjectId(userRole.getProjectid()));
             }
         }
-
-
-
-
-
+        
         List<ProjectInfoDTO> projects_info = new ArrayList<>();
         List<UserRoleDTO> projectUserDTO;
         List<MemberDTO> members;
@@ -156,7 +152,7 @@ public class ProjectController {
         List<MemberDTO> TESTER = new ArrayList<>();
 
         for (UserRoleDTO userRole : userRoleDTO) {
-            MemberDTO memberDTO = memberService.findByUserid(userRole.getUserid());
+            MemberDTO memberDTO = memberService.findByUserId(userRole.getUserid());
             switch (userRole.getRole()) {
                 case "PL":
                     PL.add(memberDTO);
