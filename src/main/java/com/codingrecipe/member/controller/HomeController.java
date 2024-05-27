@@ -9,9 +9,5 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
     
 }

@@ -66,4 +66,17 @@ public class UserRoleService {
         }
     }
 
+    public List<UserRoleDTO> findByRole(String role) {
+        List<UserRoleEntity> userRoleEntities = userRoleRepository.findByRole(role).orElse(null);
+        if (userRoleEntities != null) {
+            List<UserRoleDTO> userRoleDTOs = new ArrayList<>();
+            for (UserRoleEntity userRoleEntity : userRoleEntities) {
+                userRoleDTOs.add(UserRoleDTO.toUserRoleDTO(userRoleEntity));
+            }
+            return userRoleDTOs;
+        } else {
+            return null;
+        }
+    }
+
 }

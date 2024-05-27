@@ -6,73 +6,59 @@ import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
-
-
-
 
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @GetMapping("/register")
-    public String register_get() {
-        System.out.println("회원가입 페이지");
-        return "register";
-    }
-
-    @ModelAttribute
-    @PostMapping("/register")
-    public RedirectView register(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
+    @PostMapping("/api/register")
+    public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO) {
         if (memberService.isExistId(memberDTO.getUserid()) || memberService.isExistEmail(memberDTO.getEmail())){
             System.out.println("회원가입 실패");
-            redirectAttributes.addFlashAttribute("Error", "이미 존재하는 아이디 또는 이메일입니다.");
-            return new RedirectView("register");
+            return ResponseEntity.badRequest().body("이미 존재하는 아이디 또는 이메일입니다.");
         } else {
             memberService.register(memberDTO);
             System.out.println("회원가입 성공");
-            redirectAttributes.addFlashAttribute("Error", "회원가입이 완료되었습니다.");
-            return new RedirectView("login");
+            return ResponseEntity.ok("회원가입이 완료되었습니다.");
         }
-    }
-
-    @GetMapping("registerdone")
-    public String register_done() {
-        System.out.println("회원가입 완료 페이지");
-        return "registerdone";
     }
     
 
-    @PostMapping("/check_userid")
+    @PostMapping("/api/check_userid")
     @ResponseBody
-    public boolean checkUserId(@RequestBody MemberDTO memberDTO) {
-        return memberService.isExistId(memberDTO.getUserid());
-    }
-        
-    @GetMapping("/login")
-    public String login_get(HttpSession session) {
-        if (session.getAttribute("userid") != null) {
-            return "redirect:/projects";
+    public ResponseEntity<String> checkUserId(@RequestBody MemberDTO memberDTO) {
+        boolean isExist = memberService.isExistId(memberDTO.getUserid());
+        if (isExist) {
+            return ResponseEntity.badRequest().body("이미 존재하는 아이디입니다.");
         }
-        System.out.println("로그인 페이지");
-        return "login";
+        return ResponseEntity.ok("사용 가능한 아이디입니다.");
+    }
+    
+        
+    @PostMapping("/api/login_status")
+    public ResponseEntity<String> login_get(HttpSession session) {
+        if (session.getAttribute("userid") != null) {
+            return ResponseEntity.ok("이미 로그인 되어있습니다..");
+        }
+        return ResponseEntity.badRequest().body("로그인 해야합니다..");
     }
 
-    @PostMapping("/login")
-    public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
+    @PostMapping("/api/login")
+    public ResponseEntity<String> login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
         if (session.getAttribute("userid") != null) {
-            return "redirect:/projects";
+            return ResponseEntity.badRequest().body("이미 로그인 되어있습니다.");
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid());
+        System.out.println(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
-            model.addAttribute("Error", "아이디가 존재하지 않습니다.");
-            return "login";
+            return ResponseEntity.badRequest().body("아이디가 존재하지 않습니다.");
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
@@ -80,47 +66,31 @@ public class MemberController {
                     session.invalidate();
                 }
                 session.setAttribute("userid", findMember.getUserid());
-                return "redirect:/projects";
+                return ResponseEntity.ok("로그인 성공");
             } else {
                 System.out.println("로그인 실패");
-                model.addAttribute("Error", "비밀번호가 일치하지 않습니다.");
-                return "login";
+                return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
             }
         }
     }
 
-    @GetMapping("/member/{userid}")
-    public String member_detail(@PathVariable String userid, Model model, HttpSession session){
+    @GetMapping("/api/member/{userid}")
+    public ResponseEntity<MemberDTO> getMember(@PathVariable String userid, HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        System.out.println(session.getAttribute("userid"));
-        MemberDTO memberDTO = memberService.findByUserId(userid);
-        model.addAttribute("member", memberDTO);
-        System.out.println(memberDTO.getUserid());
-        if (session.getAttribute("userid").equals(memberDTO.getUserid())) {
-            System.out.println("내 정보");
-            return "redirect:/myinfo";
-        }
-        else {
-            return "memberdetail";
-        }
+        MemberDTO member = memberService.findByUserId(userid);
+        member.setPassword(null);
+        member.setNum(null);
+        return ResponseEntity.ok(member);
     }
 
-    @GetMapping("/myinfo")
-    public String myinfo(HttpSession session, Model model) {
+    @GetMapping("/api/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.badRequest().body("로그인 되어있지 않습니다.");
         }
-        MemberDTO memberDTO = memberService.findByUserId((String)session.getAttribute("userid"));
-        model.addAttribute("member", memberDTO);
-        return "myinfo";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
         session.invalidate();
-    
-        return "redirect:/login";
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 }

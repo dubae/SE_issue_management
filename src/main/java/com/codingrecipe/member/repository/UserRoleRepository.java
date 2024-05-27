@@ -12,6 +12,7 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long>{
     Optional<List<UserRoleEntity>> findByProjectid(Long projectid);
     Optional<List<UserRoleEntity>> findByUserid(String userid);
     Optional<UserRoleEntity> findByProjectidAndUseridAndRole(Long projectid, String userid, String role);
+    Optional<List<UserRoleEntity>> findByRole(String role);
     List<UserRoleEntity> findAll();
     //void deleteByProjectidAndUserid(Long projectid, Long userid);
     //void deleteByProjectid(Long projectid);

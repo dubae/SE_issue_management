@@ -1,6 +1,8 @@
 package com.codingrecipe.member.dto;
 
 import com.codingrecipe.member.entity.MemberEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 import lombok.*;
 
@@ -10,10 +12,12 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class MemberDTO {
+    @JsonIgnore
     public Long num;
     public String userid;
     public String username;
     public String email;
+    @JsonIgnore
     public String password;
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {

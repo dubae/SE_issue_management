@@ -5,17 +5,23 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
+import java.util.stream.Collectors;
+import org.hibernate.mapping.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.codingrecipe.member.dto.AddProjectDTO;
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.dto.ProjectDetailDTO;
 import com.codingrecipe.member.dto.ProjectInfoDTO;
 import com.codingrecipe.member.dto.UserRoleDTO;
 import com.codingrecipe.member.service.MemberService;
@@ -34,13 +40,11 @@ public class ProjectController {
     private final UserRoleService userRoleService;
 
 
-    @GetMapping("/projects")
-    public String project_get(HttpSession session, Model model){
+    @GetMapping("/api/projects")
+    public ResponseEntity<List<ProjectInfoDTO>> project_get(HttpSession session){
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-
         List<ProjectDTO> projects;
         if (session.getAttribute("userid").equals("admin")) {
             projects = projectService.findAll();
@@ -82,76 +86,74 @@ public class ProjectController {
             projectinfoDTO.setMembers(members);
             projects_info.add(projectinfoDTO);
         }
-        System.out.println(projects_info);
-        model.addAttribute("userid", session.getAttribute("userid"));
-        model.addAttribute("projects", projects_info);
-        return "projects";
+        return ResponseEntity.ok(projects_info);
     }
-    @GetMapping("/addproject")
-    public String add_project_get(HttpSession session, Model model){
+    @GetMapping("/api/addproject")
+    public ResponseEntity<List<MemberDTO>> addProjectGet(HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        model.addAttribute("userid", session.getAttribute("userid"));
-        model.addAttribute("users", memberService.findAll());
-        return "addproject";
+        return ResponseEntity.ok(memberService.findAll());
     }
-    @PostMapping("/addproject")
-    public String add_project_post(@ModelAttribute ProjectDTO projectDTO,@RequestParam List<String> pl,@RequestParam List<String> dev, @RequestParam List<String> tester,@RequestParam List<String> pm, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+
+
+    @PostMapping("/api/addproject")
+    public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        else {
-            if (projectService.isExistProjectName(projectDTO.getProjectname())) {
-                redirectAttributes.addFlashAttribute("Error", "프로젝트 이름이 이미 존재합니다.");
-                return "redirect:/addproject";
+        ProjectDTO projectDTO = addProjectDTO.getProjectDTO();
+        if (projectService.isExistProjectName(projectDTO.getProjectname())) {
+            return ResponseEntity.badRequest().body("이미 존재하는 프로젝트 이름입니다.");
+        } else {
+            projectService.register(projectDTO);
+            Long projectid = projectService.findByProjectName(projectDTO.getProjectname()).getProjectid();
+            UserRoleDTO userRoleDTO = new UserRoleDTO();
+            userRoleDTO.setProjectid(projectid);
+
+            for (String userid : addProjectDTO.getPl()) {
+                userRoleDTO.setUserid(userid);
+                userRoleDTO.setRole("PL");
+                userRoleService.add_user_role(userRoleDTO);
             }
-            else{
-                projectService.register(projectDTO);
-                Long projectid = projectService.findByProjectName(projectDTO.getProjectname()).getProjectid();
-                UserRoleDTO userRoleDTO = new UserRoleDTO();
-                userRoleDTO.setProjectid(projectid);
-                for (String userid : pl) {
-                    userRoleDTO.setUserid(userid);
-                    userRoleDTO.setRole("PL");
-                    userRoleService.add_user_role(userRoleDTO);
-                }
-                for (String userid : dev) {
-                    userRoleDTO.setUserid(userid);
-                    userRoleDTO.setRole("DEV");
-                    userRoleService.add_user_role(userRoleDTO);
-                }
-                for (String userid : tester) {
-                    userRoleDTO.setUserid(userid);
-                    userRoleDTO.setRole("TESTER");
-                    userRoleService.add_user_role(userRoleDTO);
-                }
-                for (String userid : pm) {
-                    userRoleDTO.setUserid(userid);
-                    userRoleDTO.setRole("PM");
-                    userRoleService.add_user_role(userRoleDTO);
-                }
-                return "redirect:/projects";
+            for (String userid : addProjectDTO.getDev()) {
+                userRoleDTO.setUserid(userid);
+                userRoleDTO.setRole("DEV");
+                userRoleService.add_user_role(userRoleDTO);
             }
+            for (String userid : addProjectDTO.getTester()) {
+                userRoleDTO.setUserid(userid);
+                userRoleDTO.setRole("TESTER");
+                userRoleService.add_user_role(userRoleDTO);
+            }
+            for (String userid : addProjectDTO.getPm()) {
+                userRoleDTO.setUserid(userid);
+                userRoleDTO.setRole("PM");
+                userRoleService.add_user_role(userRoleDTO);
+            }
+
+            return ResponseEntity.ok("프로젝트 등록 성공");
         }
     }
 
-    @GetMapping("/project/{projectname}")
-    public String project_get (@PathVariable String projectname, Model model, HttpSession session){
+    @GetMapping("/api/project/{projectname}")
+    public ResponseEntity<ProjectDetailDTO> project_get(@PathVariable String projectname, HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        model.addAttribute("userid", session.getAttribute("userid"));
-        model.addAttribute("project", projectService.findByProjectName(projectname));
-        List<UserRoleDTO> userRoleDTO = new ArrayList<>();
+
         ProjectDTO projectDTO = projectService.findByProjectName(projectname);
-        userRoleDTO = userRoleService.findByProjectId(projectDTO.getProjectid());
+        if (projectDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(projectDTO.getProjectid());
         List<MemberDTO> PL = new ArrayList<>();
         List<MemberDTO> DEV = new ArrayList<>();
         List<MemberDTO> PM = new ArrayList<>();
         List<MemberDTO> TESTER = new ArrayList<>();
 
-        for (UserRoleDTO userRole : userRoleDTO) {
+        for (UserRoleDTO userRole : userRoleDTOList) {
             MemberDTO memberDTO = memberService.findByUserId(userRole.getUserid());
             switch (userRole.getRole()) {
                 case "PL":
@@ -168,63 +170,51 @@ public class ProjectController {
                     break;
             }
         }
-        model.addAttribute("PL", PL);
-        model.addAttribute("DEV", DEV);
-        model.addAttribute("PM", PM);
-        model.addAttribute("TESTER", TESTER);
-        return "projectdetail";
+
+        ProjectDetailDTO projectDetailDTO = new ProjectDetailDTO(projectDTO, PL, DEV, PM, TESTER);
+        return ResponseEntity.ok(projectDetailDTO);
     }
 
-    @GetMapping("/adduser")
-    public String add_user_get(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/api/project/{projectname}/{role}/list_user")
+    public ResponseEntity<List<MemberDTO>> role_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
+        System.out.println(role);
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (session.getAttribute("userid").equals("admin")) {
-            model.addAttribute("projects", projectService.findAll());
-            model.addAttribute("users", memberService.findAll());
-            return "adduser";
+        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("PM") && !role.equals("TESTER")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String userId = (String) session.getAttribute("userid");
-        Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();
-        List<ProjectDTO> projects = new ArrayList<>();
-        List<UserRoleDTO> userRoleDTO = userRoleService.findByUserId(userId);
-        for (UserRoleDTO userRole : userRoleDTO) {//현재 어떤 역할인지 알 수 없음
-            userRole.setRole(null);
-            roles.add(userRole);
+        List<MemberDTO> memberDTOs = memberService.findAll();
+        Set<MemberDTO> memberDTOSet = new HashSet<>(memberDTOs);
+        List<UserRoleDTO> userRoleDTOs = userRoleService.findByRole(role);
+        List<MemberDTO> roleMembers = new ArrayList<>();
+        for (UserRoleDTO userRoleDTO : userRoleDTOs) {
+            roleMembers.add(memberService.findByUserId(userRoleDTO.getUserid()));
         }
-        for (UserRoleDTO userRole : new ArrayList<>(roles)){
-            projects.add(projectService.findByProjectId(userRole.getProjectid()));
-        }
-        
-        if (projects.size() == 0) {
-            redirectAttributes.addFlashAttribute("Error", "참여중인 프로젝트가 없습니다.");
-            return "redirect:/projects";
-        }
-        model.addAttribute("projects", new ArrayList<>(projects));//projectService.findAll()
-        model.addAttribute("users", memberService.findAll());
-        return "adduser";
+        Set<MemberDTO> roleMemberSet = new HashSet<>(roleMembers);
+        memberDTOSet.removeAll(roleMemberSet);
+        return ResponseEntity.ok(new ArrayList<>(memberDTOSet));
     }
 
-    @PostMapping("/adduser")
-    public String add_user_post(HttpSession session, @ModelAttribute UserRoleDTO userRoleDTO, Model model, RedirectAttributes redirectAttributes) {
+    @PostMapping("/api/project/{projectname}/adduser")
+    public ResponseEntity<String> add_user_post(HttpSession session, @RequestBody List<UserRoleDTO> userRoleDTO, @PathVariable String projectname) {
         if (session.getAttribute("userid") == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
         // 사용자 ID와 역할로 이미 존재하는 UserRole을 찾습니다.
-        UserRoleDTO existingUserRoleDTO = userRoleService.findByProjectidAndUseridAndRole(userRoleDTO.getProjectid(), userRoleDTO.getUserid(), userRoleDTO.getRole());
-        
-        // 이미 존재하는 경우, 예외를 발생시킵니다.
-        if (existingUserRoleDTO != null) {
-            redirectAttributes.addFlashAttribute("Error", "이미 같은 역할을 가진 사용자가 존재합니다.");
-            return "redirect:/adduser";
+        Long projectid = projectService.findByProjectName(projectname).getProjectid();
+        for (UserRoleDTO userRole : userRoleDTO) {
+            userRole.setProjectid(projectid);
+            UserRoleDTO existingUserRoleDTO = userRoleService.findByProjectidAndUseridAndRole(userRole.getProjectid(), userRole.getUserid(), userRole.getRole());
+            // 이미 존재하는 경우, 예외를 발생시킵니다.
+            if (existingUserRoleDTO != null) {
+                return ResponseEntity.badRequest().body(userRole.getUserid()+"는 이미 "+userRole.getRole()+"입니다.");
+            }
         }
-        else{
-            userRoleService.add_user_role(userRoleDTO);
-            return "redirect:/projects";
+        for (UserRoleDTO userRole : userRoleDTO) {
+            userRoleService.add_user_role(userRole);
         }
-        
-        
+        return ResponseEntity.ok("사용자 추가 성공");
     }
 }
