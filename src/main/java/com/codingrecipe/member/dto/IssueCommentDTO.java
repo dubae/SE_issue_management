@@ -11,7 +11,7 @@ import javax.persistence.Column;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class IssueCommentDTO {
+public class IssueCommentDTO extends  BaseDTO{
     private Long id;
     private Long writerId;
     private String content;
@@ -26,6 +26,8 @@ public class IssueCommentDTO {
         this.writerId=issueCommentEntity.getWriterId();
         this.content=issueCommentEntity.getContent();
         this.issueId=issueCommentEntity.getIssueEntity().getId();
+        this.createdAt=issueCommentEntity.getCreatedAt();
+        this.updatedAt=issueCommentEntity.getUpdatedAt();
     }
 
     /**

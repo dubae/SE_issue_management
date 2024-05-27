@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class IssueDTO {
+public class IssueDTO extends BaseDTO{
     private Long id;
     private Long writerId;
     private Long projectId;
@@ -42,6 +42,8 @@ public class IssueDTO {
         this.priority= issueEntity.getPriority();
         this.significance= issueEntity.getSignificance();
         this.description=issueEntity.getDescription();
+        this.createdAt=issueEntity.getCreatedAt();
+        this.updatedAt=issueEntity.getUpdatedAt();
         for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
             issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
         }

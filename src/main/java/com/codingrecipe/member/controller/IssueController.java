@@ -83,6 +83,7 @@ public class IssueController {
 
     /**
      * 이슈의 상태 변경하기(new->assigned ...)
+     * * 유저의 자격 확인해야 하는지는 나중에 논의.
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/{issueId}/status")
@@ -92,6 +93,7 @@ public class IssueController {
 
     /**
      * 이슈의 개발자 지정(변경)하기. 개발자 id를 req.param으로 넣기.
+     * * 유저의 자격 확인(PL)해야 하는지는 나중에 논의.
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/{issueId}/devId")
