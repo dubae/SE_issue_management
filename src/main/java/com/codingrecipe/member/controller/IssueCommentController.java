@@ -39,7 +39,7 @@ public class IssueCommentController {
     }
 
     /**
-     * 댓글 id로 하나의 댓글 조회.
+     * 댓글 id(commentId)로 하나의 댓글 조회.
      */
     @GetMapping("/project/{projectId}/issue/{issueId}/comment/{commentId}")
     @ResponseBody
@@ -48,7 +48,7 @@ public class IssueCommentController {
     }
 
     /**
-     * 한 이슈에 대한 댓글 리스트 조회
+     * 한 이슈(issueId)에 대한 댓글 리스트 조회
      */
     @GetMapping("/project/{projectId}/issue/{issueId}/comment")
     @ResponseBody

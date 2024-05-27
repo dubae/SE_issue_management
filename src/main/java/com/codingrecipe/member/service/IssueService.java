@@ -95,4 +95,13 @@ public class IssueService {
         issueRepository.save(issueEntity.get()); //pk(id)값이 겹치면 그냥 변경하게 됨. 삭제 후 추가 구현 안 해도 됨.
     }
 
+    /**
+     * 한 이슈의 개발자(devId) 변경하기.
+     */
+    public void changeDevId(Long id,Long devId){
+        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
+        issueEntity.get().setDevId(devId);
+        issueRepository.save(issueEntity.get());
+    }
+
 }

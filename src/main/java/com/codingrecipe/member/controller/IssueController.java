@@ -90,4 +90,13 @@ public class IssueController {
         issueService.changeStatus(issueId,status);
     }
 
+    /**
+     * 이슈의 개발자 지정(변경)하기. 개발자 id를 req.param으로 넣기.
+     */
+    @ModelAttribute
+    @PostMapping("/project/{projectId}/issue/{issueId}/devId")
+    public void changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,@RequestParam Long devId, Model model){
+        issueService.changeDevId(issueId,devId);
+    }
+
 }
