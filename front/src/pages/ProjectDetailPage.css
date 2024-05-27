@@ -1,0 +1,74 @@
+.header a {
+    color: black;
+  }
+  
+  .navigation-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .navigation-buttons button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .issue-section {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .issue-timeline,
+  .issue-statistics {
+    margin-top: 20px;
+  }
+  
+  .issue-timeline {
+    margin-top: 20px;
+    float: left;
+    width: 60%;
+    background-color: #dfebf7;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .issue-timeline h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+  }
+  
+  .issue-timeline ul {
+    list-style: none;
+  }
+  
+  .issue-timeline ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .issue-timeline ul li:last-child {
+    border-bottom: none;
+  }
+  
+  .issue-statistics {
+    float: right;
+    width: 35%;
+    background-color: #dfebf7;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .issue-section::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
