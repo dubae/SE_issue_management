@@ -16,6 +16,7 @@ public class ProjectDTO {
     public String projectcreatedtime;
     public String projectstatus;
 
+
     public static ProjectDTO toProjectDTO(ProjectEntity projectEntity) {
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectid(projectEntity.getProjectid());
