@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class MemberDTO {
+public class MemberDTO extends MemberDTOSecure{
     public String userid;
     public String username;
     public String email;

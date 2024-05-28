@@ -1,6 +1,7 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.MemberDTOSecure;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
@@ -74,12 +75,16 @@ public class MemberController {
     }
 
     @GetMapping("/api/member/{userid}")
-    public ResponseEntity<MemberDTO> getMember(@PathVariable String userid, HttpSession session) {
+    public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpSession session) {
         if (session.getAttribute("userid") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO member = memberService.findByUserId(userid);
-        return ResponseEntity.ok(member);
+        if (member == null) {
+            return ResponseEntity.notFound().build();
+        }
+        MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
+        return ResponseEntity.ok(memberDTOSecure);
     }
 
     @GetMapping("/api/logout")

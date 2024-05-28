@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.codingrecipe.member.dto.AddProjectDTO;
 import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.MemberDTOSecure;
 import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.dto.ProjectDetailDTO;
 import com.codingrecipe.member.dto.ProjectInfoDTO;
@@ -63,7 +64,7 @@ public class ProjectController {
         
         List<ProjectInfoDTO> projects_info = new ArrayList<>();
         List<UserRoleDTO> projectUserDTO;
-        List<MemberDTO> members;
+        List<MemberDTOSecure> members_secure;
         ProjectInfoDTO projectinfoDTO;
         
         for (ProjectDTO project : projects) {
@@ -75,13 +76,13 @@ public class ProjectController {
             projectUserDTO = new ArrayList<>();
             projectUserDTO = userRoleService.findByProjectId(project.getProjectid());
             System.out.println(projectUserDTO);
-            members = new ArrayList<>();
+            members_secure = new ArrayList<>();
             for (UserRoleDTO projectUser: projectUserDTO){
-                members.add(memberService.findByUserId(projectUser.getUserid()));
+                members_secure.add(MemberDTOSecure.toMemberDTOSecure(memberService.findByUserId(projectUser.getUserid())));
             }
-            Set<MemberDTO> memberSet = new HashSet<>(members);
-            members = new ArrayList<>(memberSet);
-            projectinfoDTO.setMembers(members);
+            Set<MemberDTOSecure> members_secureSet = new HashSet<>(members_secure);
+            members_secure = new ArrayList<>(members_secureSet);
+            projectinfoDTO.setMembers(members_secure);
             projects_info.add(projectinfoDTO);
         }
         return ResponseEntity.ok(projects_info);
