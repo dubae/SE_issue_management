@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
-import UserInfoModal from '../components/UserInfoModal'; 
+import UserInfoModal from '../components/UserInfoModal';
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
+    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin') === 'true');
     const [userInfo, setUserInfo] = useState({
         userId: localStorage.getItem('userId') || '',
         email: localStorage.getItem('email') || '',
@@ -19,6 +20,7 @@ function MainPage() {
     useEffect(() => {
         const handleStorageChange = () => {
             setLoggedIn(localStorage.getItem('userId') ? true : false);
+            setIsAdmin(localStorage.getItem('isAdmin') === 'true');
             setUserInfo({
                 userId: localStorage.getItem('userId') || '',
                 email: localStorage.getItem('email') || '',
@@ -35,7 +37,7 @@ function MainPage() {
 
     const [projects, setProjects] = useState([
         {
-            id: 1, 
+            id: 1,
             name: '프로젝트 1',
             plAccount: 'PL1',
             testerAccount: 'Tester1',
@@ -45,7 +47,7 @@ function MainPage() {
             status: '진행중'
         },
         {
-            id: 2, 
+            id: 2,
             name: '프로젝트 2',
             plAccount: 'PL2',
             testerAccount: 'Tester2',
@@ -59,6 +61,7 @@ function MainPage() {
     const [show, setShow] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [editingProject, setEditingProject] = useState(null);
     const [newProject, setNewProject] = useState({
         name: '',
         plAccount: '',
@@ -68,7 +71,17 @@ function MainPage() {
     });
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleShow = () => {
+        setEditingProject(null);
+        setNewProject({
+            name: '',
+            plAccount: '',
+            testerAccount: '',
+            devAccount: '',
+            description: ''
+        });
+        setShow(true);
+    };
     const handleCloseConfirm = () => setShowConfirm(false);
     const handleShowConfirm = (index) => {
         setSelectedIndex(index);
@@ -86,13 +99,22 @@ function MainPage() {
             alert("필수 입력란을 모두 채워주세요.");
             return;
         }
-        const projectWithDate = {
-            id: projects.length + 1, 
-            ...newProject,
-            createdAt: new Date().toISOString().split('T')[0],
-            status: '진행중'
-        };
-        setProjects([...projects, projectWithDate]);
+
+        if (editingProject) {
+            const updatedProjects = projects.map((project) =>
+                project.id === editingProject.id ? { ...editingProject, ...newProject } : project
+            );
+            setProjects(updatedProjects);
+        } else {
+            const projectWithDate = {
+                id: projects.length + 1,
+                ...newProject,
+                createdAt: new Date().toISOString().split('T')[0],
+                status: '진행중'
+            };
+            setProjects([...projects, projectWithDate]);
+        }
+
         setNewProject({
             name: '',
             plAccount: '',
@@ -115,6 +137,13 @@ function MainPage() {
         localStorage.removeItem('userId');
         localStorage.removeItem('email');
         localStorage.removeItem('name');
+        localStorage.removeItem('isAdmin');
+    };
+
+    const handleEdit = (index) => {
+        setEditingProject(projects[index]);
+        setNewProject(projects[index]);
+        setShow(true);
     };
 
     return (
@@ -143,6 +172,7 @@ function MainPage() {
                             <th>개요</th>
                             <th>프로젝트 생성날짜</th>
                             <th>상태</th>
+                            {isAdmin && <th>수정</th>}
                             <th>삭제</th>
                         </tr>
                     </thead>
@@ -162,6 +192,11 @@ function MainPage() {
                                 <td>{project.description}</td>
                                 <td>{project.createdAt}</td>
                                 <td>{project.status}</td>
+                                {isAdmin && (
+                                    <td>
+                                        <Button variant="warning" onClick={() => handleEdit(index)}>수정</Button>
+                                    </td>
+                                )}
                                 <td>
                                     <Button variant="danger" onClick={() => handleShowConfirm(index)}>삭제</Button>
                                 </td>
@@ -178,7 +213,7 @@ function MainPage() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>새 프로젝트 추가</Modal.Title>
+                    <Modal.Title>{editingProject ? '프로젝트 수정' : '새 프로젝트 추가'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>
@@ -237,7 +272,6 @@ function MainPage() {
                     </Form>
                 </Modal.Body>
             </Modal>
-
             <Modal show={showConfirm} onHide={handleCloseConfirm}>
                 <Modal.Header closeButton>
                     <Modal.Title>프로젝트 삭제</Modal.Title>

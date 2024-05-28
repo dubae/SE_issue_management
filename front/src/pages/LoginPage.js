@@ -11,12 +11,23 @@ function LoginPage() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+ 
+    //관리자 로그인 임의 설정
+    const adminUserId = 'admin'; 
+    const adminPassword = '0000'; 
 
-    const isAuthenticated = true; 
+    const isAdmin = userId === adminUserId && password === adminPassword; 
+    const isAuthenticated = userId !== '' && password !== '';
+
     if (isAuthenticated) {
-      alert('로그인이 완료되었습니다.');
+      if (isAdmin) {
+        alert('관리자 권한 허용되었습니다.');
+      } else {
+        alert('로그인이 완료되었습니다.');
+      }
       localStorage.setItem('userId', userId);
-      navigate('/'); 
+      localStorage.setItem('isAdmin', isAdmin);
+      navigate('/');
     } else {
       alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
     }
