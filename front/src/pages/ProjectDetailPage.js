@@ -4,6 +4,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import './ProjectDetailPage.css';
 import Modal from 'react-modal';
 import IssueForm from '../components/IssueForm';
+import UserInfoModal from '../components/UserInfoModal';
 
 function ProjectDetailPage() {
     const navigate = useNavigate();
@@ -22,6 +23,8 @@ function ProjectDetailPage() {
 
     const handleLogout = () => {
         localStorage.removeItem('userId');
+        localStorage.removeItem('email');
+        localStorage.removeItem('name');
         navigate('/');
     };
 
@@ -53,11 +56,22 @@ function ProjectDetailPage() {
         fetchProject();
     }, [projectId]);
 
+    const [showUserInfo, setShowUserInfo] = useState(false);
+    const handleCloseUserInfo = () => setShowUserInfo(false);
+    const handleShowUserInfo = () => setShowUserInfo(true);
+
+    const userInfo = {
+        userId: localStorage.getItem('userId') || '',
+        email: localStorage.getItem('email') || '',
+        name: localStorage.getItem('name') || ''
+    };
+
     return (
         <div className="project-detail-container">
             <header className="header">
                 <h1><Link to="/">프로젝트</Link>/{project.name}</h1>
-                <div className="logout-button">
+                <div className="auth-buttons">
+                    <Button variant="primary" onClick={handleShowUserInfo}>내 정보 보기</Button>
                     <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
                 </div>
             </header>
@@ -84,6 +98,12 @@ function ProjectDetailPage() {
                 <p>이슈 생성 횟수: {project.issueCount}</p>
                 <p>이슈 업데이트 횟수: {project.issueUpdateCount}</p>
             </div>
+
+            <UserInfoModal
+                show={showUserInfo}
+                handleClose={handleCloseUserInfo}
+                userInfo={userInfo}
+            />
         </div>
     );
 }
