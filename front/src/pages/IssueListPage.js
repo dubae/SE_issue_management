@@ -32,17 +32,17 @@ function IssueListPage() {
   };
 
   const [issues, setIssues] = useState([
-    { id: 1, title: 'issue#1', status: ['new'], priority: 'major', reportedDate: '2022-01-01', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 2, title: 'issue#2', status: ['assigned'], priority: 'critical', reportedDate: '2022-01-02', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 3, title: 'issue#3', status: ['new'], priority: 'major', reportedDate: '2022-01-03', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 4, title: 'issue#4', status: ['new'], priority: 'minor', reportedDate: '2022-01-04', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 5, title: 'issue#5', status: ['assigned'], priority: 'blocker', reportedDate: '2022-01-05', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 6, title: 'issue#6', status: ['resolved'], priority: 'critical', reportedDate: '2022-01-06', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 7, title: 'issue#7', status: ['reopened'], priority: 'trivial', reportedDate: '2022-01-07', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 8, title: 'issue#8', status: ['closed'], priority: 'major', reportedDate: '2022-01-08', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 9, title: 'issue#9', status: ['new'], priority: 'minor', reportedDate: '2022-01-09', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 10, title: 'issue#10', status: ['new'], priority: 'critical', reportedDate: '2022-01-10', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 11, title: 'issue#11', status: ['assigned'], priority: 'major', reportedDate: '2022-01-11', fixer: 'fixer2', assignee: 'tester1' }
+    { id: 1, component: 'component#1', title: 'issue#1', status: ['new'], priority: 'major', reportedDate: '2022-01-01', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 2, component: 'component#2', title: 'issue#2', status: ['assigned'], priority: 'critical', reportedDate: '2022-01-02', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 3, component: 'component#1', title: 'issue#3', status: ['new'], priority: 'major', reportedDate: '2022-01-03', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 4, component: 'component#1', title: 'issue#4', status: ['new'], priority: 'minor', reportedDate: '2022-01-04', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 5, component: 'component#2', title: 'issue#5', status: ['assigned'], priority: 'blocker', reportedDate: '2022-01-05', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 6, component: 'component#2', title: 'issue#6', status: ['resolved'], priority: 'critical', reportedDate: '2022-01-06', fixer: 'fixer2', assignee: 'tester1' },
+    { id: 7, component: 'component#3', title: 'issue#7', status: ['reopened'], priority: 'trivial', reportedDate: '2022-01-07', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 8, component: 'component#3', title: 'issue#8', status: ['closed'], priority: 'major', reportedDate: '2022-01-08', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 9, component: 'component#3', title: 'issue#9', status: ['new'], priority: 'minor', reportedDate: '2022-01-09', fixer: 'fixer3', assignee: 'pl1' },
+    { id: 10, component: 'component#1', title: 'issue#10', status: ['new'], priority: 'critical', reportedDate: '2022-01-10', fixer: 'fixer1', assignee: 'dev1' },
+    { id: 11, component: 'component#2', title: 'issue#11', status: ['assigned'], priority: 'major', reportedDate: '2022-01-11', fixer: 'fixer2', assignee: 'tester1' }
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -136,6 +136,7 @@ function IssueListPage() {
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>Component</th>
               <th>Title</th>
               <th>Status</th>
               <th>Priority</th>
@@ -145,8 +146,9 @@ function IssueListPage() {
             </tr>
           </thead>
           <tbody>
-            {displayedIssues.map((issue, index) => (
+            {displayedIssues.map((issue) => (
               <tr key={issue.id}>
+                <td>{issue.component}</td>
                 <td>
                   <Link to={`/project/${projectId}/issues/${issue.id}?projectName=${projectName}`}>
                     {issue.title}

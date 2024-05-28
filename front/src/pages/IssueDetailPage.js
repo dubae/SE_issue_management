@@ -6,7 +6,6 @@ import CommentSection from '../components/CommentSection';
 import Dropdown from '../components/Dropdown';
 import './IssueDetailPage.css';
 
-
 function IssueDetailPage() {
     const navigate = useNavigate();
     const { projectId, issueId } = useParams();
@@ -18,9 +17,10 @@ function IssueDetailPage() {
         description: '로그인, 로그아웃 기능 구현하기',
         reporter: 'Reporter1',
         reportedDate: '2023-05-20 17:40:11',
-        assignee: ['PL1'],
+        assignee: 'PL1',
         priority: 'Major',
         status: 'New',
+        component: 'UI', // 예시로 'UI' 컴포넌트 추가
         comments: [
             { author: 'Tester1', content: '이슈 생성했습니다.', date: '2023-05-20 17:40:00' },
             { author: 'PL1', content: '확인/assignee 지정했습니다.', date: '2023-05-22 15:10:00' }
@@ -71,6 +71,7 @@ function IssueDetailPage() {
                     <CommentSection comments={issue.comments} />
                 </div>
                 <div className="right-panel">
+                    <p>Component: {issue.component}</p> {/* Component 출력 추가 */}
                     <Dropdown
                         label="Assignee"
                         options={[
@@ -81,7 +82,6 @@ function IssueDetailPage() {
                         ]}
                         value={issue.assignee}
                         onChange={handleAssigneeChange}
-                        multiple
                     />
                     <Dropdown
                         label="Priority"

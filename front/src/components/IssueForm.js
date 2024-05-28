@@ -3,9 +3,10 @@ import { Form, Button } from 'react-bootstrap';
 
 const IssueForm = ({ onIssueAdded }) => {
     const [formData, setFormData] = useState({
+        component: '',
         title: '',
         description: '',
-        priority: 'major'
+        priority: 'major',
     });
 
     const handleChange = (e) => {
@@ -41,6 +42,18 @@ const IssueForm = ({ onIssueAdded }) => {
         <div className="issue-form">
             <h2>Issue 생성</h2>
             <Form onSubmit={handleSubmit}>
+
+            <Form.Group controlId="formIssueComponent">
+                    <Form.Label>Component *</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="component"
+                        value={formData.component}
+                        onChange={handleChange}
+                        required
+                    />
+                </Form.Group>
+
                 <Form.Group controlId="formIssueTitle">
                     <Form.Label>Title *</Form.Label>
                     <Form.Control
@@ -77,6 +90,7 @@ const IssueForm = ({ onIssueAdded }) => {
                         <option value="trivial">Trivial</option>
                     </Form.Control>
                 </Form.Group>
+                
                 <Button variant="primary" type="submit">
                     생성
                 </Button>

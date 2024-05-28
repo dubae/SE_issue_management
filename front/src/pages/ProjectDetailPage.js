@@ -5,7 +5,6 @@ import './ProjectDetailPage.css';
 import Modal from 'react-modal';
 import IssueForm from '../components/IssueForm';
 
-
 function ProjectDetailPage() {
     const navigate = useNavigate();
     const { projectId } = useParams();
@@ -13,9 +12,9 @@ function ProjectDetailPage() {
     const [project, setProject] = useState({
         name: '프로젝트 1',
         issues: [
-            { id: 1, author: 'dev1', title: 'issue#1', action: 'comment update', date: '2022-01-01', time: '12:00' },
-            { id: 2, author: 'pl1', title: 'issue#1', action: 'comment update', date: '2022-01-01', time: '12:00' },
-            { id: 3, author: 'tester1', title: 'issue#2', action: 'update', date: '2022-01-02', time: '13:00' }
+            { id: 1, author: 'dev1', title: 'issue#1', component: 'UI', action: 'comment update', date: '2022-01-01', time: '12:00' },
+            { id: 2, author: 'pl1', title: 'issue#1', component: 'Backend', action: 'comment update', date: '2022-01-01', time: '12:00' },
+            { id: 3, author: 'tester1', title: 'issue#2', component: 'Frontend', action: 'update', date: '2022-01-02', time: '13:00' }
         ],
         issueCount: 2,
         issueUpdateCount: 3
@@ -59,7 +58,6 @@ function ProjectDetailPage() {
             <header className="header">
                 <h1><Link to="/">프로젝트</Link>/{project.name}</h1>
                 <div className="logout-button">
-                    
                     <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
                 </div>
             </header>
@@ -76,7 +74,7 @@ function ProjectDetailPage() {
                 <ul>
                     {project.issues.map((issue, index) => (
                         <li key={index}>
-                            {issue.author}이 <Link to={`/project/${projectId}/issues/${issue.id}?projectName=${project.name}`}>{issue.title}</Link> {issue.action} | {issue.date} | {issue.time}
+                            [{issue.author}]이 <Link to={`/project/${projectId}/issues/${issue.id}?projectName=${project.name}`}>{issue.title}</Link>[{issue.component}] {issue.action} | {issue.date} | {issue.time}
                         </li>
                     ))}
                 </ul>
