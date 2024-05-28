@@ -17,7 +17,6 @@ public class MemberDTO {
     public String userid;
     public String username;
     public String email;
-    @JsonIgnore
     public String password;
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {
