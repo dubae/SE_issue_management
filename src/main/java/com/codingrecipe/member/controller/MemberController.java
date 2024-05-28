@@ -50,7 +50,7 @@ public class MemberController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<String> login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
+    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session, Model model) {
         if (session.getAttribute("userid") != null) {
             return ResponseEntity.badRequest().body("이미 로그인 되어있습니다.");
         }
