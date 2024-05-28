@@ -26,6 +26,15 @@ public class MemberService {
             return null;
         }
     }
+    public MemberDTO findByUserId(String userid, boolean isLogin) {
+        Optional<MemberEntity> memberEntity = memberRepository.findByUserid(userid);
+        System.out.println(memberEntity);
+        if (memberEntity.isPresent()) {
+            return MemberDTO.toMemberDTO(memberEntity.get(), isLogin);
+        } else {
+            return null;
+        }
+    }
     public boolean isExistEmail(String email) {
         Optional<MemberEntity> MemberEntity = memberRepository.findByEmail(email);
         return MemberEntity.isPresent();

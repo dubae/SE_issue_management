@@ -14,6 +14,7 @@ public class ProjectDTO {
     public String projectname;
     public String projectdescription;
     public String projectcreatedtime;
+    public String projectstatus;
 
     public static ProjectDTO toProjectDTO(ProjectEntity projectEntity) {
         ProjectDTO projectDTO = new ProjectDTO();
@@ -21,6 +22,7 @@ public class ProjectDTO {
         projectDTO.setProjectname(projectEntity.getProjectname());
         projectDTO.setProjectdescription(projectEntity.getProjectdescription());
         projectDTO.setProjectcreatedtime(projectEntity.getProjectcreatedtime());
+        projectDTO.setProjectstatus(projectEntity.getProjectstatus());
         return projectDTO;
     }
 }

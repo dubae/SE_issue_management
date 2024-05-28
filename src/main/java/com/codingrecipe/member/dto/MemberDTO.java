@@ -19,13 +19,24 @@ public class MemberDTO {
     public String email;
     public String password;
 
+    public static MemberDTO toMemberDTO(MemberEntity memberEntity, boolean login) {
+        MemberDTO memberDTO = new MemberDTO();
+        memberDTO.setNum(memberEntity.getNum());
+        memberDTO.setUserid(memberEntity.getUserid());
+        memberDTO.setUsername(memberEntity.getUsername());
+        memberDTO.setEmail(memberEntity.getEmail());
+        if (login){
+            memberDTO.setPassword(memberEntity.getPassword());
+        }
+        return memberDTO;
+    }
+
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {
         MemberDTO memberDTO = new MemberDTO();
         memberDTO.setNum(memberEntity.getNum());
         memberDTO.setUserid(memberEntity.getUserid());
         memberDTO.setUsername(memberEntity.getUsername());
         memberDTO.setEmail(memberEntity.getEmail());
-        memberDTO.setPassword(memberEntity.getPassword());
         return memberDTO;
     }
     @Override
@@ -33,15 +44,13 @@ public class MemberDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MemberDTO that = (MemberDTO) o;
-        return Objects.equals(num, that.num) &&
-               Objects.equals(userid, that.userid) &&
+        return Objects.equals(userid, that.userid) &&
                Objects.equals(username, that.username) &&
-               Objects.equals(email, that.email) &&
-               Objects.equals(password, that.password);
+               Objects.equals(email, that.email);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(num, userid, username, email, password);
+        return Objects.hash(userid, username, email);
     }
 }

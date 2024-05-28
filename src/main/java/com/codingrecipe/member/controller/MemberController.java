@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -50,11 +49,11 @@ public class MemberController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session, Model model) {
+    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session) {
         if (session.getAttribute("userid") != null) {
             return ResponseEntity.badRequest().body("이미 로그인 되어있습니다.");
         }
-        MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid());
+        MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
         System.out.println(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
@@ -80,8 +79,6 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO member = memberService.findByUserId(userid);
-        member.setPassword(null);
-        member.setNum(null);
         return ResponseEntity.ok(member);
     }
 

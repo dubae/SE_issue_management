@@ -5,18 +5,13 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
-import java.util.stream.Collectors;
-import org.hibernate.mapping.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.codingrecipe.member.dto.AddProjectDTO;
 import com.codingrecipe.member.dto.MemberDTO;
@@ -95,7 +90,6 @@ public class ProjectController {
         }
         return ResponseEntity.ok(memberService.findAll());
     }
-
 
     @PostMapping("/api/addproject")
     public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpSession session) {
@@ -185,11 +179,16 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<MemberDTO> memberDTOs = memberService.findAll();
+        for (MemberDTO memberDTO : memberDTOs) {
+            memberDTO.setPassword(null);
+        }
         Set<MemberDTO> memberDTOSet = new HashSet<>(memberDTOs);
         List<UserRoleDTO> userRoleDTOs = userRoleService.findByRole(role);
         List<MemberDTO> roleMembers = new ArrayList<>();
         for (UserRoleDTO userRoleDTO : userRoleDTOs) {
-            roleMembers.add(memberService.findByUserId(userRoleDTO.getUserid()));
+            MemberDTO memberDTO = memberService.findByUserId(userRoleDTO.getUserid());
+            memberDTO.setPassword(null);
+            roleMembers.add(memberDTO);
         }
         Set<MemberDTO> roleMemberSet = new HashSet<>(roleMembers);
         memberDTOSet.removeAll(roleMemberSet);
