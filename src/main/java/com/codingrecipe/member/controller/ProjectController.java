@@ -129,6 +129,23 @@ public class ProjectController {
             return ResponseEntity.ok("프로젝트 등록 성공");
         }
     }
+    //프로젝트 상태 변경 API (스트링만 받음) -> 변경 가능 상태 : Not Started, In Progress, Completed, Paused, Cancelled
+    @PostMapping("/api/project/{projectname}/update_status")
+    public ResponseEntity<String> update_status_post(HttpSession session, @PathVariable String projectname, @RequestBody String status) {
+        if (session.getAttribute("userid") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!status.equals("Not Started") && !status.equals("In Progress") && !status.equals("Completed") && !status.equals("Paused") && !status.equals("Cancelled")) {
+            return ResponseEntity.badRequest().body("올바르지 않은 프로젝트 상태입니다.");
+        }
+        ProjectDTO existingProjectDTO = projectService.findByProjectName(projectname);
+        if (existingProjectDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        String past_status = existingProjectDTO.getProjectstatus();
+        projectService.update_status(existingProjectDTO, status);
+        return ResponseEntity.ok("프로젝트 상태 변경 성공 "+past_status+" -> "+status);
+    }
 
     @GetMapping("/api/project/{projectname}")
     public ResponseEntity<ProjectDetailDTO> project_get(@PathVariable String projectname, HttpSession session) {

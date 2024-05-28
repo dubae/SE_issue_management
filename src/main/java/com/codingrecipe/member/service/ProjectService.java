@@ -18,8 +18,18 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     public void register(ProjectDTO projectDTO) {
         System.out.println("프로젝트 추가");
+        projectDTO.setProjectstatus("Not Started");
         projectRepository.save(ProjectEntity.toProjectEntity(projectDTO));
     }
+
+    public void update_status(ProjectDTO projectDTO, String status) {
+        ProjectEntity projectEntity = projectRepository.findByProjectid(projectDTO.getProjectid()).orElse(null);
+        if (projectEntity != null) {
+            projectEntity.setProjectstatus(status);
+            projectRepository.save(projectEntity);
+        }
+    }
+    
     public ProjectDTO findByProjectName(String project_name) {
         ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);
         if (projectEntity != null) {

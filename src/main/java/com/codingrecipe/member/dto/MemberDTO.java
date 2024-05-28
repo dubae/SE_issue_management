@@ -12,8 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class MemberDTO {
-    @JsonIgnore
-    public Long num;
     public String userid;
     public String username;
     public String email;
@@ -21,7 +19,6 @@ public class MemberDTO {
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity, boolean login) {
         MemberDTO memberDTO = new MemberDTO();
-        memberDTO.setNum(memberEntity.getNum());
         memberDTO.setUserid(memberEntity.getUserid());
         memberDTO.setUsername(memberEntity.getUsername());
         memberDTO.setEmail(memberEntity.getEmail());
@@ -33,7 +30,6 @@ public class MemberDTO {
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {
         MemberDTO memberDTO = new MemberDTO();
-        memberDTO.setNum(memberEntity.getNum());
         memberDTO.setUserid(memberEntity.getUserid());
         memberDTO.setUsername(memberEntity.getUsername());
         memberDTO.setEmail(memberEntity.getEmail());
