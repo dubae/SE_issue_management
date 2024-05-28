@@ -1,5 +1,6 @@
 package com.codingrecipe.member.dto;
 
+
 import com.codingrecipe.member.entity.ProjectEntity;
 import lombok.*;
 
@@ -13,6 +14,7 @@ public class ProjectDTO {
     public String projectname;
     public String projectdescription;
     public String projectcreatedtime;
+    public String projectstatus;
 
 
     public static ProjectDTO toProjectDTO(ProjectEntity projectEntity) {
@@ -21,6 +23,7 @@ public class ProjectDTO {
         projectDTO.setProjectname(projectEntity.getProjectname());
         projectDTO.setProjectdescription(projectEntity.getProjectdescription());
         projectDTO.setProjectcreatedtime(projectEntity.getProjectcreatedtime());
+        projectDTO.setProjectstatus(projectEntity.getProjectstatus());
         return projectDTO;
     }
 }

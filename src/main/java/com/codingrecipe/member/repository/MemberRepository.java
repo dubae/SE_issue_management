@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
+public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     Optional<MemberEntity> findByUserid(String userid);
     Optional<MemberEntity> findByEmail(String email);
     List<MemberEntity> findAll();

@@ -12,8 +12,6 @@ import javax.persistence.*;
 @Table(name = "member")
 public class MemberEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long num;
     @Column(name = "userid", unique = true)
     private String userid;
     @Column(name = "username")

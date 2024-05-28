@@ -3,12 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
+    <style>
+        label, input, button {
+            display: block;
+            margin: 5px 0;
+        }
+        #check-userid-msg {
+            color: red;
+            font-size: 12px;
+        }
+        </style>
+    <script>
+        function checkUserId() {
+        var userid = document.getElementById('userid').value;
+        var memberDTO = {
+            userid: userid
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/check_userid', true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                var msgElement = document.getElementById('check-userid-msg');
+                if (response) {
+                    msgElement.textContent = '사용자 ID가 이미 존재합니다.';
+                } else {
+                    msgElement.textContent = '사용자 ID를 사용할 수 있습니다.';
+                }
+            }
+        };
+        xhr.send(JSON.stringify(memberDTO));
+    }
+    </script>
 </head>
 <body>
     <h2>회원가입</h2>
     <form action="/register" method="post">
         <label for="userid">사용자 ID:</label>
-        <input type="text" id="userid" name="userid" placeholder="사용자 ID" required /><br>
+        <input type="text" id="userid" name="userid" placeholder="사용자 ID" required />
+        <button type="button" onclick="checkUserId()">중복확인</button>
+        <span id="check-userid-msg"></span><br>
 
         <label for="username">사용자 이름:</label>
         <input type="text" id="username" name="username" placeholder="사용자 이름" required /><br>
@@ -20,6 +55,6 @@
         <input type="password" id="password" name="password" placeholder="비밀번호" required /><br>
         <button type="submit">가입</button><br>
     </form>
-    <a href="/login"><button>로그인</button></a>
+    <a href="/login"><button type="button">로그인</button></a>
 </body>
 </html>
