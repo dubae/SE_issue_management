@@ -19,6 +19,9 @@ import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.dto.ProjectDetailDTO;
 import com.codingrecipe.member.dto.ProjectInfoDTO;
 import com.codingrecipe.member.dto.UserRoleDTO;
+import com.codingrecipe.member.entity.MemberEntity;
+import com.codingrecipe.member.entity.ProjectEntity;
+import com.codingrecipe.member.entity.UserRoleEntity;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.UserRoleService;
@@ -108,22 +111,26 @@ public class ProjectController {
             for (String userid : addProjectDTO.getPl()) {
                 userRoleDTO.setUserid(userid);
                 userRoleDTO.setRole("PL");
-                userRoleService.add_user_role(userRoleDTO);
+                MemberDTO memberDTO = memberService.findByUserId(userid, true);
+                userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
             }
             for (String userid : addProjectDTO.getDev()) {
                 userRoleDTO.setUserid(userid);
                 userRoleDTO.setRole("DEV");
-                userRoleService.add_user_role(userRoleDTO);
+                MemberDTO memberDTO = memberService.findByUserId(userid);
+                userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
             }
             for (String userid : addProjectDTO.getTester()) {
                 userRoleDTO.setUserid(userid);
                 userRoleDTO.setRole("TESTER");
-                userRoleService.add_user_role(userRoleDTO);
+                MemberDTO memberDTO = memberService.findByUserId(userid);
+                userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
             }
             for (String userid : addProjectDTO.getPm()) {
                 userRoleDTO.setUserid(userid);
                 userRoleDTO.setRole("PM");
-                userRoleService.add_user_role(userRoleDTO);
+                MemberDTO memberDTO = memberService.findByUserId(userid);
+                userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
             }
 
             return ResponseEntity.ok("프로젝트 등록 성공");
@@ -222,14 +229,18 @@ public class ProjectController {
         Long projectid = projectService.findByProjectName(projectname).getProjectid();
         for (UserRoleDTO userRole : userRoleDTO) {
             userRole.setProjectid(projectid);
-            UserRoleDTO existingUserRoleDTO = userRoleService.findByProjectidAndUseridAndRole(userRole.getProjectid(), userRole.getUserid(), userRole.getRole());
-            // 이미 존재하는 경우, 예외를 발생시킵니다.
-            if (existingUserRoleDTO != null) {
+            
+            if (memberService.findByUserId(userRole.getUserid()) == null) {
+                return ResponseEntity.badRequest().body(userRole.getUserid()+"는 존재하지 않는 사용자입니다.");
+            }
+            MemberEntity memberEntity = MemberEntity.toMemberEntity(memberService.findByUserId(userRole.getUserid()));
+            UserRoleEntity existingUserRoleEntity = userRoleService.findByProjectAndMemberAndRole(ProjectEntity.toProjectEntity(projectService.findByProjectName(projectname)), memberEntity, userRole.getRole());
+            if (existingUserRoleEntity != null) {
                 return ResponseEntity.badRequest().body(userRole.getUserid()+"는 이미 "+userRole.getRole()+"입니다.");
             }
         }
         for (UserRoleDTO userRole : userRoleDTO) {
-            userRoleService.add_user_role(userRole);
+            userRoleService.add_user_role(userRole, memberService.findByUserId(userRole.getUserid()), projectid);
         }
         return ResponseEntity.ok("사용자 추가 성공");
     }

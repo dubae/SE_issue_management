@@ -1,6 +1,7 @@
 package com.codingrecipe.member.dto;
-import lombok.*;
+
 import com.codingrecipe.member.entity.UserRoleEntity;
+import lombok.*;
 import java.util.Objects;
 
 @Getter
@@ -9,14 +10,15 @@ import java.util.Objects;
 @AllArgsConstructor
 @ToString
 public class UserRoleDTO {
+    private Long id;
     private Long projectid;
     private String userid;
     private String role;
 
     public static UserRoleDTO toUserRoleDTO(UserRoleEntity userRoleEntity) {
         UserRoleDTO userRoleDTO = new UserRoleDTO();
-        userRoleDTO.setProjectid(userRoleEntity.getProjectid());
-        userRoleDTO.setUserid(userRoleEntity.getUserid());
+        userRoleDTO.setProjectid(userRoleEntity.getProject().getProjectid());
+        userRoleDTO.setUserid(userRoleEntity.getMember().getUserid());
         userRoleDTO.setRole(userRoleEntity.getRole());
         return userRoleDTO;
     }

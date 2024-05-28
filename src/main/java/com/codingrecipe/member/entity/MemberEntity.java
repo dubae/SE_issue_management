@@ -12,13 +12,13 @@ import javax.persistence.*;
 @Table(name = "member")
 public class MemberEntity {
     @Id
-    @Column(name = "userid", unique = true)
+    @Column(name = "userid", unique = true, nullable = false)
     private String userid;
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
-    @Column(name = "email", unique = true)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {

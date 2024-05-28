@@ -12,21 +12,23 @@ import com.codingrecipe.member.dto.ProjectDTO;
 public class ProjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "projectid")
     private Long projectid;
-    @Column(name = "projectname", unique = true)
+    @Column(name = "projectname", unique = true, nullable = false)
     private String projectname;
 
     @Column(name = "description")
     private String projectdescription;
 
-    @Column(name = "createdtime")
+    @Column(name = "createdtime", nullable = false)
     private String projectcreatedtime;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private String projectstatus;
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
+        projectEntity.setProjectid(projectDTO.getProjectid());
         projectEntity.setProjectname(projectDTO.getProjectname());
         projectEntity.setProjectdescription(projectDTO.getProjectdescription());
         projectEntity.setProjectcreatedtime(projectDTO.getProjectcreatedtime());

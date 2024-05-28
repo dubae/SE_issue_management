@@ -38,6 +38,15 @@ public class ProjectService {
             return null;
         }
     }
+
+    public ProjectEntity findByProjectNameEntity(String project_name) {
+        ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);
+        if (projectEntity != null) {
+            return projectEntity;
+        } else {
+            return null;
+        }
+    }
     public ProjectDTO findByProjectId(Long projectid) {
         ProjectEntity projectEntity = projectRepository.findByProjectid(projectid).orElse(null);
         if (projectEntity != null) {
