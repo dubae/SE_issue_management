@@ -104,4 +104,33 @@ public class IssueService {
         issueRepository.save(issueEntity.get());
     }
 
+    /**
+     * status(상태)로 이슈 검색하기
+     */
+    public List<IssueDTO> findByStatus(String status){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getStatus().equals(status)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+
+            }
+        }
+        return issueDTOList;
+    }
+
+    /**
+     * 글쓴이 id(writerId)로 이슈 검색하기
+     */
+    public List<IssueDTO> findByWriterId(Long writerId){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getWriterId().equals(writerId)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+            }
+        }
+        return issueDTOList;
+    }
+
 }

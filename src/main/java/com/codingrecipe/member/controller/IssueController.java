@@ -2,6 +2,7 @@ package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -75,7 +76,7 @@ public class IssueController {
     /**
      * 이름으로 이슈 찾기. issueDto의 리스트로 반환되며, 댓글 역시 같이 반환됨. fetch속도 ?
      */
-    @GetMapping("/project/{projectId}/issue/find")
+    @GetMapping("/project/{projectId}/issue/findByTitle")
     @ResponseBody
     public List<IssueDTO> findByTitle(@PathVariable("projectId") Long projectId, @RequestParam String title) {
         return issueService.findByTitle(title);
@@ -99,6 +100,26 @@ public class IssueController {
     @PostMapping("/project/{projectId}/issue/{issueId}/devId")
     public void changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,@RequestParam Long devId, Model model){
         issueService.changeDevId(issueId,devId);
+    }
+
+    /**
+     * 이슈를 상태로 검색하기(status)
+     * @RequestParam 으로 status 넘겨주세요.
+     */
+    @GetMapping("/project/{projectId}/issue/findByStatus")
+    @ResponseBody
+    public List<IssueDTO> findByStatus(@PathVariable("projectId") Long projectId, @RequestParam String status) {
+        return issueService.findByStatus(status);
+    }
+
+    /**
+     * 글쓴이 id(writerId)로 이슈 검색하기
+     * @RequestParam으로 writerId 넘겨주세요.
+     */
+    @GetMapping("/project/{projectId}/issue/findByWriterId")
+    @ResponseBody
+    public List<IssueDTO> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam Long writerId) {
+        return issueService.findByWriterId(writerId);
     }
 
 }
