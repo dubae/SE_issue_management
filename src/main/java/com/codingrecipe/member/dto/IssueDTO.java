@@ -19,12 +19,14 @@ public class IssueDTO extends BaseDTO{
     private Long writerId;
     private Long projectId;
     private Long devId;
+    private Long fixerId;
     private String title;
     private String status; //enum?
     private String component;
     private String priority;
     private String significance;
     private String description;
+
 
     private List<IssueCommentDTO> issueCommentDTOList=new ArrayList<>();
 
@@ -44,6 +46,7 @@ public class IssueDTO extends BaseDTO{
         this.description=issueEntity.getDescription();
         this.createdAt=issueEntity.getCreatedAt();
         this.updatedAt=issueEntity.getUpdatedAt();
+        this.fixerId=issueEntity.getFixerId();
         for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
             issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
         }

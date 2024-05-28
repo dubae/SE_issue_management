@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -58,6 +59,11 @@ public class IssueController {
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/new")
     public String addIssue(@ModelAttribute IssueDTO issueDTO, Model model) {
+        /**
+         * 현재 내가 무슨 계정으로 로그인 되어 있는지
+         * memberId값을 자동으로 issueDto에 연결시켜야 함.
+         */
+       // issueDTO.setWriterId(/** 여기에 입력할 것! */);
         issueService.addNewIssue(issueDTO);
         return "redirect:/addissue";
     }
@@ -120,6 +126,30 @@ public class IssueController {
     @ResponseBody
     public List<IssueDTO> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam Long writerId) {
         return issueService.findByWriterId(writerId);
+    }
+
+    /** ----------------------이슈 통계 관련 API ------------------------------
+
+
+     /*
+     * 특정 날짜에 발생한 이슈들을 반환. List<issueDto>
+     *      @RequestParam으로 year, month, day  넘겨주세요.
+     */
+    @GetMapping("/project/{projectId}/issue/findByDate")
+    @ResponseBody
+    public List<IssueDTO> findByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day) {
+        return issueService.findIssuesByDate(LocalDate.of(year, month, day));
+    }
+
+    /**
+     * 특정 날짜에 발생한 이슈의 개수를 반환.
+     * @RequestParam으로 year, month, day  넘겨주세요.
+     * return 으로 json이 아닌 그냥 int형으로 반환됨.
+     */
+    @GetMapping("/project/{projectId}/issue/countIssueByDate")
+    @ResponseBody
+    public int countIssueByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day) {
+        return issueService.countIssuesByDate(LocalDate.of(year, month, day));
     }
 
 }

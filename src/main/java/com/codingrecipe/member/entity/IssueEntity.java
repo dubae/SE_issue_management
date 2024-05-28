@@ -54,6 +54,9 @@ public class IssueEntity extends BaseEntity{
     @Column(nullable = false, length = 20)
     private String description;
 
+    @Column
+    private Long fixerId;
+
     @OneToMany(mappedBy = "issueEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IssueCommentEntity> comments = new ArrayList<>();
 
@@ -71,6 +74,7 @@ public class IssueEntity extends BaseEntity{
         issueEntity.setSignificance(issueDTO.getSignificance());
         issueEntity.setDescription(issueDTO.getDescription());
         issueEntity.setCreatedAt(LocalDate.now());
+        issueEntity.setFixerId(issueDTO.getFixerId());
 
         return issueEntity;
     }

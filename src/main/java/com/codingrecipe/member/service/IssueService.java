@@ -6,7 +6,9 @@ import com.codingrecipe.member.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -131,6 +133,40 @@ public class IssueService {
             }
         }
         return issueDTOList;
+    }
+
+    /**
+     *  -----------------------------------이슈 통계 분석 파트 -----------------------------------
+     */
+
+
+    /**
+     * 특정 날짜에 발생한 이슈들을 반환
+     */
+    public List<IssueDTO> findIssuesByDate(LocalDate date){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getCreatedAt().equals(date)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+            }
+        }
+        return issueDTOList;
+    }
+
+
+    /**
+     * 특정 날짜에 발생한 이슈의 개수를 반환.
+     */
+    public int countIssuesByDate(LocalDate date){
+        int count=0;
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getCreatedAt().equals(date)){
+                count++;
+            }
+        }
+        return count;
     }
 
 }
