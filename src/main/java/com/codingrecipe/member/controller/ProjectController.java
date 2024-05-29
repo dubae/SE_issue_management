@@ -194,8 +194,8 @@ public class ProjectController {
         return ResponseEntity.ok(projectDetailDTO);
     }
 
-    @GetMapping("/api/project/{projectname}/{role}/list_user")
-    public ResponseEntity<List<MemberDTO>> role_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
+    @GetMapping("/api/project/{projectname}/{role}/list_addable_user")
+    public ResponseEntity<List<MemberDTO>> role_addable_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
         System.out.println(role);
         if (session.getAttribute("userid") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -218,6 +218,26 @@ public class ProjectController {
         Set<MemberDTO> roleMemberSet = new HashSet<>(roleMembers);
         memberDTOSet.removeAll(roleMemberSet);
         return ResponseEntity.ok(new ArrayList<>(memberDTOSet));
+    }
+
+    @GetMapping("/api/project/{projectname}/{role}/list_user")
+    public ResponseEntity<List<MemberDTO>> role_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
+        if (session.getAttribute("userid") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("PM") && !role.equals("TESTER")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<UserRoleDTO> userRoleDTOs = userRoleService.findByProjectId(projectService.findByProjectName(projectname).getProjectid());
+        List<MemberDTO> memberDTOs = new ArrayList<>();
+        for (UserRoleDTO userRoleDTO : userRoleDTOs) {
+            if (userRoleDTO.getRole().equals(role)) {
+                MemberDTO memberDTO = memberService.findByUserId(userRoleDTO.getUserid());
+                memberDTO.setPassword(null);
+                memberDTOs.add(memberDTO);
+            }
+        }
+        return ResponseEntity.ok(memberDTOs);
     }
 
     @PostMapping("/api/project/{projectname}/adduser")
