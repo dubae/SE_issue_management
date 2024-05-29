@@ -4,6 +4,8 @@ import com.codingrecipe.member.dto.IssueCommentDTO;
 import com.codingrecipe.member.repository.IssueCommentRepository;
 import com.codingrecipe.member.repository.IssueRepository;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -31,20 +33,18 @@ public class IssueCommentEntity extends BaseEntity{
 //    @Column(nullable = false, length = 20)
 //    private Long issueId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "issue_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private IssueEntity issueEntity;
 
     public static IssueCommentEntity toIssueCommentEntity(IssueCommentDTO issueCommentDTO) {
         IssueCommentEntity issueCommentEntity = new IssueCommentEntity();
 
-       // IssueRepository issueRepository;
-
-
+       //
         issueCommentEntity.setId(issueCommentDTO.getId());
         issueCommentEntity.setContent(issueCommentDTO.getContent());
         issueCommentEntity.setWriterId(issueCommentDTO.getWriterId());
-       // issueCommentEntity.setIssueEntity(issueRepository.findById(issueCommentDTO.getId()));
 
         return issueCommentEntity;
     }

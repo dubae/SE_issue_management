@@ -15,7 +15,6 @@ public class issueServiceTest {
 
     @Test
     public void testCountByDate(){
-
        int count=issueService.countIssuesByDate( LocalDate.of(2024,05,27));
        Assertions.assertThat(count).isEqualTo(3);
     }

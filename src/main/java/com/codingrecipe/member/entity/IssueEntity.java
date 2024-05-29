@@ -2,6 +2,8 @@ package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -29,8 +31,8 @@ public class IssueEntity extends BaseEntity{
     @Column(nullable = false, length = 20)
     private Long writerId;
 
-    @Column(nullable = false, length = 20)
-    private Long projectId;
+    //@Column(nullable = false, length = 20)
+    //private Long projectId;
 
     @Column(length = 20)
     private Long devId;
@@ -60,12 +62,17 @@ public class IssueEntity extends BaseEntity{
     @OneToMany(mappedBy = "issueEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IssueCommentEntity> comments = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name="project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ProjectEntity projectEntity;
+
     public static IssueEntity toIssueEntity(IssueDTO issueDTO){
         IssueEntity issueEntity=new IssueEntity();
 
         issueEntity.setId(issueDTO.getId());
         issueEntity.setWriterId(issueDTO.getWriterId());
-        issueEntity.setProjectId(issueDTO.getProjectId());
+        issueEntity.getProjectEntity().setProjectid(issueDTO.getProjectId());
         issueEntity.setDevId(issueDTO.getDevId());
         issueEntity.setTitle(issueDTO.getTitle());
         issueEntity.setStatus(issueDTO.getStatus());

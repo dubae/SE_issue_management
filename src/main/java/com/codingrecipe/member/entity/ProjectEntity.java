@@ -9,6 +9,9 @@ import java.util.Set;
 import javax.persistence.*;
 import com.codingrecipe.member.dto.ProjectDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -29,6 +32,9 @@ public class ProjectEntity {
 
     @Column(name = "status", nullable = false)
     private String projectstatus;
+
+    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IssueEntity> issueEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoleEntity> userRoles = new HashSet<>();

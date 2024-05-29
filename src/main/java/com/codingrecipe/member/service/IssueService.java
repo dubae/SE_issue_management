@@ -72,7 +72,7 @@ public class IssueService {
         List<IssueEntity> issueEntityList=issueRepository.findAll();
         for(IssueEntity issueEntity:issueEntityList){
             //모든 리스트 중 projectId가 일치하는 이슈만 리스트에 추가함.
-            if(issueEntity.getProjectId().equals(projectId)){
+            if(issueEntity.getProjectEntity().getProjectid().equals(projectId)){
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -167,6 +167,13 @@ public class IssueService {
             }
         }
         return count;
+    }
+
+    /**
+     * 새로운 이슈 DTO에 대하여 개발자를 추천해줌.
+     */
+    public int suggestDev(IssueDTO issueDTO){
+        return 1;
     }
 
 }
