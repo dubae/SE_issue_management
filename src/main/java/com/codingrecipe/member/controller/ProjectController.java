@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,9 @@ import com.codingrecipe.member.entity.UserRoleEntity;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.UserRoleService;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +42,7 @@ public class ProjectController {
     private final ProjectService projectService;
     private final MemberService memberService;
     private final UserRoleService userRoleService;
+    private final TransactionTemplate transactionTemplate;
 
 
     @GetMapping("/api/projects")
@@ -94,7 +100,7 @@ public class ProjectController {
         }
         return ResponseEntity.ok(memberService.findAll());
     }
-
+    @Transactional
     @PostMapping("/api/addproject")
     public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpSession session) {
         if (session.getAttribute("userid") == null) {
@@ -104,11 +110,23 @@ public class ProjectController {
         if (projectService.isExistProjectName(projectDTO.getProjectname())) {
             return ResponseEntity.badRequest().body("이미 존재하는 프로젝트 이름입니다.");
         } else {
+                        List<String> user_list = new ArrayList<>();
+            user_list.addAll(addProjectDTO.getPl());
+            user_list.addAll(addProjectDTO.getDev());
+            user_list.addAll(addProjectDTO.getTester());
+            user_list.addAll(addProjectDTO.getPm());
+
+            Set<String> user_set = new HashSet<>(user_list);
+            List<String> user_list_no_dup = new ArrayList<>(user_set);
+            for (String userid : user_list_no_dup) {
+                if (memberService.findByUserId(userid) == null) {
+                    return ResponseEntity.badRequest().body(userid+"는 존재하지 않는 사용자입니다.");
+                }
+            }
             projectService.register(projectDTO);
             Long projectid = projectService.findByProjectName(projectDTO.getProjectname()).getProjectid();
             UserRoleDTO userRoleDTO = new UserRoleDTO();
             userRoleDTO.setProjectid(projectid);
-
             for (String userid : addProjectDTO.getPl()) {
                 userRoleDTO.setUserid(userid);
                 userRoleDTO.setRole("PL");
@@ -138,6 +156,7 @@ public class ProjectController {
         }
     }
     //프로젝트 상태 변경 API (스트링만 받음) -> 변경 가능 상태 : Not Started, In Progress, Completed, Paused, Cancelled
+    @Transactional
     @PostMapping("/api/project/{projectname}/update_status")
     public ResponseEntity<String> update_status_post(HttpSession session, @PathVariable String projectname, @RequestBody String status) {
         if (session.getAttribute("userid") == null) {
@@ -239,7 +258,7 @@ public class ProjectController {
         }
         return ResponseEntity.ok(memberDTOs);
     }
-
+    @Transactional
     @PostMapping("/api/project/{projectname}/adduser")
     public ResponseEntity<String> add_user_post(HttpSession session, @RequestBody List<UserRoleDTO> userRoleDTO, @PathVariable String projectname) {
         if (session.getAttribute("userid") == null) {
@@ -264,5 +283,32 @@ public class ProjectController {
             userRoleService.add_user_role(userRole, memberService.findByUserId(userRole.getUserid()), projectid);
         }
         return ResponseEntity.ok("사용자 추가 성공");
+    }
+    @Transactional
+    @GetMapping("/api/project/{projectname}/delete")
+    public ResponseEntity<String> delete_project_get(HttpSession session, @PathVariable String projectname) {
+        if (session.getAttribute("userid") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        ProjectDTO projectDTO = projectService.findByProjectName(projectname);
+        if (projectDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(projectDTO.getProjectid());
+        List<MemberDTO> PL = new ArrayList<>();
+        for (UserRoleDTO userRole : userRoleDTOList) {
+            MemberDTO memberDTO = memberService.findByUserId(userRole.getUserid());
+            if (userRole.getRole().equals("PL")) PL.add(memberDTO);
+        }
+        if (!session.getAttribute("userid").equals("admin") && !PL.contains(memberService.findByUserId((String) session.getAttribute("userid")))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (projectService.deleteByProjectName(projectname)) {
+            return ResponseEntity.ok("프로젝트 삭제 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+
     }
 }

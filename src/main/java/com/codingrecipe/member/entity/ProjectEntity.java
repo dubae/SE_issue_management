@@ -2,6 +2,10 @@ package com.codingrecipe.member.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.*;
 import com.codingrecipe.member.dto.ProjectDTO;
 
@@ -25,6 +29,9 @@ public class ProjectEntity {
 
     @Column(name = "status", nullable = false)
     private String projectstatus;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRoleEntity> userRoles = new HashSet<>();
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();

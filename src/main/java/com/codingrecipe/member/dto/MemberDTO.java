@@ -1,7 +1,6 @@
 package com.codingrecipe.member.dto;
 
 import com.codingrecipe.member.entity.MemberEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 import lombok.*;

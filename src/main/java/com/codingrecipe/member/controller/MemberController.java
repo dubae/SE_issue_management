@@ -44,9 +44,9 @@ public class MemberController {
     @PostMapping("/api/login_status")
     public ResponseEntity<String> login_get(HttpSession session) {
         if (session.getAttribute("userid") != null) {
-            return ResponseEntity.ok("이미 로그인 되어있습니다..");
+            return ResponseEntity.ok("이미 로그인 되어있습니다.");
         }
-        return ResponseEntity.badRequest().body("로그인 해야합니다..");
+        return ResponseEntity.badRequest().body("로그인 해야합니다.");
     }
 
     @PostMapping("/api/login")
@@ -94,5 +94,26 @@ public class MemberController {
         }
         session.invalidate();
         return ResponseEntity.ok("로그아웃 되었습니다.");
+    }
+
+    @GetMapping("/api/user/{userid}/delete")
+    public ResponseEntity<String> delete(@PathVariable String userid, HttpSession session) {
+        if (session.getAttribute("userid") == null) {
+            return ResponseEntity.badRequest().body("로그인 되어있지 않습니다.");
+        }
+        if (!session.getAttribute("userid").equals(userid) && !session.getAttribute("userid").equals("admin")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (memberService.findByUserId(userid) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (memberService.deleteByUserId(userid)) {
+            if (session.getAttribute("userid").equals(userid)){
+                session.invalidate();
+            }
+            return ResponseEntity.ok("계정 삭제 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }
