@@ -36,7 +36,7 @@ public class IssueDTO extends BaseDTO{
     public IssueDTO(IssueEntity issueEntity){
         this.id=issueEntity.getId();
         this.writerId=issueEntity.getWriterId();
-        this.projectId=issueEntity.getProjectId();
+        this.projectId=issueEntity.getProjectEntity().getProjectid();
         this.devId=issueEntity.getDevId();
         this.title=issueEntity.getTitle();
         this.status= issueEntity.getStatus(); //enum?
@@ -60,7 +60,7 @@ public class IssueDTO extends BaseDTO{
 
         issueDTO.setId(issueEntity.getId());
         issueDTO.setWriterId(issueEntity.getWriterId());
-        issueDTO.setProjectId(issueEntity.getProjectId());
+        issueDTO.setProjectId(issueEntity.getProjectEntity().getProjectid());
         issueDTO.setDevId(issueEntity.getDevId());
         issueDTO.setTitle(issueEntity.getTitle());
         issueDTO.setStatus(issueEntity.getStatus());
