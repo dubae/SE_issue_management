@@ -173,7 +173,7 @@ public class IssueService {
      * 새로운 이슈 DTO에 대하여 개발자를 추천해줌.
      */
     public int suggestDev(IssueDTO issueDTO){
-
+        return 1;
     }
 
 }
