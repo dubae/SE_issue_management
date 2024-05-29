@@ -5,6 +5,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import com.codingrecipe.member.dto.ProjectDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -25,6 +28,9 @@ public class ProjectEntity {
 
     @Column(name = "status", nullable = false)
     private String projectstatus;
+
+    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IssueEntity> issueEntityList = new ArrayList<>();
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
