@@ -1,35 +1,54 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Button, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 
+const API_URL = 'http://localhost:8080/api';
+
 function LoginPage() {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  let isAuthenticated;
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
- 
-    //관리자 로그인 임의 설정
-    const adminUserId = 'admin'; 
-    const adminPassword = '0000'; 
 
-    const isAdmin = userId === adminUserId && password === adminPassword; 
-    const isAuthenticated = userId !== '' && password !== '';
-
-    if (isAuthenticated) {
-      if (isAdmin) {
-        alert('관리자 권한 허용되었습니다.');
-      } else {
-        alert('로그인이 완료되었습니다.');
+    try {
+      const response = await axios.post(`${API_URL}/login`, {
+        userid: userId,
+        password: password,
+      });
+      if (response.status === 200) {
+        isAuthenticated = true; // 이 부분은 실제 인증 여부에 따라 변경해야 합니다.
       }
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('isAdmin', isAdmin);
-      navigate('/');
-    } else {
-      alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
+      const isAdmin = response.data.isAdmin; // 관리자 여부를 응답에서 받아온다고 가정합니다.
+
+      if (isAuthenticated) {
+        if (isAdmin) {
+          alert('관리자 권한 허용되었습니다.');
+        } else {
+          alert('로그인이 완료되었습니다.');
+        }
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('isAdmin', isAdmin);
+        navigate('/');
+      } else {
+        alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
+      }
+    } catch (error) {
+      if (error.response) {
+        // 서버가 클라이언트 오류에 대한 응답을 보냈을 때
+        alert(error.response.data); // 에러 메시지 출력
+      } else if (error.request) {
+        // 요청이 이루어졌으나 응답을 받지 못함
+        console.log(error.request);
+      } else {
+        // 요청 설정을 만드는 중에 문제가 발생
+        console.log('Error', error.message);
+      }
     }
   };
 
@@ -52,7 +71,7 @@ function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required    
+            required
           />
         </Form.Group>
         <Button variant="primary" type="submit" style={{ float: 'right' }}>
