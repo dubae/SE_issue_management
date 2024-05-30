@@ -21,11 +21,12 @@ public class MemberController {
     public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO) {
         if (memberService.isExistId(memberDTO.getUserid()) || memberService.isExistEmail(memberDTO.getEmail())){
             System.out.println("회원가입 실패");
-            return ResponseEntity.badRequest().body("이미 존재하는 아이디 또는 이메일입니다.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
         } else {
             memberService.register(memberDTO);
             System.out.println("회원가입 성공");
-            return ResponseEntity.ok("회원가입이 완료되었습니다.");
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
     }
     
@@ -35,30 +36,30 @@ public class MemberController {
     public ResponseEntity<String> checkUserId(@RequestBody MemberDTO memberDTO) {
         boolean isExist = memberService.isExistId(memberDTO.getUserid());
         if (isExist) {
-            return ResponseEntity.badRequest().body("이미 존재하는 아이디입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok("사용 가능한 아이디입니다.");
+        return ResponseEntity.status(HttpStatus.FOUND).build();
     }
     
         
     @PostMapping("/api/login_status")
     public ResponseEntity<String> login_get(HttpSession session) {
         if (session.getAttribute("userid") != null) {
-            return ResponseEntity.ok("이미 로그인 되어있습니다.");
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
-        return ResponseEntity.badRequest().body("로그인 해야합니다.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session) {
         if (session.getAttribute("userid") != null) {
-            return ResponseEntity.badRequest().body("이미 로그인 되어있습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
         System.out.println(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
-            return ResponseEntity.badRequest().body("아이디가 존재하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
@@ -66,10 +67,10 @@ public class MemberController {
                     session.invalidate();
                 }
                 session.setAttribute("userid", findMember.getUserid());
-                return ResponseEntity.ok("로그인 성공");
+                return ResponseEntity.status(HttpStatus.OK).build();
             } else {
                 System.out.println("로그인 실패");
-                return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         }
     }
@@ -90,19 +91,19 @@ public class MemberController {
     @GetMapping("/api/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return ResponseEntity.badRequest().body("로그인 되어있지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         session.invalidate();
-        return ResponseEntity.ok("로그아웃 되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/api/user/{userid}/delete")
     public ResponseEntity<String> delete(@PathVariable String userid, HttpSession session) {
         if (session.getAttribute("userid") == null) {
-            return ResponseEntity.badRequest().body("로그인 되어있지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!session.getAttribute("userid").equals(userid) && !session.getAttribute("userid").equals("admin")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (memberService.findByUserId(userid) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -111,7 +112,7 @@ public class MemberController {
             if (session.getAttribute("userid").equals(userid)){
                 session.invalidate();
             }
-            return ResponseEntity.ok("계정 삭제 성공");
+            return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
