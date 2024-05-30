@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 4440
 
 # database 연동 설정
 spring:
@@ -21,8 +21,6 @@ spring:
       suffix: .jsp
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-
-  # spring data jpa 설정
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false

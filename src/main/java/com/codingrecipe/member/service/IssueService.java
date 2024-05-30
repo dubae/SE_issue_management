@@ -3,23 +3,23 @@ package com.codingrecipe.member.service;
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.entity.IssueEntity;
 import com.codingrecipe.member.repository.IssueRepository;
+import com.codingrecipe.member.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class IssueService {
 
     private final IssueRepository issueRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public IssueService(IssueRepository issueRepository){
+    public IssueService(IssueRepository issueRepository, ProjectRepository projectRepository){
         this.issueRepository=issueRepository;
+        this.projectRepository = projectRepository;
     }
 
     /**
@@ -54,7 +54,9 @@ public class IssueService {
      * 새 이슈 추가하기
      */
     public void addNewIssue(IssueDTO issueDTO){
-        issueRepository.save(IssueEntity.toIssueEntity(issueDTO));
+        IssueEntity issueEntity=IssueEntity.toIssueEntity(issueDTO);
+        issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
+        issueRepository.save(issueEntity);
     }
 
     /**
@@ -122,6 +124,21 @@ public class IssueService {
     }
 
     /**
+     * compontent(개발 부분)로 이슈 검색하기
+     */
+    public List<IssueDTO> findByComponent(String component){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getComponent().equals(component)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+
+            }
+        }
+        return issueDTOList;
+    }
+
+    /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
     public List<IssueDTO> findByWriterId(Long writerId){
@@ -171,9 +188,37 @@ public class IssueService {
 
     /**
      * 새로운 이슈 DTO에 대하여 개발자를 추천해줌.
+     * 새 이슈와 같은 component를 가장 많이 해결한 개발자의 id를 반환.
      */
-    public int suggestDev(IssueDTO issueDTO){
-        return 1;
+    public Long suggestDev(IssueDTO issueDTO){
+        String targetComponent=issueDTO.getComponent();
+        HashMap<Long, Integer> devMap=new HashMap<>();
+        List<IssueDTO> issueDTOList = null;
+        int max=0;
+        Long bestDev=1L;
+        
+        //이미 해결된 이슈 반환.
+        for(IssueDTO closedIssueDto: findByStatus("closed")){
+            if(closedIssueDto.getComponent().equals(targetComponent)){
+                issueDTOList.add(closedIssueDto);
+            }
+        }
+
+        Long devId;
+        for(IssueDTO issueDTO1: issueDTOList){
+            devId=issueDTO1.getDevId();
+            devMap.put(devId,devMap.get(devId)+1);
+            if(devMap.get(devId)>max){
+                max=devMap.get(devId);
+                bestDev=devId;
+            }
+        }
+
+        return bestDev;
+
+
+
+
     }
 
 }

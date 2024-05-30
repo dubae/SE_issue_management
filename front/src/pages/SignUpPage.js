@@ -24,7 +24,7 @@ function SignUpPage() {
     const memberData = {
       userid: userAccount,
       password: password,
-      name: userName,
+      username: userName,
       email: email
     };
 

@@ -4,6 +4,7 @@ import com.codingrecipe.member.dto.IssueDTO;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -11,12 +12,15 @@ import java.util.*;
 
 import java.time.LocalDate;
 
+
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 //@Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 @Setter
+@Builder
 /**
  * 한 프로젝트 내 다수의 이슈 존재.
  * 1:n관계 설정 필요.
@@ -69,10 +73,13 @@ public class IssueEntity extends BaseEntity{
 
     public static IssueEntity toIssueEntity(IssueDTO issueDTO){
         IssueEntity issueEntity=new IssueEntity();
+        //ProjectEntity projectEntity=new ProjectEntity();
 
         issueEntity.setId(issueDTO.getId());
         issueEntity.setWriterId(issueDTO.getWriterId());
-        issueEntity.getProjectEntity().setProjectid(issueDTO.getProjectId());
+        //issueEntity.getProjectEntity().setProjectid(issueDTO.getProjectId());
+        //issueEntity.getProjectEntity() 부분이 null일 수 있는 문제 발견.
+
         issueEntity.setDevId(issueDTO.getDevId());
         issueEntity.setTitle(issueDTO.getTitle());
         issueEntity.setStatus(issueDTO.getStatus());

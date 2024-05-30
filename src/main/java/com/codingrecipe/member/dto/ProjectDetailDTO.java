@@ -9,8 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 public class ProjectDetailDTO {
     private ProjectDTO project;
-    private List<MemberDTO> PL;
-    private List<MemberDTO> DEV;
-    private List<MemberDTO> PM;
-    private List<MemberDTO> TESTER;
+    private List<MemberDTOSecure> PL;
+    private List<MemberDTOSecure> DEV;
+    private List<MemberDTOSecure> PM;
+    private List<MemberDTOSecure> TESTER;
 }
