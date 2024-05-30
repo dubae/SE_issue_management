@@ -5,7 +5,6 @@ import com.codingrecipe.member.dto.MemberDTOSecure;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -39,13 +38,13 @@ public class MemberController {
     public ResponseEntity<String> checkUserId(@RequestBody MemberDTO memberDTO) {
         boolean isExist = memberService.isExistId(memberDTO.getUserid());
         if (isExist) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.FOUND).build();
         }
-        return ResponseEntity.status(HttpStatus.FOUND).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     
         
-    @PostMapping("/api/login_status")
+    @GetMapping("/api/login_status")
     public ResponseEntity<String> login_get(HttpSession session) {
         if (session.getAttribute("userid") != null) {
             return ResponseEntity.status(HttpStatus.OK).build();
