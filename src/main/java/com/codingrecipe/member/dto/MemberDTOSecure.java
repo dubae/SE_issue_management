@@ -1,6 +1,9 @@
 package com.codingrecipe.member.dto;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import lombok.*;
 
 @Getter
@@ -20,6 +23,12 @@ public class MemberDTOSecure {
         memberDTOSecure.setUsername(memberDto.getUsername());
         memberDTOSecure.setEmail(memberDto.getEmail());
         return memberDTOSecure;
+    }
+
+    public static List<MemberDTOSecure> toMemberDTOSecureList(List<MemberDTO> memberDTOList) {
+        return memberDTOList.stream()
+            .map(MemberDTOSecure::toMemberDTOSecure)  // MemberDTO를 MemberDTOSecure로 변환
+            .collect(Collectors.toList()); // 변환된 MemberDTOSecure 리스트를 수집
     }
 
     @Override

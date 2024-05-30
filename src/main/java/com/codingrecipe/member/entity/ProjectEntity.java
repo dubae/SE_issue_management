@@ -6,7 +6,9 @@ import javax.persistence.*;
 import com.codingrecipe.member.dto.ProjectDTO;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,6 +35,9 @@ public class ProjectEntity {
 
     @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IssueEntity> issueEntityList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRoleEntity> userRoles = new HashSet<>();
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();

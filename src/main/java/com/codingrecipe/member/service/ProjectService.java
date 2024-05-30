@@ -3,6 +3,8 @@ package com.codingrecipe.member.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import com.codingrecipe.member.dto.ProjectDTO;
@@ -65,5 +67,18 @@ public class ProjectService {
             projectDTOs.add(ProjectDTO.toProjectDTO(projectEntity));
         }
         return projectDTOs;
+    }
+    @Transactional
+    public boolean deleteByProjectName(String projectname) {
+        long deletedCountBefore = projectRepository.count(); // 삭제 작업 전 레코드 수
+        projectRepository.deleteByProjectname(projectname);
+        long deletedCountAfter = projectRepository.count(); // 삭제 작업 후 레코드 수
+        // 삭제 작업 전후 레코드 수가 다르면 삭제가 이루어진 것으로 간주
+        if (deletedCountBefore > deletedCountAfter) {
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

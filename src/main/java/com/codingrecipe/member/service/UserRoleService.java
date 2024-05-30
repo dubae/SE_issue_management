@@ -63,7 +63,7 @@ public class UserRoleService {
         
     // }
     // 다른 작업하다가 왜 존재하는지 이유를 찾지 못 했음.
-
+    @Transactional
     public List<UserRoleDTO> findByProjectId(Long projectid) {
         ProjectEntity projectEntity = projectRepository.findById(projectid).orElse(null);
         List<UserRoleEntity> userRoleEntities = userRoleRepository.findByProject(projectEntity).orElse(null);
@@ -77,7 +77,7 @@ public class UserRoleService {
             return null;
         }
     }
-
+    @Transactional
     public List<UserRoleDTO> findByUserId(String userid) {
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         List<UserRoleEntity> userRoleEntities = userRoleRepository.findByMember(memberEntity).orElse(null);
@@ -91,7 +91,7 @@ public class UserRoleService {
             return null;
         }
     }
-
+    @Transactional
     public List<UserRoleDTO> findByRole(String role) {
         List<UserRoleEntity> userRoleEntities = userRoleRepository.findByRole(role).orElse(null);
         if (userRoleEntities != null) {
@@ -104,7 +104,7 @@ public class UserRoleService {
             return null;
         }
     }
-
+    @Transactional
     public ProjectEntity findProject(Long projectid) {
         ProjectEntity projectEntity = projectRepository.findById(projectid).orElse(null);
         if (projectEntity != null) {
@@ -113,7 +113,7 @@ public class UserRoleService {
             return null;
         }
     }
-
+    @Transactional
     public MemberEntity findMember(String userid) {
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if (memberEntity != null) {

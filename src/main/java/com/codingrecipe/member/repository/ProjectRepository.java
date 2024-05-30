@@ -11,4 +11,5 @@ public interface ProjectRepository  extends JpaRepository<ProjectEntity, Long> {
     Optional<ProjectEntity> findByProjectname(String projectname);
     Optional<ProjectEntity> findByProjectid(Long projectid);
     List<ProjectEntity> findAll();
+    void deleteByProjectname(String projectname);
 }
