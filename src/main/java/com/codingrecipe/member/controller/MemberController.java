@@ -5,6 +5,9 @@ import com.codingrecipe.member.dto.MemberDTOSecure;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
@@ -56,7 +59,6 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
-        System.out.println(memberDTO.getUserid());
         if (findMember == null) {
             System.out.println("로그인 실패");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -116,5 +118,15 @@ public class MemberController {
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+    }
+    @GetMapping("/api/user_list")
+    public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpSession session) {
+        if (session.getAttribute("userid") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<MemberDTO> memberDTOList = memberService.findAll();
+
+        List<MemberDTOSecure> memberDTOSecureList = MemberDTOSecure.toMemberDTOSecureList(memberDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(memberDTOSecureList);
     }
 }
