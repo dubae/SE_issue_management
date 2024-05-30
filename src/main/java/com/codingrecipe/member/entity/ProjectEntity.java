@@ -1,7 +1,7 @@
 package com.codingrecipe.member.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import javax.persistence.*;
 import com.codingrecipe.member.dto.ProjectDTO;
 
@@ -11,6 +11,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor
 @Table(name = "projects")
 public class ProjectEntity {
     @Id
