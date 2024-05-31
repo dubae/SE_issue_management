@@ -61,20 +61,16 @@ public class LoginScreen {
                 String password = new String(passwordField.getPassword());
 
                 if (validateInputs(email, password)) {
-                    // Check if admin credentials
                     if (ADMIN_USERNAME.equals(email) && ADMIN_PASSWORD.equals(password)) {
-                        // Admin login successful
                         JOptionPane.showMessageDialog(frame, "Admin 모드 활성화!");
 
-                        AdminMode adminMode = new AdminMode();
-                        adminMode.showFrame();
+                        Admin admin = new Admin();
+                        admin.showFrame();
 
                         frame.dispose();
                     } else {
-                        // Retrieve user data from the MemberService
                         MemberDTO memberDTO = memberService.findByUserId(email, true);
                         if (memberDTO != null && memberDTO.getPassword().equals(password)) {
-                            // Login successful
                             JOptionPane.showMessageDialog(frame, "로그인 성공!");
 
                             UserPage userPage = new UserPage(memberService, issueService, email);
@@ -92,7 +88,7 @@ public class LoginScreen {
             }
         });
 
-        // 뒤로가기 같은 로직
+        // 뒤로가기 로직
         JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, 160, 90, 30);
         frame.getContentPane().add(btnBack);
