@@ -61,14 +61,28 @@ class IssueServiceTest {
                 .comments(issueCommentEntityList).build();
 
         IssueEntity issueEntity2 = IssueEntity.builder()
-                .id(2L).title("title2").writerId(2L).description("test")
-                .status("assigned").projectEntity(projectEntity1).component("comp2")
+                .id(2L).title("title2").writerId(2L).description("test").fixerId(1L)
+                .status("closed").projectEntity(projectEntity1).component("comp1")
+                .comments(issueCommentEntityList).build();
+
+        IssueEntity issueEntity3 = IssueEntity.builder()
+                .id(3L).title("title2").writerId(2L).description("test").fixerId(2L)
+                .status("closed").projectEntity(projectEntity1).component("comp1")
+                .comments(issueCommentEntityList).build();
+
+        IssueEntity issueEntity4 = IssueEntity.builder()
+                .id(4L).title("title2").writerId(2L).description("test").fixerId(2L)
+                .status("closed").projectEntity(projectEntity1).component("comp1")
                 .comments(issueCommentEntityList).build();
 
         issueEntity1.setCreatedAt(LocalDate.now());
         issueEntity2.setCreatedAt(LocalDate.now());
+        issueEntity3.setCreatedAt(LocalDate.now());
+        issueEntity4.setCreatedAt(LocalDate.now());
         issueEntityList.add(issueEntity1);
         issueEntityList.add(issueEntity2);
+        issueEntityList.add(issueEntity3);
+        issueEntityList.add(issueEntity4);
 
         projectEntity1.setIssueEntityList(issueEntityList);
     }
@@ -222,6 +236,18 @@ class IssueServiceTest {
         assertEquals(issueDTOList.size(), issueDTOList.stream().filter(issueEntity -> issueEntity.getCreatedAt().getMonth().equals(month)).toList().size());
 
     }
+
+    @Test
+    void testSuggestDev(){
+        when(issueRepository.findAll()).thenReturn(issueEntityList);
+        when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
+
+
+        System.out.println(issueService.suggestDev(1L));
+    }
+
+
+
 
 //    @Test
 //    void testSuggestDev() {

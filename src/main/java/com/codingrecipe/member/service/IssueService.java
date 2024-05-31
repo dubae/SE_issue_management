@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
@@ -210,33 +209,44 @@ public class IssueService {
 
     /**
      * 새로운 이슈 DTO에 대하여 개발자를 추천해줌.
+     * 이슈의 아이디를 인자로 넘겨줌.
      * 새 이슈와 같은 component를 가장 많이 해결한 개발자의 id를 반환.
      */
-    public Long suggestDev(IssueDTO issueDTO){
+    public List<Long> suggestDev(Long id){
+        IssueDTO issueDTO=findById(id);
         String targetComponent=issueDTO.getComponent();
         HashMap<Long, Integer> devMap=new HashMap<>();
-        List<IssueDTO> issueDTOList = null;
+        List<IssueDTO> issueDTOList = findByStatus("closed").stream().filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent)).toList();
         int max=0;
         Long bestDev=1L;
         
-        //이미 해결된 이슈 반환.
-        for(IssueDTO closedIssueDto: findByStatus("closed")){
-            if(closedIssueDto.getComponent().equals(targetComponent)){
-                issueDTOList.add(closedIssueDto);
-            }
-        }
 
-        Long devId;
+        Long fixerId;
+
         for(IssueDTO issueDTO1: issueDTOList){
-            devId=issueDTO1.getDevId();
-            devMap.put(devId,devMap.get(devId)+1);
-            if(devMap.get(devId)>max){
-                max=devMap.get(devId);
-                bestDev=devId;
+            fixerId=issueDTO1.getFixerId();
+            devMap.get(fixerId);
+            devMap.put(fixerId,devMap.getOrDefault(fixerId,0)+1);
+            if(devMap.get(fixerId)>max){
+                max=devMap.get(fixerId);
+                bestDev=fixerId;
             }
         }
 
-        return bestDev;
+        List<Long> keySet = new ArrayList<>(devMap.keySet());
+
+        // Value 값으로 오름차순 정렬
+        keySet.sort(new Comparator<Long>() {
+            @Override
+            public int compare(Long o1, Long o2) {
+                return devMap.get(o2).compareTo(devMap.get(o1));
+            }
+        });
+
+        if(keySet.isEmpty()){
+            keySet.add(1L);
+        }
+        return keySet.subList(0,Math.min(3,keySet.size()));
 
 
 

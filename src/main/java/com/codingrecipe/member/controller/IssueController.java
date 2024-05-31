@@ -226,4 +226,10 @@ public class IssueController {
         return issueService.countIssuesByDate(LocalDate.of(year, month, day));
     }
 
+    @PostMapping("/test/suggest/{id}")
+    @ResponseBody
+    public List<Long> suggestion(@PathVariable Long id) {
+        return issueService.suggestDev(id);
+    }
+
 }
