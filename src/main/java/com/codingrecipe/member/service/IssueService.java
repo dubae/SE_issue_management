@@ -21,8 +21,8 @@ public class IssueService {
     private final ProjectRepository projectRepository;
 
     @Autowired
-    public IssueService(IssueRepository issueRepository, ProjectRepository projectRepository){
-        this.issueRepository=issueRepository;
+    public IssueService(IssueRepository issueRepository, ProjectRepository projectRepository) {
+        this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
     }
 
@@ -30,10 +30,10 @@ public class IssueService {
      * 모든 이슈Dto 리스트 반환.
      */
     @Transactional
-    public List<IssueDTO> findAllIssue(){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
+    public List<IssueDTO> findAllIssue() {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
             issueDTOList.add(new IssueDTO(issueEntity));
         }
         return issueDTOList;
@@ -42,13 +42,13 @@ public class IssueService {
     /**
      * 제목으로 이슈 찾기. 리스트 반환.
      */
-    public List<IssueDTO> findByTitle(String title){
+    public List<IssueDTO> findByTitle(String title) {
 
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
             //모든 리스트 중 title이 일치하는 이슈만 리스트에 추가함.
-            if(issueEntity.getTitle().equals(title)){
+            if (issueEntity.getTitle().equals(title)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -58,8 +58,8 @@ public class IssueService {
     /**
      * 새 이슈 추가하기
      */
-    public void addNewIssue(IssueDTO issueDTO){
-        IssueEntity issueEntity=IssueEntity.toIssueEntity(issueDTO);
+    public void addNewIssue(IssueDTO issueDTO) {
+        IssueEntity issueEntity = IssueEntity.toIssueEntity(issueDTO);
         // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
         issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
         issueEntity.setCreatedAt(LocalDate.now());
@@ -69,19 +69,19 @@ public class IssueService {
     /**
      * 이슈 삭제하기
      */
-    public void deleteIssue(IssueDTO issueDTO){
+    public void deleteIssue(IssueDTO issueDTO) {
         issueRepository.delete(IssueEntity.toIssueEntity(issueDTO));
     }
 
     /**
      * 프로젝트id로 이슈 반환하기
      */
-    public List<IssueDTO> findByProjectId(Long projectId){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
+    public List<IssueDTO> findByProjectId(Long projectId) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
             //모든 리스트 중 projectId가 일치하는 이슈만 리스트에 추가함.
-            if(issueEntity.getProjectEntity().getProjectid().equals(projectId)){
+            if (issueEntity.getProjectEntity().getProjectid().equals(projectId)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -91,17 +91,17 @@ public class IssueService {
     /**
      * id로 이슈 찾기
      */
-    public IssueDTO findById(Long id){
-        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
-        IssueDTO issueDTO=new IssueDTO(issueEntity.get());
+    public IssueDTO findById(Long id) {
+        Optional<IssueEntity> issueEntity = issueRepository.findById(id);
+        IssueDTO issueDTO = new IssueDTO(issueEntity.get());
         return issueDTO;
     }
 
     /**
      * 이슈의 상태 변경하기. (new->assigned ->..)
      */
-    public void changeStatus(Long id,String status){
-        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
+    public void changeStatus(Long id, String status) {
+        Optional<IssueEntity> issueEntity = issueRepository.findById(id);
         issueEntity.get().setStatus(status);
         issueRepository.save(issueEntity.get()); //pk(id)값이 겹치면 그냥 변경하게 됨. 삭제 후 추가 구현 안 해도 됨.
     }
@@ -109,8 +109,8 @@ public class IssueService {
     /**
      * 한 이슈의 개발자(devId) 변경하기.
      */
-    public void changeDevId(Long id,Long devId){
-        Optional<IssueEntity> issueEntity=issueRepository.findById(id);
+    public void changeDevId(Long id, Long devId) {
+        Optional<IssueEntity> issueEntity = issueRepository.findById(id);
         issueEntity.get().setDevId(devId);
         issueRepository.save(issueEntity.get());
     }
@@ -118,11 +118,11 @@ public class IssueService {
     /**
      * status(상태)로 이슈 검색하기
      */
-    public List<IssueDTO> findByStatus(String status){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getStatus().equals(status)){
+    public List<IssueDTO> findByStatus(String status) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getStatus().equals(status)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
 
             }
@@ -133,11 +133,11 @@ public class IssueService {
     /**
      * compontent(개발 부분)로 이슈 검색하기
      */
-    public List<IssueDTO> findByComponent(String component){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getComponent().equals(component)){
+    public List<IssueDTO> findByComponent(String component) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getComponent().equals(component)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
 
             }
@@ -148,11 +148,11 @@ public class IssueService {
     /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
-    public List<IssueDTO> findByWriterId(Long writerId){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getWriterId().equals(writerId)){
+    public List<IssueDTO> findByWriterId(Long writerId) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getWriterId().equals(writerId)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -167,11 +167,11 @@ public class IssueService {
     /**
      * 특정 날짜에 발생한 이슈들을 반환
      */
-    public List<IssueDTO> findIssuesByDate(LocalDate date){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getCreatedAt().equals(date)){
+    public List<IssueDTO> findIssuesByDate(LocalDate date) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getCreatedAt().equals(date)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -182,11 +182,11 @@ public class IssueService {
      * 특정 월에 발생한 이슈들을 반환.
      * Month는 enum객체임을 명심.
      */
-    public List<IssueDTO> findIssuesByMonth(Month month){
-        List<IssueDTO> issueDTOList=new ArrayList<>();
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getCreatedAt().getMonth().equals(month)){
+    public List<IssueDTO> findIssuesByMonth(Month month) {
+        List<IssueDTO> issueDTOList = new ArrayList<>();
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getCreatedAt().getMonth().equals(month)) {
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }
@@ -197,11 +197,11 @@ public class IssueService {
     /**
      * 특정 날짜에 발생한 이슈의 개수를 반환.
      */
-    public int countIssuesByDate(LocalDate date){
-        int count=0;
-        List<IssueEntity> issueEntityList=issueRepository.findAll();
-        for(IssueEntity issueEntity:issueEntityList){
-            if(issueEntity.getCreatedAt().equals(date)){
+    public int countIssuesByDate(LocalDate date) {
+        int count = 0;
+        List<IssueEntity> issueEntityList = issueRepository.findAll();
+        for (IssueEntity issueEntity : issueEntityList) {
+            if (issueEntity.getCreatedAt().equals(date)) {
                 count++;
             }
         }
@@ -213,26 +213,26 @@ public class IssueService {
      * 이슈의 아이디를 인자로 넘겨줌.
      * 새 이슈와 같은 component를 가장 많이 해결한 개발자의 id를 반환.
      */
-    public List<Long> suggestDev(Long id){
-        IssueDTO issueDTO=findById(id);
-        String targetComponent=issueDTO.getComponent();
-        HashMap<Long, Integer> devMap=new HashMap<>();
+    public List<Long> suggestDev(Long id) {
+        IssueDTO issueDTO = findById(id);
+        String targetComponent = issueDTO.getComponent();
+        HashMap<Long, Integer> devMap = new HashMap<>();
         List<IssueDTO> issueDTOList = findByStatus("closed").stream()
                 .filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent))
                 .collect(Collectors.toList());
-        int max=0;
-        Long bestDev=1L;
+        int max = 0;
+        Long bestDev = 1L;
 
 
         Long fixerId;
 
-        for(IssueDTO issueDTO1: issueDTOList){
-            fixerId=issueDTO1.getFixerId();
+        for (IssueDTO issueDTO1 : issueDTOList) {
+            fixerId = issueDTO1.getFixerId();
             devMap.get(fixerId);
-            devMap.put(fixerId,devMap.getOrDefault(fixerId,0)+1);
-            if(devMap.get(fixerId)>max){
-                max=devMap.get(fixerId);
-                bestDev=fixerId;
+            devMap.put(fixerId, devMap.getOrDefault(fixerId, 0) + 1);
+            if (devMap.get(fixerId) > max) {
+                max = devMap.get(fixerId);
+                bestDev = fixerId;
             }
         }
 
@@ -246,14 +246,11 @@ public class IssueService {
             }
         });
 
-        if(keySet.isEmpty()){
+        if (keySet.isEmpty()) {
             keySet.add(1L);
         }
-        return keySet.subList(0,Math.min(3,keySet.size()));
-
-
+        return keySet.subList(0, Math.min(3, keySet.size()));
 
 
     }
-
 }

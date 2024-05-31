@@ -3,7 +3,7 @@ package com.codingrecipe.member.gui;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+//관리자 모드에서 프로젝트 생성 부분 구현
 public class Admin {
     private JFrame frame;
 
