@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
@@ -31,6 +32,7 @@ import com.codingrecipe.member.service.UserRoleService;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import com.codingrecipe.member.session.SessionManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,17 +47,18 @@ public class ProjectController {
     private final TransactionTemplate transactionTemplate;
 
 
-    @GetMapping("/api/projects")
-    public ResponseEntity<List<ProjectInfoDTO>> project_get(HttpSession session){
-        if (session.getAttribute("userid") == null) {
+    @PostMapping("/api/projects")
+    public ResponseEntity<List<ProjectInfoDTO>> project_get(HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getAttribute(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<ProjectDTO> projects;
-        if (session.getAttribute("userid").equals("admin")) {
+        if (SessionManager.getAttribute(sessionid).equals("admin")){
             projects = projectService.findAll();
         }
         else{
-            String userId = (String) session.getAttribute("userid");
+            String userId = (String) SessionManager.getAttribute(sessionid);
             Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();
             projects = new ArrayList<>();
             List<UserRoleDTO> userRoleDTO = userRoleService.findByUserId(userId);

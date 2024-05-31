@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
 import UserInfoModal from '../components/UserInfoModal';
+import axios from 'axios';
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
@@ -16,6 +17,28 @@ function MainPage() {
     const [showUserInfo, setShowUserInfo] = useState(false);
     const handleCloseUserInfo = () => setShowUserInfo(false);
     const handleShowUserInfo = () => setShowUserInfo(true);
+    useEffect(() => {
+        // 페이지가 로드될 때 실행되는 GET 요청 코드
+        fetchProjects();
+    }, []);
+    
+
+    const fetchProjects = async () => {
+        try {
+            let sessionid = localStorage.getItem('sessionid');
+            const response = await axios.post('http://localhost:8080/api/projects', {}, {
+                headers: {
+                  'sessionid': `${sessionid}`
+                },
+                withCredentials: true
+              });
+            console.log(response);
+            const data = response.data;
+            setProjects(data);
+        } catch (error) {
+            console.error('프로젝트를 가져오는 중 에러 발생:', error);
+        }
+    };
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -35,28 +58,7 @@ function MainPage() {
         };
     }, []);
 
-    const [projects, setProjects] = useState([
-        {
-            id: 1,
-            name: '프로젝트 1',
-            plAccount: 'PL1',
-            testerAccount: 'Tester1',
-            devAccount: 'Dev1',
-            description: '프로젝트 1의 개요입니다.',
-            createdAt: '2024-05-26',
-            status: '진행중'
-        },
-        {
-            id: 2,
-            name: '프로젝트 2',
-            plAccount: 'PL2',
-            testerAccount: 'Tester2',
-            devAccount: 'Dev2',
-            description: '프로젝트 2의 개요입니다.',
-            createdAt: '2024-05-25',
-            status: '완료'
-        }
-    ]);
+    const [projects, setProjects] = useState([]);
 
     const [show, setShow] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);

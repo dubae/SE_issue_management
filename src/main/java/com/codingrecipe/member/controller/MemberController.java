@@ -7,15 +7,18 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import com.codingrecipe.member.session.SessionManager;
 
 @Controller
 @RequiredArgsConstructor
+@CrossOrigin("http://localhost:3000")
 public class MemberController {
     private final MemberService memberService;
 
@@ -44,17 +47,23 @@ public class MemberController {
     }
     
         
-    @GetMapping("/api/login_status")
-    public ResponseEntity<String> login_get(HttpSession session) {
-        if (session.getAttribute("userid") != null) {
+    @PostMapping("/api/login_status")
+    public ResponseEntity<String> login_get(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        System.out.println(sessionid);
+        if (SessionManager.getAttribute(sessionid) != null){
             return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session) {
-        if (session.getAttribute("userid") != null) {
+    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        System.out.println(memberDTO.getUserid());
+        System.out.println(memberDTO.getPassword());
+        System.out.println(sessionid);
+        if (SessionManager.getAttribute(sessionid) != null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
@@ -64,11 +73,12 @@ public class MemberController {
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
-                if (session.getAttribute("userid") != null) {
-                    session.invalidate();
+                if (sessionid != null && SessionManager.getAttribute(sessionid) != null) {
+                    SessionManager.removeAttribute(sessionid);
                 }
-                session.setAttribute("userid", findMember.getUserid());
-                return ResponseEntity.status(HttpStatus.OK).build();
+                String key = SessionManager.generateKey();
+                SessionManager.setAttribute(key, findMember.getUserid());
+                return ResponseEntity.status(HttpStatus.OK).body(key);
             } else {
                 System.out.println("로그인 실패");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

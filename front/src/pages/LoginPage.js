@@ -12,25 +12,36 @@ function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   let isAuthenticated;
+  let sessionid;
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    if (isAuthenticated === false){
+      sessionid = null;
+    }else{
+      sessionid = localStorage.getItem('sessionId');
+    }
     try {
       const response = await axios.post(`${API_URL}/login`, {
         userid: userId,
-        password: password,
-      });
+        password: password
+    }, {
+      headers: {
+        'sessionid': `${sessionid}`
+      },
+      withCredentials: true
+    });
       if (response.status === 200) {
         isAuthenticated = true; // 이 부분은 실제 인증 여부에 따라 변경해야 합니다.
+        console.log(response.data);
+        localStorage.setItem('sessionid', response.data);
+        alert('로그인이 완료되었습니다.');
       }
       const isAdmin = response.data.isAdmin; // 관리자 여부를 응답에서 받아온다고 가정합니다.
 
       if (isAuthenticated) {
         if (isAdmin) {
           alert('관리자 권한 허용되었습니다.');
-        } else {
-          alert('로그인이 완료되었습니다.');
         }
         localStorage.setItem('userId', userId);
         localStorage.setItem('isAdmin', isAdmin);
