@@ -28,7 +28,6 @@ public class UserPage {
         lblTitle.setBounds(150, 20, 100, 30);
         frame.getContentPane().add(lblTitle);
 
-        // Add a button to create a new issue
         JButton btnCreateIssue = new JButton("Create Issue");
         btnCreateIssue.setBounds(150, 80, 120, 30);
         frame.getContentPane().add(btnCreateIssue);
@@ -38,8 +37,6 @@ public class UserPage {
             createIssue.showFrame();
             frame.dispose();
         });
-
-        // Add other components and functionalities as needed
     }
 
     public void showFrame() {

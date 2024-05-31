@@ -70,7 +70,6 @@ public class LoginScreen {
                         frame.dispose();
 
                     } else {
-                        // Login failed
                         JOptionPane.showMessageDialog(frame, "로그인 실패. 아이디 또는 비밀번호 오류!");
                     }
                 } else {
@@ -79,16 +78,16 @@ public class LoginScreen {
             }
         });
 
-        // Back Button
+        // 뒤로가기 같은 로직
         JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, 160, 90, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frame.dispose(); // Close the login screen
+                frame.dispose();
                 MainScreen mainScreen = new MainScreen(memberService);
-                mainScreen.showFrame(); // Show the main screen
+                mainScreen.showFrame();
             }
         });
     }
