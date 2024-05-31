@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class IssueService {
@@ -216,7 +217,9 @@ public class IssueService {
         IssueDTO issueDTO=findById(id);
         String targetComponent=issueDTO.getComponent();
         HashMap<Long, Integer> devMap=new HashMap<>();
-        List<IssueDTO> issueDTOList = findByStatus("closed").stream().filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent)).toList();
+        List<IssueDTO> issueDTOList = findByStatus("closed").stream()
+                .filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent))
+                .collect(Collectors.toList());
         int max=0;
         Long bestDev=1L;
         
