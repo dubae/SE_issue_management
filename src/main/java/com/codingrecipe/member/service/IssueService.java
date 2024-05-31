@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -170,6 +172,21 @@ public class IssueService {
         List<IssueEntity> issueEntityList=issueRepository.findAll();
         for(IssueEntity issueEntity:issueEntityList){
             if(issueEntity.getCreatedAt().equals(date)){
+                issueDTOList.add(new IssueDTO(issueEntity));
+            }
+        }
+        return issueDTOList;
+    }
+
+    /**
+     * 특정 월에 발생한 이슈들을 반환.
+     * Month는 enum객체임을 명심.
+     */
+    public List<IssueDTO> findIssuesByMonth(Month month){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        List<IssueEntity> issueEntityList=issueRepository.findAll();
+        for(IssueEntity issueEntity:issueEntityList){
+            if(issueEntity.getCreatedAt().getMonth().equals(month)){
                 issueDTOList.add(new IssueDTO(issueEntity));
             }
         }

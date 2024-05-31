@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 @Controller
@@ -187,10 +188,21 @@ public class IssueController {
         return issueService.findByWriterId(writerId);
     }
 
-    /** ----------------------이슈 통계 관련 API ------------------------------
+    /** ----------------------이슈 통계 관련 API ------------------------------**/
+
+    /**
+     * 특정 월에 발생한 이슈들을 반환.
+          /project/1/issue/month/5
+             return [ {issuedto json} .. ]
+     */
+    @GetMapping("/project/{projectId}/issue/month/{month}")
+    @ResponseBody
+    public List<IssueDTO> findByMonth(@PathVariable("projectId") Long projectId, @PathVariable("month") int month) {
+        return issueService.findIssuesByMonth(Month.of(month));
+    }
 
 
-     /*
+     /**
      * 특정 날짜에 발생한 이슈들을 반환. List<issueDto>
      *      @RequestParam으로 year, month, day  넘겨주세요.
      *      /project/{projectId}/issue/findByDate?year=2024&month=5&day=27

@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -209,6 +210,16 @@ class IssueServiceTest {
         int count = issueService.countIssuesByDate(date);
         // findIssueByDate() 메소드로 가져온 모든 이슈의 createdAt 값이 찾으려는 값과 같으면 테스트 통과.
         assertEquals(count, issueEntityList.stream().filter(issueEntity -> issueEntity.getCreatedAt().equals(date)).toList().size());
+
+    }
+
+    @Test
+    void testFindIssuesByMonth(){
+        when(issueRepository.findAll()).thenReturn(issueEntityList);
+        Month month=LocalDate.now().getMonth();
+        List<IssueDTO> issueDTOList=issueService.findIssuesByMonth(month);
+        // FindIssuesByMonth() 메소드로 가져온 모든 이슈의 createdAt 값이 찾으려는 값과 같으면 테스트 통과.
+        assertEquals(issueDTOList.size(), issueDTOList.stream().filter(issueEntity -> issueEntity.getCreatedAt().getMonth().equals(month)).toList().size());
 
     }
 
