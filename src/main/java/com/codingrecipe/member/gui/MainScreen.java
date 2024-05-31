@@ -3,16 +3,20 @@ package com.codingrecipe.member.gui;
 import com.codingrecipe.member.service.MemberService;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 
 public class MainScreen {
     private JFrame frame;
     private final MemberService memberService;
 
+    //헤드리스모드 확인
     public MainScreen(MemberService memberService) {
         this.memberService = memberService;
-        initialize();
+        if (!GraphicsEnvironment.isHeadless()) {
+            initialize();
+        } else {
+            System.out.println("헤드리스 모드에서 실행중");
+        }
     }
 
     private void initialize() {
@@ -29,25 +33,25 @@ public class MainScreen {
         btnSignUp.setBounds(150, 130, 100, 30);
         frame.getContentPane().add(btnSignUp);
 
-        btnLogin.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                LoginScreen loginScreen = new LoginScreen(memberService);
-                loginScreen.showFrame();
-                frame.dispose();
-            }
+        btnLogin.addActionListener(e -> {
+            LoginScreen loginScreen = new LoginScreen(memberService,null);
+            loginScreen.showFrame();
+            frame.dispose();
         });
 
-        btnSignUp.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SignUpScreen signUpScreen = new SignUpScreen(memberService);
-                signUpScreen.showFrame();
-                frame.dispose();
-            }
+        btnSignUp.addActionListener(e -> {
+            SignUpScreen signUpScreen = new SignUpScreen(memberService);
+            signUpScreen.showFrame();
+            frame.dispose();
         });
     }
 
+    //헤드리스 모드 확인
     public void showFrame() {
-        frame.setVisible(true);
+        if (!GraphicsEnvironment.isHeadless()) {
+            frame.setVisible(true);
+        } else {
+            System.out.println("헤드리스 모드에서 실행중");
+        }
     }
 }
-

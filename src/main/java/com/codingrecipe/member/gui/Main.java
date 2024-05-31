@@ -8,13 +8,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.codingrecipe.member.service"})
+@ComponentScan(basePackages = {"com.codingrecipe.member"})
 public class Main implements CommandLineRunner {
 
     @Autowired
     private MemberService memberService;
 
     public static void main(String[] args) {
+        System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Main.class, args);
     }
 

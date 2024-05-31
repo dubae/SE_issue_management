@@ -1,4 +1,4 @@
 package com.codingrecipe.member.gui;
 
-public class AdminPage {
+public class IssueDetail {
 }
