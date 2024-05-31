@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 
 public class SignUpScreen {
     private JFrame frame;
+    private JTextField textFieldUserId; // Added userid field
+    private JTextField textFieldEmail; // Added email field
     private JTextField textFieldUsername;
     private JPasswordField passwordField;
     private final MemberService memberService;
@@ -28,66 +30,75 @@ public class SignUpScreen {
         lblTitle.setBounds(150, 20, 100, 30);
         frame.getContentPane().add(lblTitle);
 
+        JLabel lblUserId = new JLabel("User ID:"); // Added userid label
+        lblUserId.setBounds(50, 60, 80, 25);
+        frame.getContentPane().add(lblUserId);
+
+        textFieldUserId = new JTextField(); // Added userid text field
+        textFieldUserId.setBounds(150, 60, 180, 25);
+        frame.getContentPane().add(textFieldUserId);
+        textFieldUserId.setColumns(10);
+
+        JLabel lblEmail = new JLabel("Email:"); // Added email label
+        lblEmail.setBounds(50, 100, 80, 25);
+        frame.getContentPane().add(lblEmail);
+
+        textFieldEmail = new JTextField(); // Added email text field
+        textFieldEmail.setBounds(150, 100, 180, 25);
+        frame.getContentPane().add(textFieldEmail);
+        textFieldEmail.setColumns(10);
+
         JLabel lblUsername = new JLabel("Username:");
-        lblUsername.setBounds(50, 80, 80, 25);
+        lblUsername.setBounds(50, 140, 80, 25);
         frame.getContentPane().add(lblUsername);
 
         textFieldUsername = new JTextField();
-        textFieldUsername.setBounds(150, 80, 180, 25);
+        textFieldUsername.setBounds(150, 140, 180, 25);
         frame.getContentPane().add(textFieldUsername);
         textFieldUsername.setColumns(10);
 
         JLabel lblPassword = new JLabel("Password:");
-        lblPassword.setBounds(50, 120, 80, 25);
+        lblPassword.setBounds(50, 180, 80, 25);
         frame.getContentPane().add(lblPassword);
 
         passwordField = new JPasswordField();
-        passwordField.setBounds(150, 120, 180, 25);
+        passwordField.setBounds(150, 180, 180, 25);
         frame.getContentPane().add(passwordField);
 
         JButton btnSignUp = new JButton("가입");
-        btnSignUp.setBounds(150, 160, 180, 30);
+        btnSignUp.setBounds(150, 220, 180, 30);
         frame.getContentPane().add(btnSignUp);
-
-        JButton btnBack = new JButton("뒤로가기");
-        btnBack.setBounds(150, 200, 180, 30);
-        frame.getContentPane().add(btnBack);
 
         btnSignUp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                String userid = textFieldUserId.getText(); // Retrieve userid
+                String email = textFieldEmail.getText(); // Retrieve email
                 String username = textFieldUsername.getText();
                 String password = new String(passwordField.getPassword());
 
-                if (validateInputs(username, password)) {
+                if (validateInputs(userid, email, username, password)) {
                     MemberDTO memberDTO = new MemberDTO();
-                    memberDTO.setUserid(username);
+                    memberDTO.setUserid(userid);
+                    memberDTO.setEmail(email);
+                    memberDTO.setUsername(username);
                     memberDTO.setPassword(password);
                     memberService.register(memberDTO);
                     JOptionPane.showMessageDialog(frame, "회원 가입 성공!");
-                    LoginScreen loginScreen = new LoginScreen(memberService);
+                    LoginScreen loginScreen = new LoginScreen(memberService,null);
                     loginScreen.showFrame();
                     frame.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "다시 입력해주세요.");
+                    JOptionPane.showMessageDialog(frame, "Please fill in all fields.");
                 }
-            }
-        });
-
-        btnBack.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MainScreen mainScreen = new MainScreen(memberService);
-                mainScreen.showFrame();
-                frame.dispose();
             }
         });
     }
 
-    private boolean validateInputs(String username, String password) {
-        return !(username.isEmpty() || password.isEmpty());
+    private boolean validateInputs(String userid, String email, String username, String password) {
+        return !(userid.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty());
     }
 
     public void showFrame() {
         frame.setVisible(true);
     }
 }
-
