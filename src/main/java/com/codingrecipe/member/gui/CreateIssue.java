@@ -1,7 +1,11 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.repository.IssueRepository;
+import com.codingrecipe.member.repository.ProjectRepository;
 import com.codingrecipe.member.service.IssueService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,10 +18,20 @@ public class CreateIssue {
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
     private JComboBox<String> comboBoxStatus;
-    private final IssueService issueService; // 이슈 서비스 객체
+
+
+    private IssueRepository issueRepository;
+
+
+    private ProjectRepository projectRepository;
+
+
+    private IssueService issueService; // 이슈 서비스 객체
+
     private final String username;
 
     // 생성자 수정 - IssueService 객체를 전달받도록 변경
+   // @Autowired
     public CreateIssue(IssueService issueService, String username) {
         this.issueService = issueService; // 이슈 서비스 객체 설정
         this.username = username;

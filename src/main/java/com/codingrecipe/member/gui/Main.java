@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,8 +12,12 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.codingrecipe.member"})
 public class Main implements CommandLineRunner {
 
+
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private IssueService issueService;
 
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");
@@ -21,7 +26,7 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        MainScreen mainScreen = new MainScreen(memberService);
+        MainScreen mainScreen = new MainScreen(memberService, issueService);
         mainScreen.showFrame();
     }
 }
