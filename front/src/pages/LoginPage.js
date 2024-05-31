@@ -1,3 +1,31 @@
+/*
+React는 세션을 사용할 수 없음.
+-> JWT 복잡함, 시간 없음
+-> 서버에서 세션을 사용하도록 함
+-> 서버로 로그인 요청을 보내고 로그인이 되면 서버에서 세션 문자열을 하나 만들어서
+    클라이언트에게 보내주는 방식으로 구현
+    
+    localStorage.setItem('sessionid', response.data);
+    코드가 다음과 같이 받은 로그인 엔드포인트로부터 받은 응답을 localStorage에 저장하고 다른 요청을 할때 꺼내서 사용
+    로그인 한 후 다른 요청을 보낼 땐 이 세션 문자열을 헤더에 담아서 보내주면 됨
+    로그아웃 하시면 localStorage에서 삭제하면 됨
+    
+    localStorage.getItem('sessionid');
+    const response = await axios.post('http://localhost:8080/api/projects', {보낼 data}, {
+      headers: {
+        'sessionid': `${sessionid}`
+      },
+        withCredentials: true
+      });
+
+    로그인을 마치면 다른 엔드포인트에는 다음과 같은 방식으로 보내주시면 됩니다.
+    헤더에 sessionid를 담아서 보내주시면 됩니다.
+    서버가 이 세션 문자열을 받아서 세션을 확인하고 로그인 여부를 판단합니다.
+
+    프론트 껐다가 실행하면 로그인이 유지되던데 이건 세션 때문에 로그인 풀리도록 해주셔야 합니다.
+    
+*/
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, Form } from 'react-bootstrap';
