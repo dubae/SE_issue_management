@@ -18,7 +18,6 @@ import com.codingrecipe.member.session.SessionManager;
 
 @Controller
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:3000")
 public class MemberController {
     private final MemberService memberService;
 
@@ -132,8 +131,9 @@ public class MemberController {
         }
     }
     @GetMapping("/api/user_list")
-    public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<MemberDTO> memberDTOList = memberService.findAll();

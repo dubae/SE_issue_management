@@ -201,9 +201,9 @@ public class ProjectController {
     }
 
     @GetMapping("/api/project/{projectname}/{role}/list_addable_user")
-    public ResponseEntity<List<MemberDTOSecure>> role_addable_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
-        System.out.println(role);
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<MemberDTOSecure>> role_addable_user_list(@PathVariable String projectname, @PathVariable String role, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!role.equals("PL") && !role.equals("DEV") && !role.equals("TESTER")) {
