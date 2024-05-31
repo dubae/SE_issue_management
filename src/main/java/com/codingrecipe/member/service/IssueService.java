@@ -2,10 +2,12 @@ package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.entity.IssueEntity;
+import com.codingrecipe.member.entity.ProjectEntity;
 import com.codingrecipe.member.repository.IssueRepository;
 import com.codingrecipe.member.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,6 +27,7 @@ public class IssueService {
     /**
      * 모든 이슈Dto 리스트 반환.
      */
+    @Transactional
     public List<IssueDTO> findAllIssue(){
         List<IssueDTO> issueDTOList=new ArrayList<>();
         List<IssueEntity> issueEntityList=issueRepository.findAll();
@@ -55,7 +58,8 @@ public class IssueService {
      */
     public void addNewIssue(IssueDTO issueDTO){
         IssueEntity issueEntity=IssueEntity.toIssueEntity(issueDTO);
-        issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
+       // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
+        issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
         issueRepository.save(issueEntity);
     }
 

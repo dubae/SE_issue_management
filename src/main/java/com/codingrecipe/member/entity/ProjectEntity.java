@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor
+@Builder
 @Table(name = "projects")
 public class ProjectEntity {
     @Id
@@ -48,4 +49,6 @@ public class ProjectEntity {
         projectEntity.setProjectstatus(projectDTO.getProjectstatus());
         return projectEntity;
     }
+
+
 }
