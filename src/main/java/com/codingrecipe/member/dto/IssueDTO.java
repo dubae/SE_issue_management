@@ -4,10 +4,12 @@ package com.codingrecipe.member.dto;
 import com.codingrecipe.member.entity.IssueCommentEntity;
 import com.codingrecipe.member.entity.IssueEntity;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -26,13 +28,14 @@ public class IssueDTO extends BaseDTO{
     private String priority;
     private String significance;
     private String description;
-
+    private ProjectDTO projectDTO;
 
     private List<IssueCommentDTO> issueCommentDTOList=new ArrayList<>();
 
     /**
      * 생성자 방식
      */
+
     public IssueDTO(IssueEntity issueEntity){
         this.id=issueEntity.getId();
         this.writerId=issueEntity.getWriterId();
@@ -47,6 +50,8 @@ public class IssueDTO extends BaseDTO{
         this.createdAt=issueEntity.getCreatedAt();
         this.updatedAt=issueEntity.getUpdatedAt();
         this.fixerId=issueEntity.getFixerId();
+
+        this.projectDTO=ProjectDTO.toProjectDTO(issueEntity.getProjectEntity());
         for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
             issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
         }
@@ -68,10 +73,21 @@ public class IssueDTO extends BaseDTO{
         issueDTO.setPriority(issueEntity.getPriority());
         issueDTO.setSignificance(issueEntity.getSignificance());
         issueDTO.setDescription(issueEntity.getDescription());
+        issueDTO.setCreatedAt(issueEntity.getCreatedAt());
+        issueDTO.setUpdatedAt(issueEntity.getUpdatedAt());
+        issueDTO.setFixerId(issueEntity.getFixerId());
+
+        issueDTO.setProjectDTO(ProjectDTO.toProjectDTO(issueEntity.getProjectEntity()));
+
         for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
             issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));
         }
 
         return issueDTO;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return Objects.equals(this.id, ((IssueDTO) o).getId());
     }
 }
