@@ -47,11 +47,11 @@ public class MemberController {
     }
     
         
-    @PostMapping("/api/login_status")
+    @GetMapping("/api/login_status")
     public ResponseEntity<String> login_get(HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         System.out.println(sessionid);
-        if (SessionManager.getAttribute(sessionid) != null){
+        if (SessionManager.getSession(sessionid) != null){
             return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -63,7 +63,7 @@ public class MemberController {
         System.out.println(memberDTO.getUserid());
         System.out.println(memberDTO.getPassword());
         System.out.println(sessionid);
-        if (SessionManager.getAttribute(sessionid) != null){
+        if (SessionManager.getSession(sessionid) != null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
@@ -73,11 +73,11 @@ public class MemberController {
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
-                if (sessionid != null && SessionManager.getAttribute(sessionid) != null) {
-                    SessionManager.removeAttribute(sessionid);
+                if (sessionid != null && SessionManager.getSession(sessionid) != null) {
+                    SessionManager.removeSession(sessionid);
                 }
                 String key = SessionManager.generateKey();
-                SessionManager.setAttribute(key, findMember.getUserid());
+                SessionManager.setSession(key, findMember.getUserid());
                 return ResponseEntity.status(HttpStatus.OK).body(key);
             } else {
                 System.out.println("로그인 실패");
@@ -87,8 +87,9 @@ public class MemberController {
     }
 
     @GetMapping("/api/member/{userid}")
-    public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO member = memberService.findByUserId(userid);
@@ -100,28 +101,30 @@ public class MemberController {
     }
 
     @GetMapping("/api/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        session.invalidate();
+        SessionManager.removeSession(sessionid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/api/user/{userid}/delete")
-    public ResponseEntity<String> delete(@PathVariable String userid, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> delete(@PathVariable String userid, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (!session.getAttribute("userid").equals(userid) && !session.getAttribute("userid").equals("admin")) {
+        if (!SessionManager.getSession(sessionid).equals(userid) && !SessionManager.getSession(sessionid).equals("admin")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (memberService.findByUserId(userid) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (memberService.deleteByUserId(userid)) {
-            if (session.getAttribute("userid").equals(userid)){
-                session.invalidate();
+            if (SessionManager.getSession(sessionid).equals(userid)){
+                SessionManager.removeSession(sessionid);
             }
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {

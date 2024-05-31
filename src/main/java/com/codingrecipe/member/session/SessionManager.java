@@ -16,15 +16,19 @@ public class SessionManager {
         return key;
     }
 
-    public static void setAttribute(String key, String username) {
+    public static void setSession(String key, String username) {
         sessionMap.put(key, username);
     }
 
-    public static Object getAttribute(String key) {
+    public static Object getSession(String key) {
         return sessionMap.get(key);
     }
 
-    public static void removeAttribute(String key) {
+    public static void removeSession(String key) {
         sessionMap.remove(key);
+    }
+
+    public static void test() {
+        sessionMap.put("testtesttesttesttest", "admin");
     }
 }
