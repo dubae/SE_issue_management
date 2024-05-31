@@ -3,6 +3,7 @@ package com.codingrecipe.member.gui;
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
+import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,10 +15,12 @@ public class LoginScreen {
     private JPasswordField passwordField;
     private final MemberService memberService;
     private final IssueService issueService;
+    private final ProjectService projectService;
 
-    public LoginScreen(MemberService memberService, IssueService issueService) {
+    public LoginScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
         this.memberService = memberService;
         this.issueService = issueService;
+        this.projectService = projectService;
         initialize();
     }
 
@@ -58,11 +61,13 @@ public class LoginScreen {
                 String password = new String(passwordField.getPassword());
 
                 if (validateInputs(email, password)) {
+                    // Retrieve user data from the MemberService
                     MemberDTO memberDTO = memberService.findByUserId(email, true);
                     if (memberDTO != null && memberDTO.getPassword().equals(password)) {
+                        // Login successful
                         JOptionPane.showMessageDialog(frame, "로그인 성공!");
 
-                        UserPage userPage = new UserPage(memberService, issueService, email);
+                        UserPage userPage = new UserPage(issueService, projectService, email, password);
                         userPage.showFrame();
 
                         frame.dispose();
@@ -84,7 +89,7 @@ public class LoginScreen {
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                MainScreen mainScreen = new MainScreen(memberService);
+                MainScreen mainScreen = new MainScreen(memberService, issueService);
                 mainScreen.showFrame();
             }
         });

@@ -2,14 +2,17 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
+import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainScreen {
-    private final IssueService issueService;
     private JFrame frame;
     private final MemberService memberService;
+    private IssueService issueService;
+    private ProjectService projectService;
+
 
     //헤드리스모드 확인
     public MainScreen(MemberService memberService, IssueService issueService) {
@@ -21,7 +24,6 @@ public class MainScreen {
             System.out.println("헤드리스 모드에서 실행중");
         }
     }
-
 
     private void initialize() {
         frame = new JFrame();
@@ -38,14 +40,13 @@ public class MainScreen {
         frame.getContentPane().add(btnSignUp);
 
         btnLogin.addActionListener(e -> {
-
-            LoginScreen loginScreen = new LoginScreen(memberService, issueService);
+            LoginScreen loginScreen = new LoginScreen(memberService,issueService,projectService);
             loginScreen.showFrame();
             frame.dispose();
         });
 
         btnSignUp.addActionListener(e -> {
-            SignUpScreen signUpScreen = new SignUpScreen(memberService);
+            SignUpScreen signUpScreen = new SignUpScreen(memberService,issueService,projectService);
             signUpScreen.showFrame();
             frame.dispose();
         });

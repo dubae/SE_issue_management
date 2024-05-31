@@ -213,16 +213,16 @@ public class IssueService {
      * 이슈의 아이디를 인자로 넘겨줌.
      * 새 이슈와 같은 component를 가장 많이 해결한 개발자의 id를 반환.
      */
-    public List<Long> suggestDev(Long id) {
-        IssueDTO issueDTO = findById(id);
-        String targetComponent = issueDTO.getComponent();
-        HashMap<Long, Integer> devMap = new HashMap<>();
+    public List<Long> suggestDev(Long id){
+        IssueDTO issueDTO=findById(id);
+        String targetComponent=issueDTO.getComponent();
+        HashMap<Long, Integer> devMap=new HashMap<>();
         List<IssueDTO> issueDTOList = findByStatus("closed").stream()
                 .filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent))
                 .collect(Collectors.toList());
-        int max = 0;
-        Long bestDev = 1L;
-
+        int max=0;
+        Long bestDev=1L;
+        
 
         Long fixerId;
 
@@ -252,5 +252,8 @@ public class IssueService {
         return keySet.subList(0, Math.min(3, keySet.size()));
 
 
+
+
     }
+
 }

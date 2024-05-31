@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.codingrecipe.member"})
 public class Main implements CommandLineRunner {
 
+
     @Autowired
     private MemberService memberService;
 
@@ -25,7 +26,7 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        MainScreen mainScreen = new MainScreen(memberService);
+        MainScreen mainScreen = new MainScreen(memberService, issueService);
         mainScreen.showFrame();
     }
 }
