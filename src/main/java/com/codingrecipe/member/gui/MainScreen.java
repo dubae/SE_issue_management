@@ -1,23 +1,27 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainScreen {
+    private final IssueService issueService;
     private JFrame frame;
     private final MemberService memberService;
 
     //헤드리스모드 확인
-    public MainScreen(MemberService memberService) {
+    public MainScreen(MemberService memberService, IssueService issueService) {
         this.memberService = memberService;
+        this.issueService = issueService;
         if (!GraphicsEnvironment.isHeadless()) {
             initialize();
         } else {
             System.out.println("헤드리스 모드에서 실행중");
         }
     }
+
 
     private void initialize() {
         frame = new JFrame();
@@ -34,7 +38,8 @@ public class MainScreen {
         frame.getContentPane().add(btnSignUp);
 
         btnLogin.addActionListener(e -> {
-            LoginScreen loginScreen = new LoginScreen(memberService,null);
+
+            LoginScreen loginScreen = new LoginScreen(memberService, issueService);
             loginScreen.showFrame();
             frame.dispose();
         });

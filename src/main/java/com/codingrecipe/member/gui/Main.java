@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -13,6 +14,9 @@ public class Main implements CommandLineRunner {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private IssueService issueService;
 
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");

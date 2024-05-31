@@ -58,10 +58,8 @@ public class LoginScreen {
                 String password = new String(passwordField.getPassword());
 
                 if (validateInputs(email, password)) {
-                    // Retrieve user data from the MemberService
                     MemberDTO memberDTO = memberService.findByUserId(email, true);
                     if (memberDTO != null && memberDTO.getPassword().equals(password)) {
-                        // Login successful
                         JOptionPane.showMessageDialog(frame, "로그인 성공!");
 
                         UserPage userPage = new UserPage(memberService, issueService, email);
