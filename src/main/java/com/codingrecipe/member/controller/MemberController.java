@@ -67,6 +67,7 @@ public class MemberController {
                 if (session.getAttribute("userid") != null) {
                     session.invalidate();
                 }
+
                 session.setAttribute("userid", findMember.getUserid());
                 return ResponseEntity.status(HttpStatus.OK).build();
             } else {

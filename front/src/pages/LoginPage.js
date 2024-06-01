@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 
@@ -11,7 +12,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  let isAuthenticated;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,11 +22,13 @@ function LoginPage() {
         password: password,
       });
       if (response.status === 200) {
-        isAuthenticated = true; // 이 부분은 실제 인증 여부에 따라 변경해야 합니다.
-      }
-      const isAdmin = response.data.isAdmin; // 관리자 여부를 응답에서 받아온다고 가정합니다.
+        const isAdmin = response.data.isAdmin; // 관리자 여부를 응답에서 받아온다고 가정합니다.
+        console.log(response.data.toString());
+        const sessionId = response.data.sessionId; // 서버가 세션 ID를 반환한다고 가정합니다
+        console.log(sessionId);
+        // Store session ID in a cookie
+        Cookies.set('sessionId', sessionId, { expires: 1 }); // 쿠키 만료 시간을 1일로 설정
 
-      if (isAuthenticated) {
         if (isAdmin) {
           alert('관리자 권한 허용되었습니다.');
         } else {
@@ -53,36 +55,36 @@ function LoginPage() {
   };
 
   return (
-    <div className="auth-container">
-      <h1 className="auth-title">로그인</h1>
-      <Form className="auth-form" onSubmit={handleLogin}>
-        <Form.Group controlId="formUserId">
-          <Form.Label>ID *</Form.Label>
-          <Form.Control
-            type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="formPassword">
-          <Form.Label>Password *</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit" style={{ float: 'right' }}>
-          로그인
-        </Button>
-      </Form>
-      <div className="auth-footer">
-        <Link to="/"><Button variant="link">홈화면</Button></Link>
-        <Link to="/signup"><Button variant="link">회원가입</Button></Link>
+      <div className="auth-container">
+        <h1 className="auth-title">로그인</h1>
+        <Form className="auth-form" onSubmit={handleLogin}>
+          <Form.Group controlId="formUserId">
+            <Form.Label>ID *</Form.Label>
+            <Form.Control
+                type="text"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                required
+            />
+          </Form.Group>
+          <Form.Group controlId="formPassword">
+            <Form.Label>Password *</Form.Label>
+            <Form.Control
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit" style={{ float: 'right' }}>
+            로그인
+          </Button>
+        </Form>
+        <div className="auth-footer">
+          <Link to="/"><Button variant="link">홈화면</Button></Link>
+          <Link to="/signup"><Button variant="link">회원가입</Button></Link>
+        </div>
       </div>
-    </div>
   );
 }
 
