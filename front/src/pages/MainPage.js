@@ -4,62 +4,58 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
 import UserInfoModal from '../components/UserInfoModal';
-import axios from 'axios';
+
+const API_URL = 'http://localhost:8080/api';
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
-    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin') === 'true');
     const [userInfo, setUserInfo] = useState({
         userId: localStorage.getItem('userId') || '',
-        email: localStorage.getItem('email') || '',
-        name: localStorage.getItem('name') || ''
+        email: '',
+        name: ''
     });
     const [showUserInfo, setShowUserInfo] = useState(false);
-    const handleCloseUserInfo = () => setShowUserInfo(false);
-    const handleShowUserInfo = () => setShowUserInfo(true);
-    useEffect(() => {
-        // 페이지가 로드될 때 실행되는 GET 요청 코드
-        fetchProjects();
-    }, []);
-    
 
-    const fetchProjects = async () => {
+    const handleCloseUserInfo = () => setShowUserInfo(false);
+    const handleShowUserInfo = async () => {
         try {
-            let sessionid = localStorage.getItem('sessionid');
-            const response = await axios.post('http://localhost:8080/api/projects', {}, {
+            const response = await fetch(`${API_URL}/member/${localStorage.getItem('userId')}`, {
                 headers: {
-                  'sessionid': `${sessionid}`
-                },
-                withCredentials: true
-              });
-            console.log(response);
-            const data = response.data;
-            setProjects(data);
+                    'Content-Type': 'application/json',
+                    'sessionid': localStorage.getItem('sessionid') // 세션 ID를 헤더에 포함
+                }
+            });
+    
+            if (!response.ok) {
+                let errorMsg = `HTTP error! Status: ${response.status}`;
+                if (response.status === 401) {
+                    errorMsg = 'Unauthorized access. Please log in again.';
+                } else if (response.status === 404) {
+                    errorMsg = 'User not found.';
+                }
+                throw new Error(errorMsg);
+            }
+    
+            const data = await response.json();
+            
+            if (!data || !data.userid || !data.email || !data.username) {
+                throw new Error('Incomplete response data');
+            }
+    
+            setUserInfo({
+                userId: data.userid,
+                email: data.email,
+                name: data.username
+            });
+    
+            setShowUserInfo(true);
         } catch (error) {
-            console.error('프로젝트를 가져오는 중 에러 발생:', error);
+            console.error('Error fetching user info:', error.message);
         }
     };
-
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setLoggedIn(localStorage.getItem('userId') ? true : false);
-            setIsAdmin(localStorage.getItem('isAdmin') === 'true');
-            setUserInfo({
-                userId: localStorage.getItem('userId') || '',
-                email: localStorage.getItem('email') || '',
-                name: localStorage.getItem('name') || ''
-            });
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
+    
 
     const [projects, setProjects] = useState([]);
-
     const [show, setShow] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
@@ -72,6 +68,47 @@ function MainPage() {
         description: ''
     });
 
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setLoggedIn(localStorage.getItem('userId') ? true : false);
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+/*
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const response = await fetch(`${API_URL}/projects`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': localStorage.getItem('userId')
+                }
+            });
+
+            const data = await response.json();
+            console.log(data);
+            const transformedProjects = data.map((project) => ({
+               id: project.projectid,
+               name: project.projectname,
+               description: project.projectdescription,
+               createdAt: project.projectcreatedtime,
+               status: project.projectstatus,
+               plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
+               testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
+               devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || ''
+            }));
+
+            setProjects(transformedProjects);
+        };
+
+        fetchProjects();
+    }, []);
+*/
     const handleClose = () => setShow(false);
     const handleShow = () => {
         setEditingProject(null);
@@ -95,43 +132,76 @@ function MainPage() {
         setNewProject({ ...newProject, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!newProject.name || !newProject.plAccount || !newProject.testerAccount || !newProject.devAccount) {
             alert("필수 입력란을 모두 채워주세요.");
             return;
         }
 
-        if (editingProject) {
-            const updatedProjects = projects.map((project) =>
-                project.id === editingProject.id ? { ...editingProject, ...newProject } : project
-            );
-            setProjects(updatedProjects);
-        } else {
-            const projectWithDate = {
-                id: projects.length + 1,
-                ...newProject,
-                createdAt: new Date().toISOString().split('T')[0],
-                status: '진행중'
-            };
-            setProjects([...projects, projectWithDate]);
-        }
+        const projectData = {
+            projectid: editingProject ? editingProject.id : projects.length + 1,
+            projectname: newProject.name,
+            projectdescription: newProject.description,
+            projectcreatedAt: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
+            projectstatus: editingProject ? editingProject.status : '진행중'
+        };
 
-        setNewProject({
-            name: '',
-            plAccount: '',
-            testerAccount: '',
-            devAccount: '',
-            description: ''
+        const addProjectDTO = {
+            projectDTO: projectData,
+            pl: newProject.plAccount,
+            dev: newProject.devAccount,
+            tester: newProject.testerAccount,
+            pm: userInfo.userId
+        };
+
+        const response = await fetch(`${API_URL}/addproject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'userId': localStorage.getItem('userId')
+            },
+            body: JSON.stringify(addProjectDTO),
         });
-        handleClose();
+
+        if (response.ok) {
+            const updatedProjects = editingProject
+                ? projects.map((project) =>
+                      project.id === editingProject.id ? projectData : project
+                  )
+                : [...projects, projectData];
+            setProjects(updatedProjects);
+            setNewProject({
+                name: '',
+                plAccount: '',
+                testerAccount: '',
+                devAccount: '',
+                description: ''
+            });
+            handleClose();
+        } else {
+            alert('프로젝트를 저장하는데 실패했습니다.');
+        }
     };
 
-    const handleDelete = () => {
-        const newProjects = [...projects];
-        newProjects.splice(selectedIndex, 1);
-        setProjects(newProjects);
-        handleCloseConfirm();
+    const handleDelete = async () => {
+        const projectToDelete = projects[selectedIndex];
+
+        const response = await fetch(`${API_URL}/addproject/${projectToDelete.name}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'userId': localStorage.getItem('userId')
+            }
+        });
+
+        if (response.ok) {
+            const newProjects = projects.filter((_, index) => index !== selectedIndex);
+            setProjects(newProjects);
+            handleCloseConfirm();
+        } else {
+            alert('프로젝트 삭제에 실패했습니다.');
+        }
     };
 
     const handleLogout = () => {
@@ -144,8 +214,36 @@ function MainPage() {
 
     const handleEdit = (index) => {
         setEditingProject(projects[index]);
-        setNewProject(projects[index]);
+        setNewProject({
+            name: projects[index].name,
+            plAccount: projects[index].plAccount,
+            testerAccount: projects[index].testerAccount,
+            devAccount: projects[index].devAccount,
+            description: projects[index].description
+        });
         setShow(true);
+    };
+
+    const handleStatusChange = async (projectName, newStatus, currentStatus) => {
+        console.log(newStatus);
+        const response = await fetch(`${API_URL}/updateproject/${projectName}/${newStatus}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'userId': localStorage.getItem('userId')
+            }
+        });
+
+        if (response.ok) {
+            setProjects(projects.map(project =>
+                project.name === projectName ? { ...project, status: newStatus } : project
+            ));
+        } else {
+            alert('상태를 변경하는데 실패했습니다.');
+            setProjects(projects.map(project =>
+                project.name === projectName ? { ...project, status: currentStatus } : project
+            ));
+        }
     };
 
     return (
@@ -174,7 +272,7 @@ function MainPage() {
                             <th>개요</th>
                             <th>프로젝트 생성날짜</th>
                             <th>상태</th>
-                            {isAdmin && <th>수정</th>}
+                            {localStorage.getItem('isAdmin') === 'true' && <th>수정</th>}
                             <th>삭제</th>
                         </tr>
                     </thead>
@@ -193,8 +291,18 @@ function MainPage() {
                                 </td>
                                 <td>{project.description}</td>
                                 <td>{project.createdAt}</td>
-                                <td>{project.status}</td>
-                                {isAdmin && (
+                                <td>
+                                    <Form.Control
+                                        as="select"
+                                        value={project.status}
+                                        onChange={(e) => handleStatusChange(project.name, e.target.value, project.status)}
+                                    >
+                                        <option value="진행중">진행중</option>
+                                        <option value="완료">완료</option>
+                                        <option value="보류">보류</option>
+                                    </Form.Control>
+                                </td>
+                                {localStorage.getItem('isAdmin') === 'true' && (
                                     <td>
                                         <Button variant="warning" onClick={() => handleEdit(index)}>수정</Button>
                                     </td>

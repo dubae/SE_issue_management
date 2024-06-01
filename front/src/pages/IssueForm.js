@@ -1,43 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import axios from 'axios';
 
-function IssueForm({ onIssueAdded }) {
+const API_URL = 'http://localhost:8080/api';
+
+function IssueForm({ onIssueAdded, projectId }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'major'
+    priority: 'major',
+    component: '',
+    status: 'New',
+    fixerId: '',
+    devId: '',
   });
+
+  useEffect(() => {
+    setFormData(prevData => ({
+      ...prevData,
+      projectId: parseInt(projectId, 10),
+      writerId: parseInt(localStorage.getItem('userId'), 10)
+    }));
+  }, [projectId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const now = new Date();
-    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    // 작성자 정보를 가져옵니다. 일단 하드코딩된 값을 사용합니다.
-    // userId로 백엔드에서 사용자 정보를 가져오는 API 호출 추가.
-    const userId = localStorage.getItem('userId');
-    const author = 'pl1';  // 이슈 작성자
-
-    // 이 정보를 formData에 추가
-    const newIssue = {
+    const issueData = {
       ...formData,
-      date,
-      time,
-      author
+      projectId: parseInt(projectId, 10),
+      writerId: localStorage.getItem('userId'),
     };
 
-    console.log(newIssue);
-    onIssueAdded(newIssue);
+    console.log(issueData);
+
+    try {
+      const response = await axios.post(`${API_URL}/addissue`, issueData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
+        const createdIssue = response.data;
+        onIssueAdded(createdIssue);
+      } else {
+        console.error('Failed to create issue:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error creating issue:', error);
+    }
   };
 
   return (
@@ -65,6 +85,15 @@ function IssueForm({ onIssueAdded }) {
             required
           />
         </Form.Group>
+        <Form.Group controlId="formIssueComponent">
+          <Form.Label>Component</Form.Label>
+          <Form.Control
+            type="text"
+            name="component"
+            value={formData.component}
+            onChange={handleChange}
+          />
+        </Form.Group>
         <Form.Group controlId="formIssuePriority">
           <Form.Label>Priority</Form.Label>
           <Form.Control
@@ -79,6 +108,24 @@ function IssueForm({ onIssueAdded }) {
             <option value="minor">Minor</option>
             <option value="trivial">Trivial</option>
           </Form.Control>
+        </Form.Group>
+        <Form.Group controlId="formIssueDevId">
+          <Form.Label>Developer ID</Form.Label>
+          <Form.Control
+            type="text"
+            name="devId"
+            value={formData.devId}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        <Form.Group controlId="formIssueFixerId">
+          <Form.Label>Fixer ID</Form.Label>
+          <Form.Control
+            type="text"
+            name="fixerId"
+            value={formData.fixerId}
+            onChange={handleChange}
+          />
         </Form.Group>
         <Button variant="primary" type="submit">
           생성

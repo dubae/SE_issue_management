@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 import Header from '../components/Header';
 import CommentSection from '../components/CommentSection';
-import Dropdown from '../components/Dropdown';
+import Dropdown from '../components/Dropdown2';
+import UserInfoModal from '../components/UserInfoModal';
 import './IssueDetailPage.css';
+
+const API_URL = 'http://localhost:8080/api';
 
 function IssueDetailPage() {
     const navigate = useNavigate();
@@ -13,52 +16,84 @@ function IssueDetailPage() {
     const projectName = searchParams.get('projectName');
 
     const [issue, setIssue] = useState({
-        title: `issue#${issueId}`,
-        description: '로그인, 로그아웃 기능 구현하기',
-        reporter: 'Reporter1',
-        reportedDate: '2023-05-20 17:40:11',
-        assignee: 'PL1',
-        priority: 'Major',
-        status: 'New',
-        component: 'UI', // 예시로 'UI' 컴포넌트 추가
-        comments: [
-            { author: 'Tester1', content: '이슈 생성했습니다.', date: '2023-05-20 17:40:00' },
-            { author: 'PL1', content: '확인/assignee 지정했습니다.', date: '2023-05-22 15:10:00' }
-        ]
+        id: null,
+        writerId: '',
+        projectId: null,
+        devId: '',
+        fixerId: '',
+        title: '',
+        status: '',
+        component: '',
+        priority: '',
+        description: '',
+        modifyCount: 0,
+        createdAt: '',
+        comments: []
+    });
+
+    const [members, setMembers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showUserModal, setShowUserModal] = useState(false);
+    const [updateData, setUpdateData] = useState({
+        assignee: '',
+        priority: '',
+        status: ''
     });
 
     const fetchIssue = async () => {
         try {
-            // API 호출을 여기에 추가
+            const response = await axios.get(`${API_URL}/issue/detail/${issueId}`); //경로
+            setIssue(response.data);
+            setUpdateData({
+                assignee: response.data.devId,
+                priority: response.data.priority,
+                status: response.data.status
+            });
         } catch (error) {
             console.error('Error fetching issue:', error);
         }
     };
 
+    const fetchMembers = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/projects/${projectId}/members`);
+            setMembers(response.data);
+        } catch (error) {
+            console.error('Error fetching members:', error);
+        }
+    };
+
     useEffect(() => {
-        // fetchIssue();
+        fetchIssue();
+        fetchMembers();
     }, [projectId, issueId]);
 
-    const handleAssigneeChange = (e) => {
-        const selectedAssignees = Array.from(e.target.selectedOptions, option => option.value);
-        setIssue(prevIssue => ({
-            ...prevIssue,
-            assignee: selectedAssignees
-        }));
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        console.log('Name:', name);
+        console.log('Value:', value);
+        const newUpdateData = { ...updateData, [name]: value };
+
+        try {
+            await axios.post(`${API_URL}/issue/${issueId}/info`, newUpdateData);
+            setUpdateData(newUpdateData);
+            setIssue(prevIssue => ({ ...prevIssue, ...newUpdateData }));
+        } catch (error) {
+            console.error('Error updating issue info:', error);
+        }
     };
 
-    const handlePriorityChange = (e) => {
-        setIssue(prevIssue => ({
-            ...prevIssue,
-            priority: e.target.value
-        }));
+    const handleUserClick = (userId) => {
+        const user = members.find(member => member.userid === userId);
+        if (user) {
+            setSelectedUser(user);
+            setShowUserModal(true);
+        }
     };
 
-    const handleStatusChange = (e) => {
-        setIssue(prevIssue => ({
-            ...prevIssue,
-            status: e.target.value
-        }));
+    const handleCloseUserModal = () => {
+        setShowUserModal(false);
+        setSelectedUser(null);
     };
 
     return (
@@ -68,23 +103,21 @@ function IssueDetailPage() {
                 <div className="left-panel">
                     <h2>이슈 설명</h2>
                     <p>{issue.description}</p>
-                    <CommentSection comments={issue.comments} />
+                    <CommentSection comments={issue.comments || []} onUserClick={handleUserClick} />
                 </div>
                 <div className="right-panel">
-                    <p>Component: {issue.component}</p> {/* Component 출력 추가 */}
+                    <p>Component: {issue.component}</p>
+                    <p>Reported Date : {issue.createdAt}</p>
                     <Dropdown
                         label="Assignee"
-                        options={[
-                            { value: 'PL1', label: 'PL1' },
-                            { value: 'Dev1', label: 'Dev1' },
-                            { value: 'Dev2', label: 'Dev2' },
-                            { value: 'Tester2', label: 'Tester2' }
-                        ]}
-                        value={issue.assignee}
-                        onChange={handleAssigneeChange}
+                        name="assignee"
+                        options={members.map(member => ({ value: member.userid, label: member.username }))}
+                        value={updateData.assignee}
+                        onChange={handleChange}
                     />
                     <Dropdown
                         label="Priority"
+                        name="priority"
                         options={[
                             { value: 'Blocker', label: 'Blocker' },
                             { value: 'Critical', label: 'Critical' },
@@ -92,11 +125,12 @@ function IssueDetailPage() {
                             { value: 'Minor', label: 'Minor' },
                             { value: 'Trivial', label: 'Trivial' }
                         ]}
-                        value={issue.priority}
-                        onChange={handlePriorityChange}
+                        value={updateData.priority}
+                        onChange={handleChange}
                     />
                     <Dropdown
                         label="Status"
+                        name="status"
                         options={[
                             { value: 'New', label: 'New' },
                             { value: 'Assigned', label: 'Assigned' },
@@ -104,11 +138,18 @@ function IssueDetailPage() {
                             { value: 'Closed', label: 'Closed' },
                             { value: 'Reopened', label: 'Reopened' }
                         ]}
-                        value={issue.status}
-                        onChange={handleStatusChange}
+                        value={updateData.status}
+                        onChange={handleChange}
                     />
                 </div>
             </div>
+            {selectedUser && (
+                <UserInfoModal
+                    show={showUserModal}
+                    handleClose={handleCloseUserModal}
+                    userInfo={selectedUser}
+                />
+            )}
         </div>
     );
 }

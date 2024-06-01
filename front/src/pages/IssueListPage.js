@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Form } from 'react-bootstrap';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import axios from 'axios';
 import Header from '../components/Header';
 import Pagination from '../components/Pagination';
 import './IssueListPage.css';
+
+const API_URL = 'http://localhost:8080/api';
 
 function IssueListPage() {
   const { projectId } = useParams();
@@ -31,22 +34,19 @@ function IssueListPage() {
     setStatusFixer(e.target.value);
   };
 
-  const [issues, setIssues] = useState([
-    { id: 1, component: 'component#1', title: 'issue#1', status: ['new'], priority: 'major', reportedDate: '2022-01-01', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 2, component: 'component#2', title: 'issue#2', status: ['assigned'], priority: 'critical', reportedDate: '2022-01-02', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 3, component: 'component#1', title: 'issue#3', status: ['new'], priority: 'major', reportedDate: '2022-01-03', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 4, component: 'component#1', title: 'issue#4', status: ['new'], priority: 'minor', reportedDate: '2022-01-04', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 5, component: 'component#2', title: 'issue#5', status: ['assigned'], priority: 'blocker', reportedDate: '2022-01-05', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 6, component: 'component#2', title: 'issue#6', status: ['resolved'], priority: 'critical', reportedDate: '2022-01-06', fixer: 'fixer2', assignee: 'tester1' },
-    { id: 7, component: 'component#3', title: 'issue#7', status: ['reopened'], priority: 'trivial', reportedDate: '2022-01-07', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 8, component: 'component#3', title: 'issue#8', status: ['closed'], priority: 'major', reportedDate: '2022-01-08', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 9, component: 'component#3', title: 'issue#9', status: ['new'], priority: 'minor', reportedDate: '2022-01-09', fixer: 'fixer3', assignee: 'pl1' },
-    { id: 10, component: 'component#1', title: 'issue#10', status: ['new'], priority: 'critical', reportedDate: '2022-01-10', fixer: 'fixer1', assignee: 'dev1' },
-    { id: 11, component: 'component#2', title: 'issue#11', status: ['assigned'], priority: 'major', reportedDate: '2022-01-11', fixer: 'fixer2', assignee: 'tester1' }
-  ]);
-
+  const [issues, setIssues] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const issuesPerPage = 10;
+
+  useEffect(() => {
+    axios.get(`${API_URL}/issues/${projectId}`)
+      .then(response => {
+        setIssues(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the issues!', error);
+      });
+  }, [projectId]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -56,7 +56,7 @@ function IssueListPage() {
   const indexOfFirstIssue = indexOfLastIssue - issuesPerPage;
   const currentIssues = issues.slice(indexOfFirstIssue, indexOfLastIssue);
 
-  const fixedIssues = issues.filter(issue => {
+  const filteredIssues = issues.filter(issue => {
     let matchesSearchText = true;
     let matchesPriority = true;
     let matchesStatus = true;
@@ -70,7 +70,7 @@ function IssueListPage() {
           matchesSearchText = issue.title.toLowerCase().includes(searchText.toLowerCase());
           break;
         case 'status':
-          matchesSearchText = issue.status.some(status => status.toLowerCase().includes(searchText.toLowerCase()));
+          matchesSearchText = issue.status.toLowerCase().includes(searchText.toLowerCase());
           break;
         default:
           matchesSearchText = true;
@@ -82,13 +82,13 @@ function IssueListPage() {
     }
 
     if (statusFixer) {
-      matchesStatus = issue.status.includes(statusFixer.toLowerCase());
+      matchesStatus = issue.status.toLowerCase() === statusFixer.toLowerCase();
     }
 
     return matchesSearchText && matchesPriority && matchesStatus;
   });
 
-  const displayedIssues = fixedIssues.slice(indexOfFirstIssue, indexOfLastIssue);
+  const displayedIssues = filteredIssues.slice(indexOfFirstIssue, indexOfLastIssue);
 
   return (
     <div className="issue-list-container">
@@ -154,11 +154,11 @@ function IssueListPage() {
                     {issue.title}
                   </Link>
                 </td>
-                <td>{issue.status.join(', ')}</td>
+                <td>{issue.status}</td>
                 <td>{issue.priority}</td>
-                <td>{issue.reportedDate}</td>
-                <td>{issue.fixer}</td>
-                <td>{issue.assignee}</td>
+                <td>{issue.createdAt}</td>
+                <td>{issue.fixerId}</td>
+                <td>{issue.devId}</td>
               </tr>
             ))}
           </tbody>
@@ -166,7 +166,7 @@ function IssueListPage() {
       </div>
       <Pagination
         currentPage={currentPage}
-        totalItems={fixedIssues.length}
+        totalItems={filteredIssues.length}
         itemsPerPage={issuesPerPage}
         onPageChange={handlePageChange}
       />
