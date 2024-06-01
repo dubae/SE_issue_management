@@ -7,6 +7,17 @@ import UserInfoModal from '../components/UserInfoModal';
 
 const API_URL = 'http://localhost:8080/api';
 
+function getCurrentDateTime() {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = ('0' + (now.getMonth() + 1)).slice(-2);
+    var day = ('0' + now.getDate()).slice(-2);
+    var hours = ('0' + now.getHours()).slice(-2);
+    var minutes = ('0' + now.getMinutes()).slice(-2);
+    var seconds = ('0' + now.getSeconds()).slice(-2);
+    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+}
+
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
     const [userInfo, setUserInfo] = useState({
@@ -79,14 +90,14 @@ function MainPage() {
             window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
-/*
+
     useEffect(() => {
         const fetchProjects = async () => {
             const response = await fetch(`${API_URL}/projects`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': localStorage.getItem('userId')
+                    'sessionid': localStorage.getItem('sessionid')
                 }
             });
 
@@ -108,7 +119,7 @@ function MainPage() {
 
         fetchProjects();
     }, []);
-*/
+
     const handleClose = () => setShow(false);
     const handleShow = () => {
         setEditingProject(null);
@@ -140,31 +151,29 @@ function MainPage() {
         }
 
         const projectData = {
-            projectid: editingProject ? editingProject.id : projects.length + 1,
             projectname: newProject.name,
             projectdescription: newProject.description,
-            projectcreatedAt: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
-            projectstatus: editingProject ? editingProject.status : '진행중'
+            projectcreatedtime: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
         };
 
         const addProjectDTO = {
             projectDTO: projectData,
-            pl: newProject.plAccount,
-            dev: newProject.devAccount,
-            tester: newProject.testerAccount,
-            pm: userInfo.userId
+            pl: [newProject.plAccount],
+            dev: [newProject.devAccount],
+            tester: [newProject.testerAccount],
         };
 
         const response = await fetch(`${API_URL}/addproject`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'userId': localStorage.getItem('userId')
+                'sessionid': localStorage.getItem('sessionid')
             },
             body: JSON.stringify(addProjectDTO),
         });
-
+        console.log(addProjectDTO);
         if (response.ok) {
+            
             const updatedProjects = editingProject
                 ? projects.map((project) =>
                       project.id === editingProject.id ? projectData : project
@@ -187,11 +196,11 @@ function MainPage() {
     const handleDelete = async () => {
         const projectToDelete = projects[selectedIndex];
 
-        const response = await fetch(`${API_URL}/addproject/${projectToDelete.name}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_URL}/project/${projectToDelete.name}/delete`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'userId': localStorage.getItem('userId')
+                'sessionid': localStorage.getItem('sessionid')
             }
         });
 
