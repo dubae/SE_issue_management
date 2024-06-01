@@ -20,7 +20,7 @@ function MainPage() {
     const handleCloseUserInfo = () => setShowUserInfo(false);
     const handleShowUserInfo = async () => {
         try {
-            const response = await fetch(`${API_URL}/member/${localStorage.getItem('userId')}`, {
+            const response = await fetch(`${API_URL}/myinfo`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'sessionid': localStorage.getItem('sessionid') // 세션 ID를 헤더에 포함
@@ -42,11 +42,12 @@ function MainPage() {
             if (!data || !data.userid || !data.email || !data.username) {
                 throw new Error('Incomplete response data');
             }
+            console.log(data);
     
             setUserInfo({
-                userId: data.userid,
+                userid: data.userid,
                 email: data.email,
-                name: data.username
+                username: data.username
             });
     
             setShowUserInfo(true);

@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.codingrecipe.member.session.SessionManager;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -140,4 +143,20 @@ public class MemberController {
         List<MemberDTOSecure> memberDTOSecureList = MemberDTOSecure.toMemberDTOSecureList(memberDTOList);
         return ResponseEntity.status(HttpStatus.OK).body(memberDTOSecureList);
     }
+    
+    @GetMapping("/api/myinfo")
+    public ResponseEntity<MemberDTOSecure> get_my_info(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userid = (String) SessionManager.getSession(sessionid);
+        MemberDTO member = memberService.findByUserId(userid);
+        if (member == null) {
+            return ResponseEntity.notFound().build();
+        }
+        MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
+        return ResponseEntity.ok(memberDTOSecure);
+    }
+    
 }
