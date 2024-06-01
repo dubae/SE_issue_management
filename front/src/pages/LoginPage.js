@@ -33,7 +33,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 
-const API_URL = 'http://localhost:808/api';
+const API_URL = 'http://localhost:8080/api';
 
 function LoginPage() {
   const navigate = useNavigate();
