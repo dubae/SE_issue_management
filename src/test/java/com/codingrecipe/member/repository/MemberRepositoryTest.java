@@ -17,7 +17,6 @@ public class MemberRepositoryTest {
     
         @AfterEach
         public void tearDown() {
-            //issueRepository.deleteAll();
     
         }
     
