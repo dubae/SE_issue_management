@@ -39,7 +39,7 @@ function IssueListPage() {
   const issuesPerPage = 10;
 
   useEffect(() => {
-    axios.get(`${API_URL}/issues/${projectId}`)
+    axios.get(`${API_URL}/project/${projectId}/issue`)
       .then(response => {
         setIssues(response.data);
       })

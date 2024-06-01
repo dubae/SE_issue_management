@@ -221,12 +221,22 @@ function MainPage() {
         }
     };
 
-    const handleLogout = () => {
-        setLoggedIn(false);
-        localStorage.removeItem('userId');
-        localStorage.removeItem('email');
-        localStorage.removeItem('name');
-        localStorage.removeItem('isAdmin');
+    const handleLogout = async () => {
+        const response = await fetch(`${API_URL}/logout`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'sessionid': localStorage.getItem('sessionid')
+            }
+        });
+        if (response.ok) {
+
+            setLoggedIn(false);
+            localStorage.removeItem('userId');
+            localStorage.removeItem('email');
+            localStorage.removeItem('name');
+            localStorage.removeItem('isAdmin');
+        }
     };
 
     const handleEdit = (index) => {
