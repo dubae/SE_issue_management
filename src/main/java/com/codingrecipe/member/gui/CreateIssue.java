@@ -1,4 +1,3 @@
-// CreateIssue.java
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
@@ -24,6 +23,8 @@ public class CreateIssue {
     private String username;
     private String password;
 
+    private Long selectedProjectId;
+
     public CreateIssue(IssueService issueService, ProjectService projectService, String username) {
         this.issueService = issueService;
         this.projectService = projectService;
@@ -33,7 +34,7 @@ public class CreateIssue {
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 400);
+        frame.setBounds(100, 100, 450, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -79,8 +80,25 @@ public class CreateIssue {
         comboBoxStatus.addItem("reopened");
         frame.getContentPane().add(comboBoxStatus);
 
+        JLabel lblSelectProject = new JLabel("Select Project:");
+        lblSelectProject.setBounds(50, 280, 100, 20);
+        frame.getContentPane().add(lblSelectProject);
+
+        JPanel projectPanel = new JPanel();
+        projectPanel.setBounds(50, 310, 350, 100);
+        frame.getContentPane().add(projectPanel);
+
+        List<ProjectDTO> projectList = projectService.findAll();
+        ButtonGroup projectButtonGroup = new ButtonGroup();
+        for (ProjectDTO project : projectList) {
+            JRadioButton projectButton = new JRadioButton(project.getProjectname());
+            projectButton.setActionCommand(project.getProjectid().toString());
+            projectButtonGroup.add(projectButton);
+            projectPanel.add(projectButton);
+        }
+
         JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(200, 300, 150, 30);
+        btnCreateIssue.setBounds(200, 420, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
         btnCreateIssue.addActionListener(new ActionListener() {
@@ -93,8 +111,8 @@ public class CreateIssue {
                     LocalDate reportedDate = LocalDate.now();
 
                     // 프로젝트 선택
-                    Long projectId = selectProject();
-                    if (projectId == null) {
+                    selectedProjectId = Long.valueOf(projectButtonGroup.getSelection().getActionCommand());
+                    if (selectedProjectId == null) {
                         JOptionPane.showMessageDialog(frame, "No project selected. Please create a project first.");
                         return;
                     }
@@ -105,7 +123,7 @@ public class CreateIssue {
                     issueDTO.setDescription(description);
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus(status);
-                    issueDTO.setProjectId(projectId); // projectId
+                    issueDTO.setProjectId(selectedProjectId); // projectId
                     issueDTO.setWriterId(1L); // writerId
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
@@ -125,7 +143,7 @@ public class CreateIssue {
         });
 
         JButton btnBack = new JButton("뒤로가기");
-        btnBack.setBounds(50, 300, 100, 30);
+        btnBack.setBounds(50, 420, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
@@ -135,19 +153,6 @@ public class CreateIssue {
                 frame.dispose();
             }
         });
-    }
-
-    private Long selectProject() {
-        // 프로젝트 선택 로직 구현
-        // 예를 들어, 프로젝트 목록을 가져와서 사용자에게 선택하도록 할 수 있습니다.
-        // 이 부분은 필요에 따라 구현하세요.
-        List<ProjectDTO> projectList = projectService.findAll();
-        if (projectList.isEmpty()) {
-            return null;
-        }
-
-        // 간단한 예로 첫 번째 프로젝트를 선택하도록 하겠습니다.
-        return projectList.get(0).getProjectid();
     }
 
     public void showFrame() {

@@ -11,8 +11,8 @@ import java.awt.event.ActionListener;
 
 public class SignUpScreen {
     private JFrame frame;
-    private JTextField textFieldUserId; // Added userid field
-    private JTextField textFieldEmail; // Added email field
+    private JTextField textFieldUserId;
+    private JTextField textFieldEmail;
     private JTextField textFieldUsername;
     private JPasswordField passwordField;
     private final MemberService memberService;

@@ -1,4 +1,3 @@
-// CreateProject.java
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.ProjectDTO;

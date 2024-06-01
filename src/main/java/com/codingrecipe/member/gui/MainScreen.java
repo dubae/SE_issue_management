@@ -40,13 +40,13 @@ public class MainScreen {
         frame.getContentPane().add(btnSignUp);
 
         btnLogin.addActionListener(e -> {
-            LoginScreen loginScreen = new LoginScreen(memberService,issueService,projectService);
+            LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
             loginScreen.showFrame();
             frame.dispose();
         });
 
         btnSignUp.addActionListener(e -> {
-            SignUpScreen signUpScreen = new SignUpScreen(memberService,issueService,projectService);
+            SignUpScreen signUpScreen = new SignUpScreen(memberService, issueService, projectService);
             signUpScreen.showFrame();
             frame.dispose();
         });

@@ -61,19 +61,21 @@ public class LoginScreen {
                 String password = new String(passwordField.getPassword());
 
                 if (validateInputs(email, password)) {
-                    // Retrieve user data from the MemberService
-                    MemberDTO memberDTO = memberService.findByUserId(email, true);
-                    if (memberDTO != null && memberDTO.getPassword().equals(password)) {
-                        // Login successful
-                        JOptionPane.showMessageDialog(frame, "로그인 성공!");
-
-                        UserPage userPage = new UserPage(issueService, projectService, email, password);
-                        userPage.showFrame();
-
+                    if (email.equals("admin") && password.equals("0000")) {
+                        JOptionPane.showMessageDialog(frame, "관리자 로그인 성공!");
+                        CreateProject createProject = new CreateProject(issueService, projectService, email, password);
+                        createProject.showFrame();
                         frame.dispose();
-
                     } else {
-                        JOptionPane.showMessageDialog(frame, "로그인 실패. 아이디 또는 비밀번호 오류!");
+                        MemberDTO memberDTO = memberService.findByUserId(email, true);
+                        if (memberDTO != null && memberDTO.getPassword().equals(password)) {
+                            JOptionPane.showMessageDialog(frame, "로그인 성공!");
+                            UserPage userPage = new UserPage(issueService, projectService, email, password);
+                            userPage.showFrame();
+                            frame.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "로그인 실패. 아이디 또는 비밀번호 오류!");
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(frame, "아이디와 비밀번호를 입력하세요.");
@@ -81,7 +83,6 @@ public class LoginScreen {
             }
         });
 
-        // 뒤로가기 같은 로직
         JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, 160, 90, 30);
         frame.getContentPane().add(btnBack);
