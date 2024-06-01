@@ -36,40 +36,11 @@ public class UserPage {
         btnCreateIssue.setBounds(50, 60, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
-        btnCreateIssue.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, username);
-                createIssue.showFrame();
-                frame.dispose();
-            }
+        btnCreateIssue.addActionListener(e -> {
+            CreateIssue createIssue = new CreateIssue(issueService, username);
+            createIssue.showFrame();
+            frame.dispose();
         });
-
-        try {
-            Long writerId = Long.parseLong(username); // Convert username to Long
-            List<IssueDTO> issues = issueService.findByWriterId(writerId);
-
-            // 디버그 메시지 추가
-            System.out.println("Found issues for user " + username + ": " + issues.size());
-
-            int yPosition = 100;
-            for (IssueDTO issue : issues) {
-                JButton issueButton = new JButton(issue.getTitle());
-                issueButton.setBounds(50, yPosition, 400, 30);
-                issueButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        IssueDetailPage detailPage = new IssueDetailPage(issueService, issue);
-                        detailPage.showFrame();
-                        frame.dispose();
-                    }
-                });
-                frame.getContentPane().add(issueButton);
-                yPosition += 40;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(frame, "Invalid user ID format.");
-        } catch (NullPointerException e) {
-            JOptionPane.showMessageDialog(frame, "IssueService is null.");
-        }
     }
 
     public void showFrame() {

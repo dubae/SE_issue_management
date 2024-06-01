@@ -18,6 +18,11 @@ const Header = ({ projectId, projectName, issueTitle }) => {
                 {issueTitle && <span>{issueTitle}</span>}
             </h1>
             <div className="buttons">
+                {issueTitle && (
+                    <Link to={`/project/${projectId}/issues?projectName=${projectName}`}>
+                        <Button variant="info">이슈 목록</Button>
+                    </Link>
+                )}
                 <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
             </div>
         </header>
