@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4440/api';
+const API_URL = 'http://218.239.229.119:4440/api';
 
 export const register = async (memberData) => {
     try {
@@ -12,7 +12,7 @@ export const register = async (memberData) => {
                 'password': memberData.password,
             },
             {
-            'Access-Control-Allow-Origin': 'http://localhost:4440'
+            'Access-Control-Allow-Origin': 'http://localhost:8080'
             }
             );
         return response.data;

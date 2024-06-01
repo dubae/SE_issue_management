@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AuthPage.css';
 
-const API_URL = 'http://localhost:4440/api';
+const API_URL = 'http://localhost:8080/api';
 
 function LoginPage() {
   const navigate = useNavigate();
