@@ -7,17 +7,6 @@ import UserInfoModal from '../components/UserInfoModal';
 
 const API_URL = 'http://localhost:8080/api';
 
-function getCurrentDateTime() {
-    var now = new Date();
-    var year = now.getFullYear();
-    var month = ('0' + (now.getMonth() + 1)).slice(-2);
-    var day = ('0' + now.getDate()).slice(-2);
-    var hours = ('0' + now.getHours()).slice(-2);
-    var minutes = ('0' + now.getMinutes()).slice(-2);
-    var seconds = ('0' + now.getSeconds()).slice(-2);
-    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-}
-
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
     const [userInfo, setUserInfo] = useState({
@@ -25,6 +14,7 @@ function MainPage() {
         email: '',
         name: ''
     });
+    const [userIds, setUserIds] = useState([]);
     const [showUserInfo, setShowUserInfo] = useState(false);
 
     const handleCloseUserInfo = () => setShowUserInfo(false);
@@ -118,6 +108,23 @@ function MainPage() {
         };
 
         fetchProjects();
+    }, []);
+
+    useEffect(() => {
+        const getUserList = async () => {
+            const response = await fetch(`${API_URL}/user_list`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sessionid': localStorage.getItem('sessionid')
+                }
+            });
+
+            const data = await response.json();
+            const users = data.map((user) => user.userid);
+            setUserIds(users);
+        }
+        getUserList();
     }, []);
 
     const handleClose = () => setShow(false);
@@ -349,32 +356,47 @@ function MainPage() {
                         <Form.Group controlId="formPLAccount">
                             <Form.Label>PL 계정 *</Form.Label>
                             <Form.Control
-                                type="text"
+                                as="select"
                                 name="plAccount"
                                 value={newProject.plAccount}
                                 onChange={handleChange}
                                 required
-                            />
+                            >
+                                <option value="">PL 계정 선택</option>
+                                {userIds.map(userId => (
+                                    <option key={userId} value={userId}>{userId}</option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formTesterAccount">
                             <Form.Label>Tester 계정 *</Form.Label>
                             <Form.Control
-                                type="text"
+                                as="select"
                                 name="testerAccount"
                                 value={newProject.testerAccount}
                                 onChange={handleChange}
                                 required
-                            />
+                            >
+                                <option value="">Tester 계정 선택</option>
+                                {userIds.map(userId => (
+                                    <option key={userId} value={userId}>{userId}</option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formDevAccount">
                             <Form.Label>Dev 계정 *</Form.Label>
                             <Form.Control
-                                type="text"
+                                as="select"
                                 name="devAccount"
                                 value={newProject.devAccount}
                                 onChange={handleChange}
                                 required
-                            />
+                            >
+                                <option value="">Dev 계정 선택</option>
+                                {userIds.map(userId => (
+                                    <option key={userId} value={userId}>{userId}</option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formProjectDescription">
                             <Form.Label>프로젝트 개요</Form.Label>
