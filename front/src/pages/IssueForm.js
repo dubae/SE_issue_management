@@ -3,7 +3,6 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/api';
-const sessionid = localStorage.getItem('sessionid');
 
 function IssueForm({ onIssueAdded, projectId }) {
   const [formData, setFormData] = useState({
@@ -44,10 +43,9 @@ function IssueForm({ onIssueAdded, projectId }) {
     console.log(issueData);
 
     try {
-      const response = await axios.post(`${API_URL}/project/${projectId}/issue/new`, issueData, {
+      const response = await axios.post(`${API_URL}/addissue`, issueData, {
         headers: {
-          'Content-Type': 'application/json',
-          'sessionid': `${sessionid}`
+          'Content-Type': 'application/json'
         }
       });
 

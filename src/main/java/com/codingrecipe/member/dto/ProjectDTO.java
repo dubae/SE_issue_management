@@ -15,6 +15,8 @@ public class ProjectDTO {
     public String projectdescription;
     public String projectcreatedtime;
     public String projectstatus;
+    public String projectcreatedAt;
+    public String status;
 
 
     public static ProjectDTO toProjectDTO(ProjectEntity projectEntity) {
@@ -24,6 +26,8 @@ public class ProjectDTO {
         projectDTO.setProjectdescription(projectEntity.getProjectdescription());
         projectDTO.setProjectcreatedtime(projectEntity.getProjectcreatedtime());
         projectDTO.setProjectstatus(projectEntity.getProjectstatus());
+        System.out.println("projectEntity.getProjectstatus(): "+projectEntity.getProjectstatus());
+        projectDTO.setStatus(projectEntity.getProjectstatus());
         return projectDTO;
     }
 }

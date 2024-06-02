@@ -43,7 +43,8 @@ function ProjectDetailPage() {
             const userId = localStorage.getItem('userId');
             const response = await axios.get(`${API_URL}/projects`, {
                 headers: {
-                    'userId': userId
+                    'userId': userId,
+                    'sessionid': localStorage.getItem("sessionid")
                 }
             });
             const projects = response.data;
@@ -62,7 +63,13 @@ function ProjectDetailPage() {
 
     const fetchIssues = async () => {
         try {
-            const response = await axios.get(`${API_URL}/issues/${projectId}`);
+            const userId = localStorage.getItem('userId');
+            const response = await axios.get(`${API_URL}/issues/${projectId}`, {
+                headers: {
+                    'userId': userId,
+                    'sessionid': localStorage.getItem("sessionid")
+                }
+            });
             const data = response.data;
             setAllIssues(data);
             filterIssues(data, timeFrame);

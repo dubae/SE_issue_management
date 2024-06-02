@@ -3,12 +3,14 @@ package com.codingrecipe.member.entity;
 import com.codingrecipe.member.dto.MemberDTO;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
 
+@ToString
 @Entity
 @Setter
 @Getter

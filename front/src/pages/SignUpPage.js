@@ -33,6 +33,7 @@ function SignUpPage() {
       alert('회원가입이 완료되었습니다.');
       navigate('/login'); // Navigate to the login page
     } catch (error) {
+      console.log('error', error)
       alert(error);
     }
   };

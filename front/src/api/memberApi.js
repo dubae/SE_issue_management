@@ -17,6 +17,7 @@ export const register = async (memberData) => {
             );
         return response.data;
     } catch (error) {
+        console.log('in api,', error)
         throw error.response.data;
     }
 };

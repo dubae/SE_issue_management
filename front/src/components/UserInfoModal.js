@@ -8,9 +8,9 @@ function UserInfoModal({ show, handleClose, userInfo }) {
                 <Modal.Title>내 정보</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p><strong>아이디:</strong> {userInfo.userid}</p>
+                <p><strong>아이디:</strong> {userInfo.userId}</p>
                 <p><strong>이메일:</strong> {userInfo.email}</p>
-                <p><strong>이름:</strong> {userInfo.username}</p>
+                <p><strong>이름:</strong> {userInfo.name}</p>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>

@@ -14,13 +14,12 @@ function MainPage() {
         email: '',
         name: ''
     });
-    const [userIds, setUserIds] = useState([]);
     const [showUserInfo, setShowUserInfo] = useState(false);
 
     const handleCloseUserInfo = () => setShowUserInfo(false);
     const handleShowUserInfo = async () => {
         try {
-            const response = await fetch(`${API_URL}/myinfo`, {
+            const response = await fetch(`${API_URL}/member/${localStorage.getItem('userId')}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'sessionid': localStorage.getItem('sessionid') // 세션 ID를 헤더에 포함
@@ -38,16 +37,16 @@ function MainPage() {
             }
     
             const data = await response.json();
+            console.log('data', data)
             
             if (!data || !data.userid || !data.email || !data.username) {
                 throw new Error('Incomplete response data');
             }
-            console.log(data);
     
             setUserInfo({
-                userid: data.userid,
+                userId: data.userid,
                 email: data.email,
-                username: data.username
+                name: data.username
             });
     
             setShowUserInfo(true);
@@ -84,48 +83,36 @@ function MainPage() {
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const response = await fetch(`${API_URL}/projects`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'sessionid': localStorage.getItem('sessionid')
-                }
-            });
-
-            const data = await response.json();
-            console.log(data);
-            const transformedProjects = data.map((project) => ({
-               id: project.projectid,
-               name: project.projectname,
-               description: project.projectdescription,
-               createdAt: project.projectcreatedtime,
-               status: project.projectstatus,
-               plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
-               testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
-               devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || ''
-            }));
-
-            setProjects(transformedProjects);
+            try {
+                const response = await fetch(`${API_URL}/projects`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'userId': localStorage.getItem('userId'),
+                        'sessionid': localStorage.getItem("sessionid")
+                    }
+                });
+                
+                const data = await response.json();
+                console.log(data);
+                const transformedProjects = data.map((project) => ({
+                    id: project.projectid,
+                    name: project.projectname,
+                    description: project.projectdescription,
+                    createdAt: project.projectcreatedtime,
+                    status: project?.projectstatus || project?.status,
+                    plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
+                    testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
+                    devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || '',
+                }));
+                
+                setProjects(transformedProjects);
+            } catch (err) {
+                console.log('err', err)
+            }
         };
 
         fetchProjects();
-    }, []);
-
-    useEffect(() => {
-        const getUserList = async () => {
-            const response = await fetch(`${API_URL}/user_list`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'sessionid': localStorage.getItem('sessionid')
-                }
-            });
-
-            const data = await response.json();
-            const users = data.map((user) => user.userid);
-            setUserIds(users);
-        }
-        getUserList();
     }, []);
 
     const handleClose = () => setShow(false);
@@ -159,9 +146,11 @@ function MainPage() {
         }
 
         const projectData = {
+            projectid: editingProject ? editingProject.id : projects.length + 1,
             projectname: newProject.name,
             projectdescription: newProject.description,
             projectcreatedtime: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
+            projectstatus: editingProject ? editingProject.status : '진행중'
         };
 
         const addProjectDTO = {
@@ -169,19 +158,21 @@ function MainPage() {
             pl: [newProject.plAccount],
             dev: [newProject.devAccount],
             tester: [newProject.testerAccount],
+            pm: [userInfo.userId]
         };
 
         const response = await fetch(`${API_URL}/addproject`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'sessionid': localStorage.getItem('sessionid')
+                'userId': localStorage.getItem('userId'),
+                'sessionid': localStorage.getItem("sessionid")
             },
             body: JSON.stringify(addProjectDTO),
         });
-        console.log(addProjectDTO);
+
         if (response.ok) {
-            
+            console.log('response', response, await response.text())
             const updatedProjects = editingProject
                 ? projects.map((project) =>
                       project.id === editingProject.id ? projectData : project
@@ -197,17 +188,19 @@ function MainPage() {
             });
             handleClose();
         } else {
-            alert('프로젝트를 저장하는데 실패했습니다.');
+            const errorMessage = (await response.text()) || '';
+            alert(errorMessage.trim().length > 0 ? errorMessage : '프로젝트를 저장하는데 실패했습니다.');
         }
     };
 
     const handleDelete = async () => {
         const projectToDelete = projects[selectedIndex];
 
+        // 프로젝트 삭제 url 및 메서드 변경.
         const response = await fetch(`${API_URL}/project/${projectToDelete.name}/delete`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'userId': localStorage.getItem('userId'),
                 'sessionid': localStorage.getItem('sessionid')
             }
         });
@@ -221,22 +214,12 @@ function MainPage() {
         }
     };
 
-    const handleLogout = async () => {
-        const response = await fetch(`${API_URL}/logout`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'sessionid': localStorage.getItem('sessionid')
-            }
-        });
-        if (response.ok) {
-
-            setLoggedIn(false);
-            localStorage.removeItem('userId');
-            localStorage.removeItem('email');
-            localStorage.removeItem('name');
-            localStorage.removeItem('isAdmin');
-        }
+    const handleLogout = () => {
+        setLoggedIn(false);
+        localStorage.removeItem('userId');
+        localStorage.removeItem('email');
+        localStorage.removeItem('name');
+        localStorage.removeItem('isAdmin');
     };
 
     const handleEdit = (index) => {
@@ -253,20 +236,26 @@ function MainPage() {
 
     const handleStatusChange = async (projectName, newStatus, currentStatus) => {
         console.log(newStatus);
-        const response = await fetch(`${API_URL}/updateproject/${projectName}/${newStatus}`, {
+        const response = await fetch(`${API_URL}/project/${projectName}/update_status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'userId': localStorage.getItem('userId')
-            }
+                'userId': localStorage.getItem('userId'),
+                'sessionid': localStorage.getItem('sessionid')
+            },
+            body: newStatus
         });
+        
+        console.log('newStatus', newStatus)
 
         if (response.ok) {
             setProjects(projects.map(project =>
                 project.name === projectName ? { ...project, status: newStatus } : project
             ));
         } else {
-            alert('상태를 변경하는데 실패했습니다.');
+            // 에러 메세지 추가
+            const errorMEssage = await response.text();
+            alert(errorMEssage?.trim().length === 0 ? '상태를 변경하는데 실패했습니다.' : errorMEssage);
             setProjects(projects.map(project =>
                 project.name === projectName ? { ...project, status: currentStatus } : project
             ));
@@ -319,14 +308,17 @@ function MainPage() {
                                 <td>{project.description}</td>
                                 <td>{project.createdAt}</td>
                                 <td>
-                                    <Form.Control
+                                <Form.Control
                                         as="select"
                                         value={project.status}
                                         onChange={(e) => handleStatusChange(project.name, e.target.value, project.status)}
                                     >
-                                        <option value="진행중">진행중</option>
-                                        <option value="완료">완료</option>
-                                        <option value="보류">보류</option>
+                                        {/*프로젝트 상태 변경 API (스트링만 받음) -> 변경 가능 상태 : Not Started, In Progress, Completed, Paused, Cancelled*/}
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Paused">Paused</option>
+                                        <option value="Cancelled">Cancelled</option>
                                     </Form.Control>
                                 </td>
                                 {localStorage.getItem('isAdmin') === 'true' && (
@@ -367,47 +359,32 @@ function MainPage() {
                         <Form.Group controlId="formPLAccount">
                             <Form.Label>PL 계정 *</Form.Label>
                             <Form.Control
-                                as="select"
+                                type="text"
                                 name="plAccount"
                                 value={newProject.plAccount}
                                 onChange={handleChange}
                                 required
-                            >
-                                <option value="">PL 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
-                                ))}
-                            </Form.Control>
+                            />
                         </Form.Group>
                         <Form.Group controlId="formTesterAccount">
                             <Form.Label>Tester 계정 *</Form.Label>
                             <Form.Control
-                                as="select"
+                                type="text"
                                 name="testerAccount"
                                 value={newProject.testerAccount}
                                 onChange={handleChange}
                                 required
-                            >
-                                <option value="">Tester 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
-                                ))}
-                            </Form.Control>
+                            />
                         </Form.Group>
                         <Form.Group controlId="formDevAccount">
                             <Form.Label>Dev 계정 *</Form.Label>
                             <Form.Control
-                                as="select"
+                                type="text"
                                 name="devAccount"
                                 value={newProject.devAccount}
                                 onChange={handleChange}
                                 required
-                            >
-                                <option value="">Dev 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
-                                ))}
-                            </Form.Control>
+                            />
                         </Form.Group>
                         <Form.Group controlId="formProjectDescription">
                             <Form.Label>프로젝트 개요</Form.Label>

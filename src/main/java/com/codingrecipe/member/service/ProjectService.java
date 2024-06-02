@@ -21,6 +21,8 @@ public class ProjectService {
     public void register(ProjectDTO projectDTO) {
         System.out.println("프로젝트 추가");
         projectDTO.setProjectstatus("Not Started");
+        ProjectEntity projectEntity = ProjectEntity.toProjectEntity(projectDTO);
+        System.out.println("projectEntity toString: "+ projectEntity.toString());
         projectRepository.save(ProjectEntity.toProjectEntity(projectDTO));
     }
 
@@ -31,7 +33,7 @@ public class ProjectService {
             projectRepository.save(projectEntity);
         }
     }
-    
+
     public ProjectDTO findByProjectName(String project_name) {
         ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);
         if (projectEntity != null) {
