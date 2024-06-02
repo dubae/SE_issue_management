@@ -151,16 +151,7 @@ function ProjectDetailPage() {
                     'projectid': projectId,
                 }
             });
-
-
-
-
-            /* 여기에 test 대신 프로젝트 이름이 들어가야 함*/
-
-
-
-
-            const response2 = await fetch(`${API_URL}/project/test/${sessionStorage.getItem('userId')}/getrole`, {
+            const response2 = await fetch(`${API_URL}/project/${project.name}/${sessionStorage.getItem('userId')}/getrole`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
@@ -204,6 +195,8 @@ function ProjectDetailPage() {
     const calculateIssueUpdateCount = (issues) => {
         return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);
     };
+
+    
 
     return (
         <div className="project-detail-container">

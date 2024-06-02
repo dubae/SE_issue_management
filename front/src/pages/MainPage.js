@@ -8,6 +8,10 @@ import UserInfoModal from '../components/UserInfoModal';
 const API_URL = 'http://localhost:8080/api';
 
 function MainPage() {
+    const [plAccounts, setPlAccounts] = useState(['']);
+    const [testerAccounts, setTesterAccounts] = useState(['']);
+    const [devAccounts, setDevAccounts] = useState(['']);
+
     const [loggedIn, setLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState({
         userId: sessionStorage.getItem('userId') || '',
@@ -144,7 +148,7 @@ function MainPage() {
                 name: project.projectname,
                 description: project.projectdescription,
                 createdAt: project.projectcreatedtime,
-                status: project?.projectstatus || project?.status,
+                status: project?.projectstatus,
                 plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
                 testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
                 devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || '',
@@ -180,30 +184,25 @@ function MainPage() {
     };
 
     const handleSubmit = async (e) => {
-        console.log('yayaya')
         e.preventDefault();
-        if (!newProject.name || !accountInfo?.plAccount || !accountInfo?.testerAccount || !accountInfo?.devAccount) {
-            alert("필수 입력란을 모두 채워주세요.");
-            return;
-        }
-
+    
         const projectData = {
             projectid: editingProject ? editingProject.id : projects.length + 1,
             projectname: newProject.name,
             projectdescription: newProject.description,
             projectcreatedtime: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
-            projectstatus: editingProject ? editingProject.status : 'In Progress'
+            projectstatus: editingProject ? editingProject.projectstatus : 'In Progress'
         };
-
+    
         const addProjectDTO = {
             projectDTO: projectData,
-            pl: [accountInfo.plAccount],
-            dev: [accountInfo.devAccount],
-            tester: [accountInfo.testerAccount],
+            pl: plAccounts.filter(account => account),
+            dev: devAccounts.filter(account => account),
+            tester: testerAccounts.filter(account => account),
             pm: [userInfo.userId],
             editingProject: !!editingProject
         };
-
+    
         const response = await fetch(`${API_URL}/addproject`, {
             method: 'POST',
             headers: {
@@ -213,9 +212,8 @@ function MainPage() {
             },
             body: JSON.stringify(addProjectDTO),
         });
-
+    
         if (response.ok) {
-            console.log('response', response, await response.text())
             fetchProjects();
             setNewProject({
                 name: '',
@@ -230,6 +228,7 @@ function MainPage() {
             alert(errorMessage.trim().length > 0 ? errorMessage : '프로젝트를 저장하는데 실패했습니다.');
         }
     };
+    
 
     const handleDelete = async () => {
         const projectToDelete = projects[selectedIndex];
@@ -312,6 +311,41 @@ function MainPage() {
             [type]: value
         }))
     }
+
+    const handleAddAccount = (type) => {
+        if (type === 'PL') setPlAccounts([...plAccounts, '']);
+        else if (type === 'Tester') setTesterAccounts([...testerAccounts, '']);
+        else if (type === 'Dev') setDevAccounts([...devAccounts, '']);
+    };
+
+    const handleDeleteAccount = (role, index) => {
+        switch(role) {
+            case 'PL':
+                const newPlAccounts = [...plAccounts];
+                newPlAccounts.splice(index, 1);
+                setPlAccounts(newPlAccounts);
+                break;
+            // Tester, Dev의 경우에도 같은 방식으로 처리
+            default:
+                break;
+        }
+    };
+    
+    const handleAccountChange = (type, index, value) => {
+        if (type === 'PL') {
+            const updatedPlAccounts = [...plAccounts];
+            updatedPlAccounts[index] = value;
+            setPlAccounts(updatedPlAccounts);
+        } else if (type === 'Tester') {
+            const updatedTesterAccounts = [...testerAccounts];
+            updatedTesterAccounts[index] = value;
+            setTesterAccounts(updatedTesterAccounts);
+        } else if (type === 'Dev') {
+            const updatedDevAccounts = [...devAccounts];
+            updatedDevAccounts[index] = value;
+            setDevAccounts(updatedDevAccounts);
+        }
+    };
 
     return (
         <div className="main-container">
@@ -409,35 +443,86 @@ function MainPage() {
                         </Form.Group>
                         <Form.Group controlId="formPLAccount">
                             <Form.Label>PL 계정 *</Form.Label>
-                            <Form.Control as="select" name="plAccount" value={accountInfo?.plAccount}
-                                          onChange={( e ) => changeAccountInfo('plAccount', e.target.value)} required>
-                                <option key={'choose..'} value={null}>선택하세요.</option>
-                                {userList?.map(option => (
-                                    <option key={option.userid} value={option.userid}>{option.username}</option>
-                                ))}
-                            </Form.Control>
+                            {plAccounts.map((account, index) => (
+                                <div key={index} className="account-group">
+                                    <div className="account-control">
+                                        <Form.Control
+                                            as="select"
+                                            value={account}
+                                            onChange={(e) => handleAccountChange('PL', index, e.target.value)}
+                                            required
+                                        >
+                                            <option value=''>선택하세요.</option>
+                                            {userList.map(option => (
+                                                <option key={option.userid} value={option.userid}>{option.username}</option>
+                                            ))}
+                                        </Form.Control>
+                                    </div>
+                                    <div className="delete-button">
+                                        {index === plAccounts.length - 1 && (
+                                            <Button variant="danger" onClick={() => handleDeleteAccount('PL', index)}>삭제</Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            <Button variant="secondary" onClick={() => handleAddAccount('PL')}>추가</Button>
                         </Form.Group>
+
                         <Form.Group controlId="formTesterAccount">
                             <Form.Label>Tester 계정 *</Form.Label>
-                            <Form.Control as="select" name="testerAccount" value={accountInfo?.testerAccount}
-                                          onChange={( e ) => changeAccountInfo('testerAccount', e.target.value)}
-                                          required>
-                                <option key={'choose..'} value={null}>선택하세요.</option>
-                                {userList?.map(option => (
-                                    <option key={option.userid} value={option.userid}>{option.username}</option>
-                                ))}
-                            </Form.Control>
+                            {testerAccounts.map((account, index) => (
+                                <div key={index} className="account-group">
+                                    <div className="account-control">
+                                        <Form.Control
+                                            as="select"
+                                            value={account}
+                                            onChange={(e) => handleAccountChange('Tester', index, e.target.value)}
+                                            required
+                                        >
+                                            <option value=''>선택하세요.</option>
+                                            {userList.map(option => (
+                                                <option key={option.userid} value={option.userid}>{option.username}</option>
+                                            ))}
+                                        </Form.Control>
+                                    </div>
+                                    <div className="delete-button">
+                                        {index === testerAccounts.length - 1 && (
+                                            <Button variant="danger" onClick={() => handleDeleteAccount('Tester', index)}>삭제</Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            <Button variant="secondary" onClick={() => handleAddAccount('Tester')}>추가</Button>
                         </Form.Group>
+
                         <Form.Group controlId="formDevAccount">
                             <Form.Label>Dev 계정 *</Form.Label>
-                            <Form.Control as="select" name="devAccount" value={accountInfo?.devAccount}
-                                          onChange={( e ) => changeAccountInfo('devAccount', e.target.value)} required>
-                                <option key={'choose..'} value={null}>선택하세요.</option>
-                                {userList?.map(option => (
-                                    <option key={option.userid} value={option.userid}>{option.username}</option>
-                                ))}
-                            </Form.Control>
+                            {devAccounts.map((account, index) => (
+                                <div key={index} className="account-group">
+                                    <div className="account-control">
+                                        <Form.Control
+                                            as="select"
+                                            value={account}
+                                            onChange={(e) => handleAccountChange('Dev', index, e.target.value)}
+                                            required
+                                        >
+                                            <option value=''>선택하세요.</option>
+                                            {userList.map(option => (
+                                                <option key={option.userid} value={option.userid}>{option.username}</option>
+                                            ))}
+                                        </Form.Control>
+                                    </div>
+                                    <div className="delete-button">
+                                        {index === devAccounts.length - 1 && (
+                                            <Button variant="danger" onClick={() => handleDeleteAccount('Dev', index)}>삭제</Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            <Button variant="secondary" onClick={() => handleAddAccount('Dev')}>추가</Button>
                         </Form.Group>
+
+
                         <Form.Group controlId="formProjectDescription">
                             <Form.Label>프로젝트 개요</Form.Label>
                             <Form.Control

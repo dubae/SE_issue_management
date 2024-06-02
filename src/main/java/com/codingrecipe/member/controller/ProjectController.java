@@ -81,7 +81,7 @@ public class ProjectController {
             projectinfoDTO.setProjectname(project.getProjectname());
             projectinfoDTO.setProjectdescription(project.getProjectdescription());
             projectinfoDTO.setProjectcreatedtime(project.getProjectcreatedtime());
-            projectinfoDTO.setStatus(project.getStatus());
+            projectinfoDTO.setProjectstatus(project.getProjectstatus());
             projectUserDTO = new ArrayList<>();
             projectUserDTO = userRoleService.findByProjectId(project.getProjectid());
             System.out.println(projectUserDTO);
@@ -300,7 +300,9 @@ public class ProjectController {
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        System.out.println(projectname);
         ProjectDTO projectDTO = projectService.findByProjectName(projectname);
+        System.out.println(projectDTO);
         if (projectDTO == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -338,6 +340,7 @@ public class ProjectController {
         for (UserRoleDTO userRole : userRoleDTO) {
             roles.add(userRole.getRole());
         }
+        System.out.println(roles.toString());
         return ResponseEntity.status(HttpStatus.OK).body(roles);
         
     }
