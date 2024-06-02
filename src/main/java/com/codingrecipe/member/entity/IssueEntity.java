@@ -31,9 +31,11 @@ public class IssueEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @Column(nullable = false, length = 20)
+//    private Long writerId;
 
     @Column(nullable = false, length = 20)
-    private Long writerId;
+    private String writerId;
 
     //@Column(nullable = false, length = 20)
     //private Long projectId;

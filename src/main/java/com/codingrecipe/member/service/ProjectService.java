@@ -2,6 +2,7 @@ package com.codingrecipe.member.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -14,18 +15,19 @@ import com.codingrecipe.member.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    public void register(ProjectDTO projectDTO) {
+    @Transactional
+    public ProjectEntity register(ProjectDTO projectDTO) {
         System.out.println("프로젝트 추가");
         projectDTO.setProjectstatus("Not Started");
-        ProjectEntity projectEntity = ProjectEntity.toProjectEntity(projectDTO);
-        System.out.println("projectEntity toString: "+ projectEntity.toString());
-        projectRepository.save(ProjectEntity.toProjectEntity(projectDTO));
+        return projectRepository.save(ProjectEntity.toProjectEntity(projectDTO));
     }
 
+    @Transactional
     public void update_status(ProjectDTO projectDTO, String status) {
         ProjectEntity projectEntity = projectRepository.findByProjectid(projectDTO.getProjectid()).orElse(null);
         if (projectEntity != null) {
@@ -34,8 +36,11 @@ public class ProjectService {
         }
     }
 
+    @Transactional
     public ProjectDTO findByProjectName(String project_name) {
         ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);
+        System.out.println("project_name: "+project_name);
+        System.out.println("projectEntity:"+projectEntity);
         if (projectEntity != null) {
             return ProjectDTO.toProjectDTO(projectEntity);
         } else {
@@ -43,6 +48,8 @@ public class ProjectService {
         }
     }
 
+
+    @Transactional
     public ProjectEntity findByProjectNameEntity(String project_name) {
         ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);
         if (projectEntity != null) {
@@ -51,6 +58,8 @@ public class ProjectService {
             return null;
         }
     }
+
+    @Transactional
     public ProjectDTO findByProjectId(Long projectid) {
         ProjectEntity projectEntity = projectRepository.findByProjectid(projectid).orElse(null);
         if (projectEntity != null) {
@@ -59,9 +68,13 @@ public class ProjectService {
             return null;
         }
     }
+
+    @Transactional
     public boolean isExistProjectName(String projectname) {
         return projectRepository.findByProjectname(projectname).isPresent();
     }
+
+    @Transactional
     public List<ProjectDTO> findAll() {
         List<ProjectEntity> projectEntities = projectRepository.findAll();
         List<ProjectDTO> projectDTOs = new ArrayList<>();

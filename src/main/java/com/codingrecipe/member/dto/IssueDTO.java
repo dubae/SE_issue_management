@@ -18,7 +18,7 @@ import java.util.Objects;
 @ToString
 public class IssueDTO extends BaseDTO{
     private Long id;
-    private Long writerId;
+    private String writerId;
     private Long projectId;
     private Long devId;
     private Long fixerId;
@@ -29,6 +29,7 @@ public class IssueDTO extends BaseDTO{
     private String significance;
     private String description;
     private ProjectDTO projectDTO;
+    private String userId;
 
     private List<IssueCommentDTO> issueCommentDTOList=new ArrayList<>();
 

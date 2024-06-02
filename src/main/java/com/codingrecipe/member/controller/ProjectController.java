@@ -127,9 +127,13 @@ public class ProjectController {
             }
             if(notUserId.length() > 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'"+notUserId+"' 해당 유저의 정보를 찾을 수 없습니다.");
 
+            // 그리고 이미 생성된 Id 값을 집어넣고 생성하니 오류 발생.
+            if(!addProjectDTO.isEditingProject()) addProjectDTO.getProjectDTO().setProjectid(null);
             System.out.println("finish check dup~");
-            projectService.register(projectDTO);
-            Long projectid = projectService.findByProjectName(projectDTO.getProjectname()).getProjectid();
+            System.out.println("projectDTO.getProjectname(): "+ projectDTO.getProjectname());
+            // 여기 로직에 문제가 있었음. 생성 직후 조회하는 과정에 문제가 발생해서, 생성된 값을 바로 가져오도록 조회.
+            Long projectid = projectService.register(projectDTO).getProjectid();
+            System.out.println("projectid: "+projectid);
             UserRoleDTO userRoleDTO = new UserRoleDTO();
             userRoleDTO.setProjectid(projectid);
             for (String userid : addProjectDTO.getPl()) {

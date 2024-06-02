@@ -12,6 +12,8 @@ import lombok.*;
 public class AddProjectDTO {
     private ProjectDTO projectDTO;
     private List<String> pl;
+    private List<String> pm;
     private List<String> dev;
     private List<String> tester;
+    private boolean editingProject;
 }

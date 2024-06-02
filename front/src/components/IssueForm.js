@@ -24,7 +24,7 @@ const IssueForm = ({ onIssueAdded }) => {
         const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-        const userId = localStorage.getItem('userId');
+        const userId = sessionStorage.getItem('userId');
         const author = 'pl1';
 
         const newIssue = {

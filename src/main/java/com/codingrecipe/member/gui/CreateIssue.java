@@ -106,7 +106,7 @@ public class CreateIssue {
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus(status);
                     issueDTO.setProjectId(1L); // projectId
-                    issueDTO.setWriterId(1L); // writerId
+                    issueDTO.setWriterId(null); // writerId
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component

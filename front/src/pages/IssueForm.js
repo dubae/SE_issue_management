@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/api';
+const sessionid = sessionStorage.getItem('sessionid');
 
 function IssueForm({ onIssueAdded, projectId }) {
   const [formData, setFormData] = useState({
@@ -19,7 +20,8 @@ function IssueForm({ onIssueAdded, projectId }) {
     setFormData(prevData => ({
       ...prevData,
       projectId: parseInt(projectId, 10),
-      writerId: parseInt(localStorage.getItem('userId'), 10)
+      writerId: null,
+      userId: parseInt(sessionStorage.getItem('userId'), 10)
     }));
   }, [projectId]);
 
@@ -37,17 +39,20 @@ function IssueForm({ onIssueAdded, projectId }) {
     const issueData = {
       ...formData,
       projectId: parseInt(projectId, 10),
-      writerId: localStorage.getItem('userId'),
+      writerId: sessionStorage.getItem('userId'),
     };
 
     console.log(issueData);
 
     try {
-      const response = await axios.post(`${API_URL}/addissue`, issueData, {
+      const response = await axios.post(`${API_URL}/project/${projectId}/issue/new`, issueData, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'sessionid': `${sessionStorage.getItem('sessionid')}`
         }
       });
+      
+      console.log('response', response)
 
       if (response.status === 200) {
         const createdIssue = response.data;
@@ -108,24 +113,6 @@ function IssueForm({ onIssueAdded, projectId }) {
             <option value="minor">Minor</option>
             <option value="trivial">Trivial</option>
           </Form.Control>
-        </Form.Group>
-        <Form.Group controlId="formIssueDevId">
-          <Form.Label>Developer ID</Form.Label>
-          <Form.Control
-            type="text"
-            name="devId"
-            value={formData.devId}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="formIssueFixerId">
-          <Form.Label>Fixer ID</Form.Label>
-          <Form.Control
-            type="text"
-            name="fixerId"
-            value={formData.fixerId}
-            onChange={handleChange}
-          />
         </Form.Group>
         <Button variant="primary" type="submit">
           생성
