@@ -1,9 +1,7 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.MemberDTO;
-import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
-import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -11,18 +9,14 @@ import java.awt.event.ActionListener;
 
 public class SignUpScreen {
     private JFrame frame;
-    private JTextField textFieldUserId;
-    private JTextField textFieldEmail;
+    private JTextField textFieldUserId; // Added userid field
+    private JTextField textFieldEmail; // Added email field
     private JTextField textFieldUsername;
     private JPasswordField passwordField;
     private final MemberService memberService;
-    private final IssueService issueService;
-    private final ProjectService projectService;
 
-    public SignUpScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
+    public SignUpScreen(MemberService memberService) {
         this.memberService = memberService;
-        this.issueService = issueService;
-        this.projectService = projectService;
         initialize();
     }
 
@@ -90,7 +84,7 @@ public class SignUpScreen {
                     memberDTO.setPassword(password);
                     memberService.register(memberDTO);
                     JOptionPane.showMessageDialog(frame, "회원 가입 성공!");
-                    LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+                    LoginScreen loginScreen = new LoginScreen(memberService,null);
                     loginScreen.showFrame();
                     frame.dispose();
                 } else {

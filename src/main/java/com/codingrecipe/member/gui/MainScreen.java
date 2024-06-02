@@ -2,7 +2,6 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
-import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,13 +9,13 @@ import java.awt.*;
 public class MainScreen {
     private JFrame frame;
     private final MemberService memberService;
-    private final IssueService issueService;
-    private final ProjectService projectService;
+    private IssueService issueService;
 
-    public MainScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
+
+    //헤드리스모드 확인
+    public MainScreen(MemberService memberService, IssueService issueService) {
         this.memberService = memberService;
         this.issueService = issueService;
-        this.projectService = projectService; // ProjectService 인스턴스 초기화
         if (!GraphicsEnvironment.isHeadless()) {
             initialize();
         } else {
@@ -39,18 +38,19 @@ public class MainScreen {
         frame.getContentPane().add(btnSignUp);
 
         btnLogin.addActionListener(e -> {
-            LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+            LoginScreen loginScreen = new LoginScreen(memberService,issueService);
             loginScreen.showFrame();
             frame.dispose();
         });
 
         btnSignUp.addActionListener(e -> {
-            SignUpScreen signUpScreen = new SignUpScreen(memberService, issueService, projectService);
+            SignUpScreen signUpScreen = new SignUpScreen(memberService);
             signUpScreen.showFrame();
             frame.dispose();
         });
     }
 
+    //헤드리스 모드 확인
     public void showFrame() {
         if (!GraphicsEnvironment.isHeadless()) {
             frame.setVisible(true);

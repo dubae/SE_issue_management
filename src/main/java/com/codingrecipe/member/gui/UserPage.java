@@ -1,73 +1,47 @@
-// UserPage.java
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;
-import com.codingrecipe.member.service.ProjectService;
+import com.codingrecipe.member.service.MemberService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class UserPage {
     private JFrame frame;
+    private final MemberService memberService;
     private final IssueService issueService;
-    private final ProjectService projectService;
     private final String username;
-    private final String password;
 
-    public UserPage(IssueService issueService, ProjectService projectService, String username, String password) {
+    public UserPage(MemberService memberService, IssueService issueService, String username) {
+        this.memberService = memberService;
         this.issueService = issueService;
-        this.projectService = projectService;
         this.username = username;
-        this.password = password;
         initialize();
     }
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 300);
+        frame.setBounds(100, 100, 500, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
-        JButton btnCreateProject = new JButton("Create Project");
-        btnCreateProject.setBounds(150, 100, 150, 30);
-        frame.getContentPane().add(btnCreateProject);
-
-        btnCreateProject.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                CreateProject createProject = new CreateProject(issueService, projectService, username, password);
-                createProject.showFrame();
-                frame.dispose();
-            }
-        });
+        JLabel lblTitle = new JLabel("User Page");
+        lblTitle.setBounds(200, 20, 100, 30);
+        frame.getContentPane().add(lblTitle);
 
         JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(150, 150, 150, 30);
+        btnCreateIssue.setBounds(50, 60, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
-
-        btnCreateIssue.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, projectService, username);
-                createIssue.showFrame();
-                frame.dispose();
-            }
+        btnCreateIssue.addActionListener(e -> {
+            CreateIssue createIssue = new CreateIssue(issueService, username);
+            createIssue.showFrame();
+            frame.dispose();
         });
-
-        JButton btnViewIssues = new JButton("View Issues");
-        btnViewIssues.setBounds(150, 200, 150, 30);
-        frame.getContentPane().add(btnViewIssues);
-
-        btnViewIssues.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
-                viewIssue.showFrame();
-                frame.dispose();
-            }
-        });
-
     }
-
 
     public void showFrame() {
         frame.setVisible(true);
