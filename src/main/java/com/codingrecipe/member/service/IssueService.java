@@ -63,6 +63,7 @@ public class IssueService {
         // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
         issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
         issueEntity.setCreatedAt(LocalDate.now());
+        issueEntity.setId(1L);
         issueRepository.save(issueEntity);
     }
 

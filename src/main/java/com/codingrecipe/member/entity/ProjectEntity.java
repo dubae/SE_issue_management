@@ -34,7 +34,7 @@ public class ProjectEntity {
     @Column(name = "status", nullable = false)
     private String projectstatus;
 
-    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Builder.Default
     private List<IssueEntity> issueEntityList = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class ProjectEntity {
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
-        //projectEntity.setProjectid(projectDTO.getProjectid());
+        projectEntity.setProjectid(projectDTO.getProjectid());
         projectEntity.setProjectname(projectDTO.getProjectname());
         projectEntity.setProjectdescription(projectDTO.getProjectdescription());
         projectEntity.setProjectcreatedtime(projectDTO.getProjectcreatedtime());
