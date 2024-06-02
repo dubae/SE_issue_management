@@ -41,7 +41,7 @@ public class IssueEntity extends BaseEntity{
     //private Long projectId;
 
     @Column(length = 20)
-    private Long devId;
+    private String devId;
 
     @Column(nullable = false, length = 20)
     private String title;
@@ -66,7 +66,6 @@ public class IssueEntity extends BaseEntity{
     private Long fixerId;
 
     @OneToMany(mappedBy = "issueEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private List<IssueCommentEntity> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
@@ -80,7 +79,6 @@ public class IssueEntity extends BaseEntity{
 
         issueEntity.setId(issueDTO.getId());
         issueEntity.setWriterId(issueDTO.getWriterId());
-
         //issueEntity.getProjectEntity().setProjectid(issueDTO.getProjectId());
         //issueEntity.getProjectEntity() 부분이 null일 수 있는 문제 발견.
 

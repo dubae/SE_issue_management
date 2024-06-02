@@ -15,7 +15,7 @@ function IssueDetailPage() {
     const { projectId, issueId } = useParams();
     const [searchParams] = useSearchParams();
     const projectName = searchParams.get('projectName');
-
+    
     const [issue, setIssue] = useState({
         id: null,
         writerId: '',
@@ -48,6 +48,8 @@ function IssueDetailPage() {
                     'sessionid': sessionStorage.getItem('sessionid')
                 }
             }); //경로
+            
+            console.log('response.data', response.data)
             setIssue(response.data);
             setUpdateData({
                 assignee: response.data.devId,
@@ -110,7 +112,8 @@ function IssueDetailPage() {
         const newUpdateData = { ...updateData, [name]: value };
 
         try {
-            await axios.post(`${API_URL}/issue/${issueId}/info`, newUpdateData, {
+            // 서버단에서 어떤 값이 바뀌었는지 알기 위해 바뀐 부분만 전송
+            await axios.post(`${API_URL}/issue/${issueId}/info`, { [name]: value }, {
                 headers: {
                     'sessionid': sessionStorage.getItem('sessionid')
                 }

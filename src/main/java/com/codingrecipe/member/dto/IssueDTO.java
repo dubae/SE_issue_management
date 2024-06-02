@@ -20,7 +20,7 @@ public class IssueDTO extends BaseDTO{
     private Long id;
     private String writerId;
     private Long projectId;
-    private Long devId;
+    private String devId;
     private Long fixerId;
     private String title;
     private String status; //enum?

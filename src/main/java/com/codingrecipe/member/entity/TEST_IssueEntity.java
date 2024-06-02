@@ -23,7 +23,7 @@ public class TEST_IssueEntity extends IssueEntity {
     private String writerId;
 
     @Column
-    private Long devId;
+    private String devId;
 
     @Column(nullable = false, length = 20)
     private String title;

@@ -48,6 +48,6 @@ public class IssueCommentEntity extends BaseEntity{
 
         return issueCommentEntity;
     }
-    
+
 
 }

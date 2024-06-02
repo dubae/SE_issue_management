@@ -199,7 +199,7 @@ function ProjectDetailPage() {
                 <Link to={`/project/${projectId}/issues?projectName=${project.name}`}><Button variant="info">이슈 목록</Button></Link>
                 <Button variant="success" onClick={handleToggleModal}>이슈 등록</Button>
                 <Modal isOpen={isModalOpen} onRequestClose={handleToggleModal}>
-                    <IssueForm onIssueAdded={handleAddIssue} projectId={projectId} />
+                    <IssueForm onIssueAdded={handleAddIssue} projectId={projectId} fetchIssues={fetchIssues} />
                     <Button onClick={handleToggleModal}>닫기</Button>
                 </Modal>
             </div>

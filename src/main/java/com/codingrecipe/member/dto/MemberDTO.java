@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
 public class MemberDTO extends MemberDTOSecure{
     public String userid;
     public String username;
@@ -41,10 +40,10 @@ public class MemberDTO extends MemberDTOSecure{
         if (o == null || getClass() != o.getClass()) return false;
         MemberDTO that = (MemberDTO) o;
         return Objects.equals(userid, that.userid) &&
-                Objects.equals(username, that.username) &&
-                Objects.equals(email, that.email);
+               Objects.equals(username, that.username) &&
+               Objects.equals(email, that.email);
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(userid, username, email);

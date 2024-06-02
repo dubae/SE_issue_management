@@ -1,6 +1,7 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.dto.IssueUpdateDTO;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.session.SessionManager;
 import lombok.Getter;
@@ -156,18 +157,18 @@ public class IssueController {
 
     /**
      * 이슈의 개발자 지정(변경)하기. 개발자 id를 req.param으로 넣기.
-     * * 유저의 자격 확인(PL)해야 하는지는 나중에 논의.
+     * * 유저의 자격 확인(PL)해야 하는지는 나중에 논의. // 현재 이 부분은 안쓰임.
      /project/{projectId}/issue/{issueId}/devId?devId=11
      */
-    @PostMapping("/api/project/{projectId}/issue/{issueId}/devId")
-    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
-        String sessionid = request.getHeader("sessionid");
-        if (SessionManager.getSession(sessionid) == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        issueService.changeDevId(issueId, devId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
+//    @PostMapping("/api/project/{projectId}/issue/{issueId}/devId")
+//    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
+//        String sessionid = request.getHeader("sessionid");
+//        if (SessionManager.getSession(sessionid) == null){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        issueService.changeDevId(issueId, devId);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
 
     /**
      * 이슈를 상태로 검색하기(status)
@@ -267,9 +268,9 @@ public class IssueController {
         return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
     }
 
-//    @PostMapping("/api/issue/{issueId}/info")
-//    public ResponseEntity<?> updateIssueInfo(@PathVariable Long issueId, @RequestBody IssueUpdateDTO issueUpdateDTO) {
-//        issueService.updateInfo(issueId, issueUpdateDTO);
-//        return ResponseEntity.ok().build();
-//    }
+    @PostMapping("/api/issue/{issueId}/info")
+    public ResponseEntity<?> updateIssueInfo(@PathVariable Long issueId, @RequestBody IssueUpdateDTO issueUpdateDTO) {
+        issueService.updateInfo(issueId, issueUpdateDTO);
+        return ResponseEntity.ok().build();
+    }
 }

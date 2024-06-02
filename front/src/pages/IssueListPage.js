@@ -135,22 +135,22 @@ function IssueListPage() {
           <Form.Label>Priority:</Form.Label>
           <Form.Control as="select" onChange={handlePriorityFixerChange}>
             <option value="">전체</option>
-            <option value="blocker">Blocker</option>
-            <option value="critical">Critical</option>
-            <option value="major">Major</option>
-            <option value="minor">Minor</option>
-            <option value="trivial">Trivial</option>
+            <option value="Blocker">Blocker</option>
+            <option value="Critical">Critical</option>
+            <option value="Major">Major</option>
+            <option value="Minor">Minor</option>
+            <option value="Trivial">Trivial</option>
           </Form.Control>
         </Form.Group>
         <Form.Group controlId="statusFixer">
           <Form.Label>Status:</Form.Label>
           <Form.Control as="select" onChange={handleStatusFixerChange}>
             <option value="">전체</option>
-            <option value="new">New</option>
-            <option value="assigned">Assigned</option>
-            <option value="resolved">Resolved</option>
-            <option value="closed">Closed</option>
-            <option value="reopened">Reopened</option>
+            <option value="New">New</option>
+            <option value="Assigned">Assigned</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+            <option value="Reopened">Reopened</option>
           </Form.Control>
         </Form.Group>
       </div>

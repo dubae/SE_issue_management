@@ -1,5 +1,7 @@
 package com.codingrecipe.member.entity;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 import javax.persistence.*;
@@ -16,8 +18,8 @@ import com.codingrecipe.member.dto.UserRoleDTO;
 @Setter
 @Table(name = "member_role")
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+//@AllArgsConstructor
+//@Builder
 public class UserRoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,7 @@ public class UserRoleEntity {
 
     @ManyToOne(fetch = FetchType.LAZY) // 많은 UserRoleEntity가 하나의 MemberEntity를 참조할 수 있음
     @JoinColumn(name = "userid") // user_id 컬럼을 FK로 지정
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY) // 많은 UserRoleEntity가 하나의 ProjectEntity를 참조할 수 있음

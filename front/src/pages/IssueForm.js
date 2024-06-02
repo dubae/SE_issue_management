@@ -5,11 +5,11 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8080/api';
 const sessionid = sessionStorage.getItem('sessionid');
 
-function IssueForm({ onIssueAdded, projectId }) {
+function IssueForm({ onIssueAdded, projectId, fetchIssues }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'major',
+    priority: 'Major',
     component: '',
     status: 'New',
     fixerId: '',
@@ -57,6 +57,8 @@ function IssueForm({ onIssueAdded, projectId }) {
       if (response.status === 200) {
         const createdIssue = response.data;
         onIssueAdded(createdIssue);
+        // 추가 후, 이슈 타임 라인 즉각 반영을 위해 함수 추가.
+        fetchIssues();
       } else {
         console.error('Failed to create issue:', response.statusText);
       }
@@ -109,7 +111,7 @@ function IssueForm({ onIssueAdded, projectId }) {
           >
             <option value="blocker">Blocker</option>
             <option value="critical">Critical</option>
-            <option value="major">Major</option>
+            <option value="Major">Major</option>
             <option value="minor">Minor</option>
             <option value="trivial">Trivial</option>
           </Form.Control>
