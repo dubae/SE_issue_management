@@ -178,7 +178,7 @@ class IssueServiceTest {
     @Test
     void testChangeDevId() {
         when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
-        Long devId = 99L; Long id=1L;
+        String devId = "99L"; Long id=1L;
         issueService.changeDevId(id, devId);
         assertEquals(devId, issueService.findById(id).getDevId());
     }

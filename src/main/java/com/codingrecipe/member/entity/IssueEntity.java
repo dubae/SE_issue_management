@@ -7,10 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.swing.*;
 import java.util.*;
-
-import java.time.LocalDate;
 
 
 @Entity
@@ -33,13 +30,13 @@ public class IssueEntity extends BaseEntity{
 
 
     @Column(nullable = false, length = 20)
-    private Long writerId;
+    private String writerId;
 
     //@Column(nullable = false, length = 20)
     //private Long projectId;
 
     @Column(length = 20)
-    private Long devId;
+    private String devId;
 
     @Column(nullable = false, length = 20)
     private String title;
@@ -61,9 +58,10 @@ public class IssueEntity extends BaseEntity{
     private String description;
 
     @Column
-    private Long fixerId;
+    private String fixerId;
 
     @OneToMany(mappedBy = "issueEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<IssueCommentEntity> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)

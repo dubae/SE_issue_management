@@ -114,10 +114,15 @@ CreateIssue {
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus("new"); // status를 "new"로 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
-                    issueDTO.setWriterId(1L); // writerId
+                    issueDTO.setWriterId("1L"); // writerId
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
+
+                    /**
+                     * 두회 추가
+                     */
+                    issueDTO.setProjectDTO(projectService.findByProjectId(selectedProjectId));
 
                     // IssueService를 통해 이슈 추가
                     issueService.addNewIssue(issueDTO);

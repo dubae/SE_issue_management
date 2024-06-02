@@ -35,9 +35,11 @@ public class ProjectEntity {
     private String projectstatus;
 
     @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<IssueEntity> issueEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<UserRoleEntity> userRoles = new HashSet<>();
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {

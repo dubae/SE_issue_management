@@ -114,7 +114,7 @@ public class IssueDetailsPage {
                         break;
                         /*
                     case "Priority":
-                        searchResults = issueService.findByPriority(fieldValue);
+                        //searchResults = issueService.findByPriority(fieldValue);
                         break;
 
                          */

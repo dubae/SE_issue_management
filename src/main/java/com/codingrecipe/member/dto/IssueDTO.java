@@ -4,9 +4,7 @@ package com.codingrecipe.member.dto;
 import com.codingrecipe.member.entity.IssueCommentEntity;
 import com.codingrecipe.member.entity.IssueEntity;
 import lombok.*;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,10 +16,10 @@ import java.util.Objects;
 @ToString
 public class IssueDTO extends BaseDTO{
     private Long id;
-    private Long writerId;
+    private String writerId;
     private Long projectId;
-    private Long devId;
-    private Long fixerId;
+    private String devId;
+    private String fixerId;
     private String title;
     private String status; //enum?
     private String component;
