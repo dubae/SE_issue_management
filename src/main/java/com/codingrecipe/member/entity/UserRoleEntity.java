@@ -25,9 +25,10 @@ public class UserRoleEntity {
 
     @ManyToOne(fetch = FetchType.LAZY) // 많은 UserRoleEntity가 하나의 MemberEntity를 참조할 수 있음
     @JoinColumn(name = "userid") // user_id 컬럼을 FK로 지정
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private MemberEntity member;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // 많은 UserRoleEntity가 하나의 ProjectEntity를 참조할 수 있음
+    @ManyToOne(fetch = FetchType.LAZY) // 많은 UserRoleEntity가 하나의 ProjectEntity를 참조할 수 있음
     @JoinColumn(name = "projectid") // project_id 컬럼을 FK로 지정
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ProjectEntity project;
