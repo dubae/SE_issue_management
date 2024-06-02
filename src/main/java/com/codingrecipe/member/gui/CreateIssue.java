@@ -16,7 +16,6 @@ public class CreateIssue {
     private JTextField textFieldTitle;
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
-    private JComboBox<String> comboBoxStatus;
 
     private IssueService issueService;
     private ProjectService projectService;
@@ -67,25 +66,12 @@ public class CreateIssue {
         comboBoxPriority.addItem("trivial");
         frame.getContentPane().add(comboBoxPriority);
 
-        JLabel lblStatus = new JLabel("Status:");
-        lblStatus.setBounds(50, 240, 100, 20);
-        frame.getContentPane().add(lblStatus);
-
-        comboBoxStatus = new JComboBox<>();
-        comboBoxStatus.setBounds(150, 240, 150, 25);
-        comboBoxStatus.addItem("new");
-        comboBoxStatus.addItem("assigned");
-        comboBoxStatus.addItem("resolved");
-        comboBoxStatus.addItem("closed");
-        comboBoxStatus.addItem("reopened");
-        frame.getContentPane().add(comboBoxStatus);
-
         JLabel lblSelectProject = new JLabel("Select Project:");
-        lblSelectProject.setBounds(50, 280, 100, 20);
+        lblSelectProject.setBounds(50, 240, 100, 20);
         frame.getContentPane().add(lblSelectProject);
 
         JPanel projectPanel = new JPanel();
-        projectPanel.setBounds(50, 310, 350, 100);
+        projectPanel.setBounds(50, 270, 350, 100);
         frame.getContentPane().add(projectPanel);
 
         List<ProjectDTO> projectList = projectService.findAll();
@@ -107,7 +93,6 @@ public class CreateIssue {
                     String title = textFieldTitle.getText();
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
-                    String status = (String) comboBoxStatus.getSelectedItem();
                     LocalDate reportedDate = LocalDate.now();
 
                     // 프로젝트 선택
@@ -117,12 +102,11 @@ public class CreateIssue {
                         return;
                     }
 
-                    // IssueDTO 생성 및 설정
                     IssueDTO issueDTO = new IssueDTO();
                     issueDTO.setTitle(title);
                     issueDTO.setDescription(description);
                     issueDTO.setPriority(priority);
-                    issueDTO.setStatus(status);
+                    issueDTO.setStatus("new"); // status를 "new"로 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
                     issueDTO.setWriterId(1L); // writerId
                     issueDTO.setDevId(null); // devId
