@@ -112,9 +112,12 @@ public class IssueDetailsPage {
                     case "Component":
                         searchResults = issueService.findByComponent(fieldValue);
                         break;
+                        /*
                     case "Priority":
                         searchResults = issueService.findByPriority(fieldValue);
                         break;
+
+                         */
                 }
                 if (searchResults != null) {
                     // Display the search results in a new window

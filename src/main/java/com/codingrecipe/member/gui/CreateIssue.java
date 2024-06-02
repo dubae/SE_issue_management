@@ -11,7 +11,9 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CreateIssue {
+public class
+
+CreateIssue {
     private JFrame frame;
     private JTextField textFieldTitle;
     private JTextArea textAreaDescription;
