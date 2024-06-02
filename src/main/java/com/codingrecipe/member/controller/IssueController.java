@@ -258,12 +258,12 @@ public class IssueController {
      [ 1, 3, 12] 이런 형태로 반환.
      */
     @PostMapping("/api/project/{projectId}/issue/{issueId}/suggestDev")
-    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
+    public ResponseEntity<List<String>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        List<Long> devIds = issueService.suggestDev(issueId);
+        List<String> devIds = issueService.suggestDev(issueId);
         return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
     }
 
