@@ -1,7 +1,5 @@
 package com.codingrecipe.member.entity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 import javax.persistence.*;
@@ -19,6 +17,8 @@ import com.codingrecipe.member.service.UserRoleService;
 @Setter
 @Table(name = "member_role")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserRoleEntity {
     @Transient
     @Autowired

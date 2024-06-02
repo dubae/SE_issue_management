@@ -9,6 +9,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class UserRoleDTO {
     private Long id;
     private Long projectid;

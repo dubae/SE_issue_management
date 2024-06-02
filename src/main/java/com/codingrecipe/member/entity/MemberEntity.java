@@ -1,8 +1,7 @@
 package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.dto.MemberDTO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +12,9 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Table(name = "member")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MemberEntity {
     @Id
     @Column(name = "userid", unique = true, nullable = false)
