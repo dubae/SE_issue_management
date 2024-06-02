@@ -1,46 +1,39 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
-import com.codingrecipe.member.repository.IssueRepository;
-import com.codingrecipe.member.repository.ProjectRepository;
+import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.service.IssueService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.util.List;
 
 public class CreateIssue {
     private JFrame frame;
     private JTextField textFieldTitle;
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
-    private JComboBox<String> comboBoxStatus;
 
+    private IssueService issueService;
+    private ProjectService projectService;
+    private String username;
+    private String password;
 
-    private IssueRepository issueRepository;
+    private Long selectedProjectId;
 
-
-    private ProjectRepository projectRepository;
-
-
-    private IssueService issueService; // 이슈 서비스 객체
-
-    private final String username;
-
-    // 생성자 수정 - IssueService 객체를 전달받도록 변경
-   // @Autowired
-    public CreateIssue(IssueService issueService, String username) {
-        this.issueService = issueService; // 이슈 서비스 객체 설정
+    public CreateIssue(IssueService issueService, ProjectService projectService, String username) {
+        this.issueService = issueService;
+        this.projectService = projectService;
         this.username = username;
         initialize();
     }
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 400);
+        frame.setBounds(100, 100, 450, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -73,21 +66,25 @@ public class CreateIssue {
         comboBoxPriority.addItem("trivial");
         frame.getContentPane().add(comboBoxPriority);
 
-        JLabel lblStatus = new JLabel("Status:");
-        lblStatus.setBounds(50, 240, 100, 20);
-        frame.getContentPane().add(lblStatus);
+        JLabel lblSelectProject = new JLabel("Select Project:");
+        lblSelectProject.setBounds(50, 240, 100, 20);
+        frame.getContentPane().add(lblSelectProject);
 
-        comboBoxStatus = new JComboBox<>();
-        comboBoxStatus.setBounds(150, 240, 150, 25);
-        comboBoxStatus.addItem("new");
-        comboBoxStatus.addItem("assigned");
-        comboBoxStatus.addItem("resolved");
-        comboBoxStatus.addItem("closed");
-        comboBoxStatus.addItem("reopened");
-        frame.getContentPane().add(comboBoxStatus);
+        JPanel projectPanel = new JPanel();
+        projectPanel.setBounds(50, 270, 350, 100);
+        frame.getContentPane().add(projectPanel);
+
+        List<ProjectDTO> projectList = projectService.findAll();
+        ButtonGroup projectButtonGroup = new ButtonGroup();
+        for (ProjectDTO project : projectList) {
+            JRadioButton projectButton = new JRadioButton(project.getProjectname());
+            projectButton.setActionCommand(project.getProjectid().toString());
+            projectButtonGroup.add(projectButton);
+            projectPanel.add(projectButton);
+        }
 
         JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(200, 300, 150, 30);
+        btnCreateIssue.setBounds(200, 420, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
         btnCreateIssue.addActionListener(new ActionListener() {
@@ -96,17 +93,26 @@ public class CreateIssue {
                     String title = textFieldTitle.getText();
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
-                    String status = (String) comboBoxStatus.getSelectedItem();
                     LocalDate reportedDate = LocalDate.now();
 
-                    // IssueDTO 생성 및 설정
+                    // 프로젝트 선택
+                    if (projectButtonGroup.getSelection() == null) {
+                        JOptionPane.showMessageDialog(frame, "Please select a project.");
+                        return;
+                    }
+                    selectedProjectId = Long.valueOf(projectButtonGroup.getSelection().getActionCommand());
+                    if (selectedProjectId == null) {
+                        JOptionPane.showMessageDialog(frame, "No project selected. Please create a project first.");
+                        return;
+                    }
+
                     IssueDTO issueDTO = new IssueDTO();
                     issueDTO.setTitle(title);
                     issueDTO.setDescription(description);
                     issueDTO.setPriority(priority);
-                    issueDTO.setStatus(status);
-                    issueDTO.setProjectId(1L); // projectId
-                    issueDTO.setWriterId(null); // writerId
+                    issueDTO.setStatus("new"); // status를 "new"로 설정
+                    issueDTO.setProjectId(selectedProjectId); // projectId
+                    issueDTO.setWriterId("1L"); // writerId
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
@@ -115,7 +121,7 @@ public class CreateIssue {
                     issueService.addNewIssue(issueDTO);
 
                     // 생성된 이슈 페이지로 이동
-                    UserPage userPage = new UserPage(null, issueService, username);
+                    UserPage userPage = new UserPage(issueService, projectService, username, password);
                     userPage.showFrame();
                     frame.dispose();
                 } catch (Exception ex) {
@@ -125,18 +131,17 @@ public class CreateIssue {
         });
 
         JButton btnBack = new JButton("뒤로가기");
-        btnBack.setBounds(50, 300, 100, 30);
+        btnBack.setBounds(50, 420, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(null, issueService, username);
+                UserPage userPage = new UserPage(issueService, projectService, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }
         });
     }
-
 
     public void showFrame() {
         frame.setVisible(true);

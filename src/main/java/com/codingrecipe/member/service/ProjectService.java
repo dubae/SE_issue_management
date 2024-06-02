@@ -2,6 +2,7 @@ package com.codingrecipe.member.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -86,6 +87,8 @@ public class ProjectService {
     public boolean deleteByProjectName(String projectname) {
         long deletedCountBefore = projectRepository.count(); // 삭제 작업 전 레코드 수
         projectRepository.deleteByProjectname(projectname);
+        projectRepository.delete(Objects.requireNonNull(projectRepository.findByProjectname(projectname).orElse(null)));
+        System.out.println(projectname);
         long deletedCountAfter = projectRepository.count(); // 삭제 작업 후 레코드 수
         // 삭제 작업 전후 레코드 수가 다르면 삭제가 이루어진 것으로 간주
         if (deletedCountBefore > deletedCountAfter) {

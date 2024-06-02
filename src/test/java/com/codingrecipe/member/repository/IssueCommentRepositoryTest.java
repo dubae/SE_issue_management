@@ -29,7 +29,7 @@
 //        List<IssueCommentEntity> issueCommentEntities = new ArrayList<>();
 //        IssueCommentEntity issueCommentEntity1=new IssueCommentEntity();
 //        issueCommentEntity1.setId(1L);
-//        issueCommentEntity1.setWriterId(1L);
+//        issueCommentEntity1.setwriterId("1L");
 //        issueCommentEntity1.setContent("test1");
 //        issueCommentEntities.add(issueCommentEntity1);
 //        IssueCommentEntity issueCommentEntity2=new IssueCommentEntity();

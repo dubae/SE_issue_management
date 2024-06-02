@@ -43,16 +43,16 @@ public class IssueCommentServiceTest {
         closeable = MockitoAnnotations.openMocks(this);
 
         issueEntity1  = IssueEntity.builder()
-                .id(1L).title("title1").writerId(1L).description("test")
+                .id(1L).title("title1").writerId("1L").description("test")
                 .status("new").component("comp1")
                 .build();
 
 
         comment1 = new IssueCommentEntity().builder()
-                .id(1L).writerId(1L).content("content1").issueEntity(issueEntity1).build();
+                .id(1L).writerId("1L").content("content1").issueEntity(issueEntity1).build();
 
         comment2 = new IssueCommentEntity().builder()
-                .id(2L).writerId(1L).content("content2").issueEntity(issueEntity1).build();
+                .id(2L).writerId("1L").content("content2").issueEntity(issueEntity1).build();
 
         issueComments = new ArrayList<>();
         issueComments.add(comment1);
