@@ -2,6 +2,7 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
@@ -10,7 +11,6 @@ import com.codingrecipe.member.service.ProjectService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,11 +19,12 @@ public class CreateIssue {
     private JTextField textFieldTitle;
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
+    private JComboBox<String> comboBoxAssignee;
 
     private MemberService memberService;
     private IssueService issueService;
-    private IssueCommentService issueCommentService;
     private ProjectService projectService;
+    private IssueCommentService issueCommentService;
     private String username;
     private String password;
 
@@ -40,7 +41,7 @@ public class CreateIssue {
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 500);
+        frame.setBounds(100, 100, 450, 550);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -73,12 +74,26 @@ public class CreateIssue {
         comboBoxPriority.addItem("trivial");
         frame.getContentPane().add(comboBoxPriority);
 
+        JLabel lblAssignee = new JLabel("Assignee:");
+        lblAssignee.setBounds(50, 240, 100, 20);
+        frame.getContentPane().add(lblAssignee);
+
+        comboBoxAssignee = new JComboBox<>();
+        comboBoxAssignee.setBounds(150, 240, 250, 25);
+        frame.getContentPane().add(comboBoxAssignee);
+
+        comboBoxAssignee.addItem("No Assignee"); // 이슈추가만 하고 assignee 등록 안하는 경우
+        List<MemberDTO> members = memberService.findAll();
+        for (MemberDTO member : members) {
+            comboBoxAssignee.addItem(member.getUserid());
+        }
+
         JLabel lblSelectProject = new JLabel("Select Project:");
-        lblSelectProject.setBounds(50, 240, 100, 20);
+        lblSelectProject.setBounds(50, 280, 100, 20);
         frame.getContentPane().add(lblSelectProject);
 
         JPanel projectPanel = new JPanel();
-        projectPanel.setBounds(50, 270, 350, 100);
+        projectPanel.setBounds(50, 310, 350, 100);
         frame.getContentPane().add(projectPanel);
 
         List<ProjectDTO> projectList = projectService.findAll();
@@ -100,6 +115,7 @@ public class CreateIssue {
                     String title = textFieldTitle.getText();
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
+                    String assignee = (String) comboBoxAssignee.getSelectedItem();
                     LocalDateTime createdAt = LocalDateTime.now();
 
                     // 프로젝트 선택
@@ -117,13 +133,13 @@ public class CreateIssue {
                     issueDTO.setTitle(title);
                     issueDTO.setDescription(description);
                     issueDTO.setPriority(priority);
-                    issueDTO.setStatus("new"); // status를 "new"로 설정
+                    issueDTO.setStatus(assignee.equals("No Assignee") ? "new" : "assigned"); // 상태 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
                     issueDTO.setWriterId("1L"); // writerId
-                    issueDTO.setDevId(null); // devId
+                    issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
-                    issueDTO.setCreatedAt(LocalDate.from(createdAt)); // 생성 시간 설정
+                    issueDTO.setCreatedAt(createdAt.toLocalDate()); // 생성 시간 오류 남 ㅠ
 
                     issueDTO.setProjectDTO(projectService.findByProjectId(selectedProjectId));
 
@@ -131,7 +147,7 @@ public class CreateIssue {
                     issueService.addNewIssue(issueDTO);
 
                     // 생성된 이슈 페이지로 이동
-                    UserPage userPage = new UserPage(issueService, issueCommentService,projectService, memberService, username, password);
+                    UserPage userPage = new UserPage(issueService, issueCommentService, projectService, memberService, username, password);
                     userPage.showFrame();
                     frame.dispose();
                 } catch (Exception ex) {
@@ -146,7 +162,7 @@ public class CreateIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(issueService, issueCommentService,projectService, memberService, username, password);
+                UserPage userPage = new UserPage(issueService, issueCommentService, projectService, memberService, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }

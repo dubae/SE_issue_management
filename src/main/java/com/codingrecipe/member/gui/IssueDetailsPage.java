@@ -10,6 +10,7 @@ import com.codingrecipe.member.service.ProjectService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,8 +24,6 @@ public class IssueDetailsPage {
     private final String username;
     private final String password;
     private final IssueDTO issueDTO;
-    private JComboBox<String> comboBoxSearchBy;
-    private JTextField textFieldSearch;
     private JTextArea textAreaComments;
     private JTextField textFieldComment;
 
@@ -109,9 +108,9 @@ public class IssueDetailsPage {
                 if (!commentText.isEmpty()) {
                     IssueCommentDTO newComment = new IssueCommentDTO();
                     newComment.setContent(commentText);
-                    newComment.setWriterId(Long.parseLong(username)); // Assuming username is the user ID
+                    newComment.setWriterId(Long.parseLong(username));
                     newComment.setIssueId(issueDTO.getId());
-                    newComment.setCreatedAt(LocalDateTime.now());
+                    newComment.setCreatedAt(LocalDate.from(LocalDateTime.now()));
                     issueCommentService.save(newComment);
                     issueDTO.getIssueCommentDTOList().add(newComment);
                     updateComments();
@@ -120,32 +119,8 @@ public class IssueDetailsPage {
             }
         });
 
-        JLabel lblSearchBy = new JLabel("Search by:");
-        lblSearchBy.setBounds(50, 460, 100, 20);
-        frame.getContentPane().add(lblSearchBy);
-
-        comboBoxSearchBy = new JComboBox<>(new String[]{"Title", "Status", "Component"});
-        comboBoxSearchBy.setBounds(150, 460, 150, 25);
-        frame.getContentPane().add(comboBoxSearchBy);
-
-        textFieldSearch = new JTextField();
-        textFieldSearch.setBounds(150, 490, 150, 25);
-        frame.getContentPane().add(textFieldSearch);
-
-        JButton btnSearch = new JButton("Search");
-        btnSearch.setBounds(310, 490, 90, 25);
-        frame.getContentPane().add(btnSearch);
-
-        btnSearch.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String searchBy = (String) comboBoxSearchBy.getSelectedItem();
-                String searchValue = textFieldSearch.getText();
-                searchIssues(searchBy, searchValue);
-            }
-        });
-
-        JButton btnBack = new JButton("뒤로가기");
-        btnBack.setBounds(50, 530, 100, 30);
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(50, 500, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
@@ -165,40 +140,6 @@ public class IssueDetailsPage {
         for (IssueCommentDTO comment : issueDTO.getIssueCommentDTOList()) {
             textAreaComments.append(comment.getWriterId() + " (" + comment.getCreatedAt().format(formatter) + "): " + comment.getContent() + "\n");
         }
-    }
-
-    private void searchIssues(String searchBy, String searchValue) {
-        List<IssueDTO> searchResults = null;
-        switch (searchBy) {
-            case "Title":
-                searchResults = issueService.findByTitle(searchValue);
-                break;
-            case "Status":
-                searchResults = issueService.findByStatus(searchValue);
-                break;
-            case "Component":
-                searchResults = issueService.findByComponent(searchValue);
-                break;
-        }
-        if (searchResults != null) {
-            displaySearchResults(searchResults);
-        } else {
-            JOptionPane.showMessageDialog(frame, "No search results found for " + searchBy + ": " + searchValue);
-        }
-    }
-
-    private void displaySearchResults(List<IssueDTO> searchResults) {
-        JFrame searchResultsFrame = new JFrame();
-        searchResultsFrame.setBounds(200, 200, 600, 400);
-        searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        searchResultsFrame.getContentPane().setLayout(null);
-
-        JList<String> resultList = new JList<>(searchResults.stream().map(IssueDTO::getTitle).toArray(String[]::new));
-        JScrollPane scrollPane = new JScrollPane(resultList);
-        scrollPane.setBounds(50, 50, 500, 250);
-        searchResultsFrame.getContentPane().add(scrollPane);
-
-        searchResultsFrame.setVisible(true);
     }
 
     public void showFrame() {

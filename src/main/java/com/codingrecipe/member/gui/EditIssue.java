@@ -1,6 +1,7 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
@@ -9,6 +10,7 @@ import com.codingrecipe.member.service.ProjectService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class EditIssue {
     private JFrame frame;
@@ -16,6 +18,7 @@ public class EditIssue {
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
     private JComboBox<String> comboBoxStatus;
+    private JComboBox<String> comboBoxAssignee;
 
     private final IssueService issueService;
     private final IssueCommentService issueCommentService;
@@ -40,7 +43,7 @@ public class EditIssue {
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 500);
+        frame.setBounds(100, 100, 450, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -81,11 +84,25 @@ public class EditIssue {
         comboBoxStatus = new JComboBox<>();
         comboBoxStatus.setBounds(150, 240, 150, 25);
         comboBoxStatus.addItem("new");
-        comboBoxStatus.addItem("in progress");
+        comboBoxStatus.addItem("assigned");
         comboBoxStatus.addItem("resolved");
         comboBoxStatus.addItem("closed");
         comboBoxStatus.setSelectedItem(issueDTO.getStatus());
         frame.getContentPane().add(comboBoxStatus);
+
+        JLabel lblAssignee = new JLabel("Assignee:");
+        lblAssignee.setBounds(50, 280, 100, 20);
+        frame.getContentPane().add(lblAssignee);
+
+        comboBoxAssignee = new JComboBox<>();
+        comboBoxAssignee.setBounds(150, 280, 150, 25);
+        comboBoxAssignee.addItem("No Assignee"); // No Assignee 옵션 추가
+        List<MemberDTO> members = memberService.findAll();
+        for (MemberDTO member : members) {
+            comboBoxAssignee.addItem(member.getUserid());
+        }
+        comboBoxAssignee.setSelectedItem(issueDTO.getDevId() == null ? "No Assignee" : issueDTO.getDevId());
+        frame.getContentPane().add(comboBoxAssignee);
 
         JButton btnUpdateIssue = new JButton("Update Issue");
         btnUpdateIssue.setBounds(200, 420, 150, 30);
@@ -97,19 +114,15 @@ public class EditIssue {
                 String description = textAreaDescription.getText();
                 String priority = (String) comboBoxPriority.getSelectedItem();
                 String status = (String) comboBoxStatus.getSelectedItem();
+                String assignee = (String) comboBoxAssignee.getSelectedItem();
 
                 issueDTO.setTitle(title);
                 issueDTO.setDescription(description);
                 issueDTO.setPriority(priority);
-                issueDTO.setStatus(status);
-                issueDTO.setFixerId(userid.toString()); // userid가 fixerId
+                issueDTO.setStatus(assignee.equals("No Assignee") ? "new" : "assigned"); // 상태 설정
+                issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId 설정
 
-                // fixerId가 설정되면 상태를 fixed로 변경
-                if (!userid.toString().equals(issueDTO.getFixerId())) {
-                    issueDTO.setStatus("fixed");
-                }
-
-                issueService.changeStatus(issueDTO.getId(), issueDTO.getStatus());
+                issueService.addNewIssue(issueDTO);
 
                 ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
                 viewIssue.showFrame();
@@ -123,7 +136,7 @@ public class EditIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService,projectService, memberService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
