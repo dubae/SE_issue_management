@@ -48,7 +48,6 @@ public class ProjectService {
         }
     }
 
-
     @Transactional
     public ProjectEntity findByProjectNameEntity(String project_name) {
         ProjectEntity projectEntity = projectRepository.findByProjectname(project_name).orElse(null);

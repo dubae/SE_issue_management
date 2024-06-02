@@ -16,7 +16,6 @@ public class MemberDTOSecure {
     public String userid;
     public String username;
     public String email;
-    public String role;
 
     public static MemberDTOSecure toMemberDTOSecure(MemberDTO memberDto) {
         MemberDTOSecure memberDTOSecure = new MemberDTOSecure();

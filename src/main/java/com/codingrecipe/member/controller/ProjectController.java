@@ -32,6 +32,9 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.codingrecipe.member.session.SessionManager;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -316,4 +319,27 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/api/project/{projectname}/{userid}/getrole")
+    public ResponseEntity<List<String>> user_project_role(@PathVariable String projectname, @PathVariable String userid, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        ProjectEntity projectEntity = projectService.findByProjectNameEntity(projectname);
+        if (projectEntity == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<UserRoleDTO> userRoleDTO = userRoleService.findByProjectAndMember(projectEntity, MemberEntity.toMemberEntity(memberService.findByUserId(userid)));
+        if (userRoleDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<String> roles = new ArrayList<>();
+        for (UserRoleDTO userRole : userRoleDTO) {
+            roles.add(userRole.getRole());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(roles);
+        
+    }
+    
 }

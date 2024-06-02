@@ -107,16 +107,7 @@ public class MemberController {
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println("member toString:" +member.toString());
         MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
-
-        String projectid = request.getHeader("projectid");
-        System.out.println("projectid: "+projectid);
-        if(!ObjectUtils.isEmpty(projectid)) {
-            List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(Long.valueOf(projectid));
-            UserRoleDTO userRoleDTO = userRoleDTOList.stream().filter(item -> item.getUserid().equals(userid)).findFirst().get();
-            memberDTOSecure.setRole(userRoleDTO.getRole());
-        }
 
         return ResponseEntity.ok(memberDTOSecure);
     }

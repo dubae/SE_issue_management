@@ -151,6 +151,23 @@ function ProjectDetailPage() {
                     'projectid': projectId,
                 }
             });
+
+
+
+
+            /* 여기에 test 대신 프로젝트 이름이 들어가야 함*/
+
+
+
+
+            const response2 = await fetch(`${API_URL}/project/test/${sessionStorage.getItem('userId')}/getrole`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
+                }
+            });
+            
+        
             
             if (!response.ok) {
                 let errorMsg = `HTTP error! Status: ${response.status}`;
@@ -163,7 +180,9 @@ function ProjectDetailPage() {
             }
             
             const data = await response.json();
+            const roles = await response2.json();
             console.log('data', data)
+            console.log('roles', roles)
             
             if (!data || !data.userid || !data.email || !data.username) {
                 throw new Error('Incomplete response data');
@@ -173,7 +192,7 @@ function ProjectDetailPage() {
                 userId: data.userid,
                 email: data.email,
                 name: data.username,
-                role: data?.role
+                role: roles.join(', ')
             });
             
             setShowUserInfo(true);
