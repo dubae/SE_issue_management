@@ -42,7 +42,7 @@ public class ProjectEntity {
 
     public static ProjectEntity toProjectEntity(ProjectDTO projectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
-        projectEntity.setProjectid(projectDTO.getProjectid());
+        //projectEntity.setProjectid(projectDTO.getProjectid());
         projectEntity.setProjectname(projectDTO.getProjectname());
         projectEntity.setProjectdescription(projectDTO.getProjectdescription());
         projectEntity.setProjectcreatedtime(projectDTO.getProjectcreatedtime());
