@@ -9,11 +9,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class
-
-CreateIssue {
+public class CreateIssue {
     private JFrame frame;
     private JTextField textFieldTitle;
     private JTextArea textAreaDescription;
@@ -23,13 +23,16 @@ CreateIssue {
     private ProjectService projectService;
     private String username;
     private String password;
+    private Long userid;
 
     private Long selectedProjectId;
 
-    public CreateIssue(IssueService issueService, ProjectService projectService, String username) {
+    public CreateIssue(IssueService issueService, ProjectService projectService, Long userid, String username, String password) {
         this.issueService = issueService;
         this.projectService = projectService;
+        this.userid = userid;
         this.username = username;
+        this.password = password;
         initialize();
     }
 
@@ -66,6 +69,7 @@ CreateIssue {
         comboBoxPriority.addItem("blocker");
         comboBoxPriority.addItem("minor");
         comboBoxPriority.addItem("trivial");
+        comboBoxPriority.setSelectedItem("major"); // 기본값 설정
         frame.getContentPane().add(comboBoxPriority);
 
         JLabel lblSelectProject = new JLabel("Select Project:");
@@ -95,7 +99,7 @@ CreateIssue {
                     String title = textFieldTitle.getText();
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
-                    LocalDate reportedDate = LocalDate.now();
+                    String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
                     // 프로젝트 선택
                     if (projectButtonGroup.getSelection() == null) {
@@ -114,21 +118,18 @@ CreateIssue {
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus("new"); // status를 "new"로 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
-                    issueDTO.setWriterId("1L"); // writerId
+                    issueDTO.setWriterId(userid.toString()); // reporter 필드를 userid로 설정
+                    issueDTO.setCreatedAt(LocalDate.parse(createdAt)); // createdAt 필드 설정
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
-
-                    /**
-                     * 두회 추가
-                     */
                     issueDTO.setProjectDTO(projectService.findByProjectId(selectedProjectId));
 
                     // IssueService를 통해 이슈 추가
                     issueService.addNewIssue(issueDTO);
 
                     // 생성된 이슈 페이지로 이동
-                    UserPage userPage = new UserPage(issueService, projectService, username, password);
+                    UserPage userPage = new UserPage(issueService, projectService, userid, username, password);
                     userPage.showFrame();
                     frame.dispose();
                 } catch (Exception ex) {
@@ -137,13 +138,13 @@ CreateIssue {
             }
         });
 
-        JButton btnBack = new JButton("뒤로가기");
+        JButton btnBack = new JButton("Back");
         btnBack.setBounds(50, 420, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(issueService, projectService, username, password);
+                UserPage userPage = new UserPage(issueService, projectService, userid, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }

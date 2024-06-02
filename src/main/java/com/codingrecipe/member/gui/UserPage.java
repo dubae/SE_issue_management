@@ -1,4 +1,3 @@
-// UserPage.java
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.service.IssueService;
@@ -14,10 +13,12 @@ public class UserPage {
     private final ProjectService projectService;
     private final String username;
     private final String password;
+    private final Long userid;
 
-    public UserPage(IssueService issueService, ProjectService projectService, String username, String password) {
+    public UserPage(IssueService issueService, ProjectService projectService, Long userid, String username, String password) {
         this.issueService = issueService;
         this.projectService = projectService;
+        this.userid = userid;
         this.username = username;
         this.password = password;
         initialize();
@@ -45,10 +46,9 @@ public class UserPage {
         btnCreateIssue.setBounds(150, 150, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
-
         btnCreateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, projectService, username);
+                CreateIssue createIssue = new CreateIssue(issueService, projectService, userid, username, password);
                 createIssue.showFrame();
                 frame.dispose();
             }
@@ -60,14 +60,12 @@ public class UserPage {
 
         btnViewIssues.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
         });
-
     }
-
 
     public void showFrame() {
         frame.setVisible(true);

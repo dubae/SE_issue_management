@@ -19,13 +19,15 @@ public class EditIssue {
     private final ProjectService projectService;
     private final String username;
     private final String password;
+    private final Long userid;
     private final IssueDTO issueDTO;
 
-    public EditIssue(IssueService issueService, ProjectService projectService, String username, String password, IssueDTO issueDTO) {
+    public EditIssue(IssueService issueService, ProjectService projectService, Long userid, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
         this.projectService = projectService;
         this.username = username;
         this.password = password;
+        this.userid = userid;
         this.issueDTO = issueDTO;
         initialize();
     }
@@ -94,13 +96,13 @@ public class EditIssue {
                 issueDTO.setDescription(description);
                 issueDTO.setPriority(priority);
                 issueDTO.setStatus(status);
-                issueDTO.setFixerId(issueDTO.getWriterId()); // 수정한 사람의 userid를 fixerid로 설정
+                issueDTO.setFixerId(userid.toString()); // 수정한 사람의 userid를 fixerid로 설정
 
                 // 이슈 업데이트
                 issueService.changeStatus(issueDTO.getId(), status);
 
                 // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
@@ -113,7 +115,7 @@ public class EditIssue {
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
