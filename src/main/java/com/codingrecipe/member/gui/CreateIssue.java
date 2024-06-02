@@ -96,6 +96,10 @@ public class CreateIssue {
                     LocalDate reportedDate = LocalDate.now();
 
                     // 프로젝트 선택
+                    if (projectButtonGroup.getSelection() == null) {
+                        JOptionPane.showMessageDialog(frame, "Please select a project.");
+                        return;
+                    }
                     selectedProjectId = Long.valueOf(projectButtonGroup.getSelection().getActionCommand());
                     if (selectedProjectId == null) {
                         JOptionPane.showMessageDialog(frame, "No project selected. Please create a project first.");

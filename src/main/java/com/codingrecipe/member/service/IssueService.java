@@ -145,18 +145,6 @@ public class IssueService {
         return issueDTOList;
     }
 
-    public List<IssueDTO> findByPriority(String component) {
-        List<IssueDTO> issueDTOList = new ArrayList<>();
-        List<IssueEntity> issueEntityList = issueRepository.findAll();
-        for (IssueEntity issueEntity : issueEntityList) {
-            if (issueEntity.getComponent().equals(component)) {
-                issueDTOList.add(new IssueDTO(issueEntity));
-
-            }
-        }
-        return issueDTOList;
-    }
-
     /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
@@ -234,7 +222,7 @@ public class IssueService {
                 .collect(Collectors.toList());
         int max=0;
         Long bestDev=1L;
-        
+
 
         Long fixerId;
 
