@@ -19,9 +19,10 @@ function ProjectDetailPage() {
     const [timeFrame, setTimeFrame] = useState('month');
 
     const handleLogout = () => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('email');
-        localStorage.removeItem('name');
+        sessionStorage.removeItem('sessionid');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('name');
         navigate('/');
     };
 
@@ -31,19 +32,28 @@ function ProjectDetailPage() {
     };
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    
+    
+    const [userInfo, setUserInfo] = useState({
+        userId: sessionStorage.getItem('userId') || '',
+        email: sessionStorage.getItem('email') || '',
+        name: sessionStorage.getItem('name') || ''
+    });
+    
     const handleToggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
+    
 
 
 
     const fetchProject = async () => {
         try {
-            const userId = localStorage.getItem('userId');
+            const userId = sessionStorage.getItem('userId');
             const response = await axios.get(`${API_URL}/projects`, {
                 headers: {
-                    'userId': userId
+                    'userId': userId,
+                    'sessionid': sessionStorage.getItem("sessionid")
                 }
             });
             const projects = response.data;
@@ -62,7 +72,14 @@ function ProjectDetailPage() {
 
     const fetchIssues = async () => {
         try {
-            const response = await axios.get(`${API_URL}/issues/${projectId}`);
+            const userId = sessionStorage.getItem('userId');
+            const response = await axios.get(`${API_URL}/issues/${projectId}`, {
+                headers: {
+                    'userId': userId,
+                    'sessionid': sessionStorage.getItem("sessionid")
+                },
+                method:'GET'
+            });
             const data = response.data;
             setAllIssues(data);
             filterIssues(data, timeFrame);
@@ -70,10 +87,30 @@ function ProjectDetailPage() {
             console.error('Error fetching issues:', error);
         }
     };
+    
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await fetch(API_URL+'/login_status', {
+                    method:'POST',
+                    headers: {
+                        userid: sessionStorage.getItem('userid'),
+                        sessionid: sessionStorage.getItem('sessionid')
+                    },
+                });
+                if (!result?.ok) navigate("/");
+            } catch (err) {
+                console.log('error!!!', err)
+                navigate("/");
+            }
+        })();
+    }, []);
 
     useEffect(() => {
-        fetchProject();
-        fetchIssues();
+        (async() => {
+            await fetchProject();
+            await fetchIssues();
+        })();
     }, [projectId]);
 
     useEffect(() => {
@@ -105,13 +142,45 @@ function ProjectDetailPage() {
 
     const [showUserInfo, setShowUserInfo] = useState(false);
     const handleCloseUserInfo = () => setShowUserInfo(false);
-    const handleShowUserInfo = () => setShowUserInfo(true);
-
-    const userInfo = {
-        userId: localStorage.getItem('userId') || '',
-        email: localStorage.getItem('email') || '',
-        name: localStorage.getItem('name') || ''
-    };
+    const handleShowUserInfo = async () => {
+        try {
+            const response = await fetch(`${API_URL}/member/${sessionStorage.getItem('userId')}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
+                    'projectid': projectId,
+                }
+            });
+            
+            if (!response.ok) {
+                let errorMsg = `HTTP error! Status: ${response.status}`;
+                if (response.status === 401) {
+                    errorMsg = 'Unauthorized access. Please log in again.';
+                } else if (response.status === 404) {
+                    errorMsg = 'User not found.';
+                }
+                throw new Error(errorMsg);
+            }
+            
+            const data = await response.json();
+            console.log('data', data)
+            
+            if (!data || !data.userid || !data.email || !data.username) {
+                throw new Error('Incomplete response data');
+            }
+            
+            setUserInfo({
+                userId: data.userid,
+                email: data.email,
+                name: data.username,
+                role: data?.role
+            });
+            
+            setShowUserInfo(true);
+        } catch (error) {
+            console.error('Error fetching user info:', error.message);
+        }
+    }
 
     const calculateIssueUpdateCount = (issues) => {
         return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);

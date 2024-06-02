@@ -1,23 +1,23 @@
 .issue-list-container {
-    padding: 20px;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .issue-table-container {
-    margin-bottom: 20px;
-  }
-  
-  .pagination {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .pagination button {
-    margin: 0 5px;
-  }
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.issue-table-container {
+  margin-bottom: 20px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.pagination button {
+  margin: 0 5px;
+}

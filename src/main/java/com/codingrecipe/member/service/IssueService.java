@@ -1,6 +1,7 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.entity.IssueEntity;
 import com.codingrecipe.member.entity.ProjectEntity;
 import com.codingrecipe.member.repository.IssueRepository;
@@ -59,9 +60,21 @@ public class IssueService {
      * 새 이슈 추가하기
      */
     public void addNewIssue(IssueDTO issueDTO) {
+        System.out.println("issueDTO: "+ issueDTO.toString());
         IssueEntity issueEntity = IssueEntity.toIssueEntity(issueDTO);
-        // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
-        issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
+        ProjectEntity findProjectEntity = (projectRepository.findByProjectid(issueDTO.getProjectId())).get();
+        ProjectDTO projectDto = new ProjectDTO();
+
+        projectDto.setProjectid(findProjectEntity.getProjectid());
+        projectDto.setProjectname(findProjectEntity.getProjectname());
+        projectDto.setProjectdescription(findProjectEntity.getProjectdescription());
+        projectDto.setProjectcreatedtime(findProjectEntity.getProjectcreatedtime());
+        projectDto.setProjectstatus(findProjectEntity.getProjectstatus());
+
+        System.out.println("projectDto:" +projectDto.toString());
+
+        System.out.println("issueEntity: "+ issueEntity.toString());
+        issueEntity.setProjectEntity(findProjectEntity);
         issueEntity.setCreatedAt(LocalDate.now());
         issueRepository.save(issueEntity);
     }
@@ -148,7 +161,7 @@ public class IssueService {
     /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
-    public List<IssueDTO> findByWriterId(Long writerId) {
+    public List<IssueDTO> findByWriterId(String writerId) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
         for (IssueEntity issueEntity : issueEntityList) {

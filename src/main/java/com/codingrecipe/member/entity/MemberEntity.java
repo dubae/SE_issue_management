@@ -1,6 +1,9 @@
 package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.dto.MemberDTO;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.*;
 
 import java.util.HashSet;
@@ -8,6 +11,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+@ToString
 @Entity
 @Setter
 @Getter
@@ -27,6 +31,7 @@ public class MemberEntity {
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<UserRoleEntity> userRoles = new HashSet<>();
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -10,10 +11,7 @@ import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.codingrecipe.member.dto.AddProjectDTO;
 import com.codingrecipe.member.dto.MemberDTO;
@@ -68,18 +66,19 @@ public class ProjectController {
                 projects.add(projectService.findByProjectId(userRole.getProjectid()));
             }
         }
-        
+
         List<ProjectInfoDTO> projects_info = new ArrayList<>();
         List<UserRoleDTO> projectUserDTO;
         List<MemberDTOSecure> members_secure;
         ProjectInfoDTO projectinfoDTO;
-        
+
         for (ProjectDTO project : projects) {
             projectinfoDTO = new ProjectInfoDTO();
             projectinfoDTO.setProjectid(project.getProjectid());
             projectinfoDTO.setProjectname(project.getProjectname());
             projectinfoDTO.setProjectdescription(project.getProjectdescription());
             projectinfoDTO.setProjectcreatedtime(project.getProjectcreatedtime());
+            projectinfoDTO.setStatus(project.getStatus());
             projectUserDTO = new ArrayList<>();
             projectUserDTO = userRoleService.findByProjectId(project.getProjectid());
             System.out.println(projectUserDTO);
@@ -96,30 +95,45 @@ public class ProjectController {
     }
 
     @Transactional
-    @PostMapping("/api/addproject")
+    @ResponseBody
+    @PostMapping(value = "/api/addproject", produces="text/plain;charset=UTF-8")
     public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpServletRequest request){
+        System.out.println("hi~~");
         String sessionid = request.getHeader("sessionid");
+        System.out.println("sessionid: "+ sessionid);
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         ProjectDTO projectDTO = addProjectDTO.getProjectDTO();
         if (projectService.isExistProjectName(projectDTO.getProjectname())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.badRequest().body("이미 존재하는 프로젝트 이름입니다.");
         } else {
             List<String> user_list = new ArrayList<>();
             user_list.addAll(addProjectDTO.getPl());
             user_list.addAll(addProjectDTO.getDev());
             user_list.addAll(addProjectDTO.getTester());
 
-            Set<String> user_set = new HashSet<>(user_list);
-            List<String> user_list_no_dup = new ArrayList<>(user_set);
+//            Set<String> user_set = new HashSet<>(user_list);
+//            List<String> user_list_no_dup = user_set.stream().collect(Collectors.toList());
+            List<String> user_list_no_dup = user_list.stream().distinct().collect(Collectors.toList());
+            System.out.print("user_list_no_dup: \n");
+            user_list_no_dup.forEach(System.out::println);
+            String notUserId = "";
             for (String userid : user_list_no_dup) {
                 if (memberService.findByUserId(userid) == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userid);
+                    notUserId = userid;
+                    break;
                 }
             }
-            projectService.register(projectDTO);
-            Long projectid = projectService.findByProjectName(projectDTO.getProjectname()).getProjectid();
+            if(notUserId.length() > 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("'"+notUserId+"' 해당 유저의 정보를 찾을 수 없습니다.");
+
+            // 그리고 이미 생성된 Id 값을 집어넣고 생성하니 오류 발생.
+            if(!addProjectDTO.isEditingProject()) addProjectDTO.getProjectDTO().setProjectid(null);
+            System.out.println("finish check dup~");
+            System.out.println("projectDTO.getProjectname(): "+ projectDTO.getProjectname());
+            // 여기 로직에 문제가 있었음. 생성 직후 조회하는 과정에 문제가 발생해서, 생성된 값을 바로 가져오도록 조회.
+            Long projectid = projectService.register(projectDTO).getProjectid();
+            System.out.println("projectid: "+projectid);
             UserRoleDTO userRoleDTO = new UserRoleDTO();
             userRoleDTO.setProjectid(projectid);
             for (String userid : addProjectDTO.getPl()) {
@@ -148,19 +162,25 @@ public class ProjectController {
     @Transactional
     @PostMapping("/api/project/{projectname}/update_status")
     public ResponseEntity<String> update_status_post(@PathVariable String projectname, @RequestBody String status, HttpServletRequest request){
+        System.out.println("status: "+status);
         String sessionid = request.getHeader("sessionid");
+        System.out.println("sessionid: "+sessionid);
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!status.equals("Not Started") && !status.equals("In Progress") && !status.equals("Completed") && !status.equals("Paused") && !status.equals("Cancelled")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
+            System.out.println("올바르지 않은~");
+            return ResponseEntity.badRequest().body("올바르지 않은 프로젝트 상태입니다.");
         }
         ProjectDTO existingProjectDTO = projectService.findByProjectName(projectname);
+        System.out.println("existingProjectDTO: "+existingProjectDTO);
         if (existingProjectDTO == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        String past_status = existingProjectDTO.getProjectstatus();
+        System.out.println("past_status:" + past_status);
         projectService.update_status(existingProjectDTO, status);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok("프로젝트 상태 변경에 성공 하였습니다." + past_status + " -> " + status);
     }
 
     @GetMapping("/api/project/{projectname}")
@@ -249,12 +269,12 @@ public class ProjectController {
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         // 사용자 ID와 역할로 이미 존재하는 UserRole을 찾습니다.
         Long projectid = projectService.findByProjectName(projectname).getProjectid();
         for (UserRoleDTO userRole : userRoleDTO) {
             userRole.setProjectid(projectid);
-            
+
             if (memberService.findByUserId(userRole.getUserid()) == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userRole.getUserid());
             }

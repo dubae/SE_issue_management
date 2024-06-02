@@ -20,7 +20,7 @@ public class TEST_IssueEntity extends IssueEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long writerId;
+    private String writerId;
 
     @Column
     private Long devId;

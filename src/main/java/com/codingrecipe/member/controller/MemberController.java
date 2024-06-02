@@ -1,8 +1,11 @@
 package com.codingrecipe.member.controller;
 
+import antlr.StringUtils;
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.MemberDTOSecure;
+import com.codingrecipe.member.dto.UserRoleDTO;
 import com.codingrecipe.member.service.MemberService;
+import com.codingrecipe.member.service.UserRoleService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -12,50 +15,53 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import com.codingrecipe.member.session.SessionManager;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final UserRoleService userRoleService;
 
     @PostMapping("/api/register")
     public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO) {
         if (memberService.isExistId(memberDTO.getUserid()) || memberService.isExistEmail(memberDTO.getEmail())){
             System.out.println("회원가입 실패");
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            // 에러 메시지
+            return ResponseEntity.badRequest().body("이미 존재하는 아이디 또는 이메일입니다.");
 
         } else {
             memberService.register(memberDTO);
             System.out.println("회원가입 성공");
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.ok("회원가입이 완료되었습니다.");
         }
     }
-    
+
 
     @PostMapping("/api/check_userid")
-    @ResponseBody
     public ResponseEntity<String> checkUserId(@RequestBody MemberDTO memberDTO) {
         boolean isExist = memberService.isExistId(memberDTO.getUserid());
         if (isExist) {
-            return ResponseEntity.status(HttpStatus.FOUND).build();
+            // 에러 메시지
+            return ResponseEntity.badRequest().body("이미 존재하는 아이디입니다.");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        // 에러 메시지
+        return ResponseEntity.ok("사용 가능한 아이디입니다.");
     }
-    
-        
-    @GetMapping("/api/login_status")
+
+
+    @RequestMapping(value = "/api/login_status", method = RequestMethod.POST, produces="text/plain;charset=UTF-8")
     public ResponseEntity<String> login_get(HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         System.out.println(sessionid);
         if (SessionManager.getSession(sessionid) != null){
-            return ResponseEntity.status(HttpStatus.OK).build();
+            // 에러 메시지
+            return ResponseEntity.ok("이미 로그인 되어있습니다..!");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        // 에러 메시지
+        return ResponseEntity.badRequest().body("로그인을 해야 합니다..!");
     }
 
     @PostMapping("/api/login")
@@ -70,7 +76,8 @@ public class MemberController {
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
         if (findMember == null) {
             System.out.println("로그인 실패");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            // 에러 메시지
+            return ResponseEntity.badRequest().body("아이디가 존재하지 않습니다.");
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
@@ -79,10 +86,12 @@ public class MemberController {
                 }
                 String key = SessionManager.generateKey();
                 SessionManager.setSession(key, findMember.getUserid());
+                System.out.println("key: "+key);
                 return ResponseEntity.status(HttpStatus.OK).body(key);
             } else {
                 System.out.println("로그인 실패");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                // 에러 메시지
+                return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
             }
         }
     }
@@ -97,7 +106,18 @@ public class MemberController {
         if (member == null) {
             return ResponseEntity.notFound().build();
         }
+
+        System.out.println("member toString:" +member.toString());
         MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
+
+        String projectid = request.getHeader("projectid");
+        System.out.println("projectid: "+projectid);
+        if(!ObjectUtils.isEmpty(projectid)) {
+            List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(Long.valueOf(projectid));
+            UserRoleDTO userRoleDTO = userRoleDTOList.stream().filter(item -> item.getUserid().equals(userid)).findFirst().get();
+            memberDTOSecure.setRole(userRoleDTO.getRole());
+        }
+
         return ResponseEntity.ok(memberDTOSecure);
     }
 
@@ -132,8 +152,9 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
-    @GetMapping("/api/user_list")
+    @PostMapping("/api/user_list")
     public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpServletRequest request) {
+        System.out.println("user list~");
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -143,7 +164,7 @@ public class MemberController {
         List<MemberDTOSecure> memberDTOSecureList = MemberDTOSecure.toMemberDTOSecureList(memberDTOList);
         return ResponseEntity.status(HttpStatus.OK).body(memberDTOSecureList);
     }
-    
+
     @GetMapping("/api/myinfo")
     public ResponseEntity<MemberDTOSecure> get_my_info(HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
@@ -158,5 +179,4 @@ public class MemberController {
         MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
         return ResponseEntity.ok(memberDTOSecure);
     }
-    
 }

@@ -8,25 +8,25 @@ import UserInfoModal from '../components/UserInfoModal';
 const API_URL = 'http://localhost:8080/api';
 
 function MainPage() {
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userId') ? true : false);
+    const [loggedIn, setLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        userId: localStorage.getItem('userId') || '',
+        userId: sessionStorage.getItem('userId') || '',
         email: '',
         name: ''
     });
-    const [userIds, setUserIds] = useState([]);
+    const [userList, setUserList] = useState([]);
     const [showUserInfo, setShowUserInfo] = useState(false);
 
     const handleCloseUserInfo = () => setShowUserInfo(false);
     const handleShowUserInfo = async () => {
         try {
-            const response = await fetch(`${API_URL}/myinfo`, {
+            const response = await fetch(`${API_URL}/member/${sessionStorage.getItem('userId')}`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'sessionid': localStorage.getItem('sessionid') // 세션 ID를 헤더에 포함
+                    'sessionid': sessionStorage.getItem('sessionid') // 세션 ID를 헤더에 포함
                 }
             });
-    
+
             if (!response.ok) {
                 let errorMsg = `HTTP error! Status: ${response.status}`;
                 if (response.status === 401) {
@@ -36,26 +36,26 @@ function MainPage() {
                 }
                 throw new Error(errorMsg);
             }
-    
+
             const data = await response.json();
-            
+            console.log('data', data)
+
             if (!data || !data.userid || !data.email || !data.username) {
                 throw new Error('Incomplete response data');
             }
-            console.log(data);
-    
+
             setUserInfo({
-                userid: data.userid,
+                userId: data.userid,
                 email: data.email,
-                username: data.username
+                name: data.username
             });
-    
+
             setShowUserInfo(true);
         } catch (error) {
             console.error('Error fetching user info:', error.message);
         }
     };
-    
+
 
     const [projects, setProjects] = useState([]);
     const [show, setShow] = useState(false);
@@ -72,61 +72,89 @@ function MainPage() {
 
     useEffect(() => {
         const handleStorageChange = () => {
-            setLoggedIn(localStorage.getItem('userId') ? true : false);
+            setLoggedIn(sessionStorage.getItem('userId') ? true : false);
         };
 
-        window.addEventListener('storage', handleStorageChange);
+        // window.addEventListener('storage', handleStorageChange);
+
+        // 프로젝트 목록 조회
+        (async () => {
+            try {
+                const result = await fetch(API_URL+'/login_status', {
+                    method:'POST',
+                    headers: {
+                        userid: sessionStorage.getItem('userid'),
+                        sessionid: sessionStorage.getItem('sessionid')
+                    },
+                });
+                
+                console.log('result', result, await result.text())
+
+                setLoggedIn(result.ok)
+
+                if (result.ok) fetchProjects();
+            } catch (err) {
+                console.log('err', err)
+                setLoggedIn(false)
+            }
+        })();
+        
+        // 유저 목록 조회
+        (async () => {
+            try {
+                const result = await fetch(API_URL+'/user_list', {
+                    method:'POST',
+                    headers: {
+                        userid: sessionStorage.getItem('userid'),
+                        sessionid: sessionStorage.getItem('sessionid')
+                    },
+                });
+                
+                console.log('result', result)
+                
+                const list = ((await result.json()) || []);
+                // .filter(item => item.userid !== sessionStorage.getItem("userId"));
+                console.log('list', list)
+                setUserList(list);
+            } catch (err) {
+                console.log('err', err)
+            }
+        })();
 
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
+            // window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 
-    useEffect(() => {
-        const fetchProjects = async () => {
+    const fetchProjects = async () => {
+        try {
             const response = await fetch(`${API_URL}/projects`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'sessionid': localStorage.getItem('sessionid')
+                    'userId': sessionStorage.getItem('userId'),
+                    'sessionid': sessionStorage.getItem("sessionid")
                 }
             });
 
             const data = await response.json();
             console.log(data);
             const transformedProjects = data.map((project) => ({
-               id: project.projectid,
-               name: project.projectname,
-               description: project.projectdescription,
-               createdAt: project.projectcreatedtime,
-               status: project.projectstatus,
-               plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
-               testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
-               devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || ''
+                id: project.projectid,
+                name: project.projectname,
+                description: project.projectdescription,
+                createdAt: project.projectcreatedtime,
+                status: project?.projectstatus || project?.status,
+                plAccount: project.members.find(member => member.userRole === 'PL')?.userid || '',
+                testerAccount: project.members.find(member => member.userRole === 'Tester')?.userid || '',
+                devAccount: project.members.find(member => member.userRole === 'Dev')?.userid || '',
             }));
 
             setProjects(transformedProjects);
-        };
-
-        fetchProjects();
-    }, []);
-
-    useEffect(() => {
-        const getUserList = async () => {
-            const response = await fetch(`${API_URL}/user_list`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'sessionid': localStorage.getItem('sessionid')
-                }
-            });
-
-            const data = await response.json();
-            const users = data.map((user) => user.userid);
-            setUserIds(users);
+        } catch (err) {
+            console.log('err', err)
         }
-        getUserList();
-    }, []);
+    };
 
     const handleClose = () => setShow(false);
     const handleShow = () => {
@@ -152,42 +180,43 @@ function MainPage() {
     };
 
     const handleSubmit = async (e) => {
+        console.log('yayaya')
         e.preventDefault();
-        if (!newProject.name || !newProject.plAccount || !newProject.testerAccount || !newProject.devAccount) {
+        if (!newProject.name || !accountInfo?.plAccount || !accountInfo?.testerAccount || !accountInfo?.devAccount) {
             alert("필수 입력란을 모두 채워주세요.");
             return;
         }
 
         const projectData = {
+            projectid: editingProject ? editingProject.id : projects.length + 1,
             projectname: newProject.name,
             projectdescription: newProject.description,
             projectcreatedtime: editingProject ? editingProject.createdAt : new Date().toISOString().split('T')[0],
+            projectstatus: editingProject ? editingProject.status : 'In Progress'
         };
 
         const addProjectDTO = {
             projectDTO: projectData,
-            pl: [newProject.plAccount],
-            dev: [newProject.devAccount],
-            tester: [newProject.testerAccount],
+            pl: [accountInfo.plAccount],
+            dev: [accountInfo.devAccount],
+            tester: [accountInfo.testerAccount],
+            pm: [userInfo.userId],
+            editingProject: !!editingProject
         };
 
         const response = await fetch(`${API_URL}/addproject`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'sessionid': localStorage.getItem('sessionid')
+                'userId': sessionStorage.getItem('userId'),
+                'sessionid': sessionStorage.getItem("sessionid")
             },
             body: JSON.stringify(addProjectDTO),
         });
-        console.log(addProjectDTO);
+
         if (response.ok) {
-            
-            const updatedProjects = editingProject
-                ? projects.map((project) =>
-                      project.id === editingProject.id ? projectData : project
-                  )
-                : [...projects, projectData];
-            setProjects(updatedProjects);
+            console.log('response', response, await response.text())
+            fetchProjects();
             setNewProject({
                 name: '',
                 plAccount: '',
@@ -197,18 +226,20 @@ function MainPage() {
             });
             handleClose();
         } else {
-            alert('프로젝트를 저장하는데 실패했습니다.');
+            const errorMessage = (await response.text()) || '';
+            alert(errorMessage.trim().length > 0 ? errorMessage : '프로젝트를 저장하는데 실패했습니다.');
         }
     };
 
     const handleDelete = async () => {
         const projectToDelete = projects[selectedIndex];
 
+        // 프로젝트 삭제 url 및 메서드 변경.
         const response = await fetch(`${API_URL}/project/${projectToDelete.name}/delete`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'sessionid': localStorage.getItem('sessionid')
+                'userId': sessionStorage.getItem('userId'),
+                'sessionid': sessionStorage.getItem('sessionid')
             }
         });
 
@@ -221,22 +252,13 @@ function MainPage() {
         }
     };
 
-    const handleLogout = async () => {
-        const response = await fetch(`${API_URL}/logout`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'sessionid': localStorage.getItem('sessionid')
-            }
-        });
-        if (response.ok) {
-
-            setLoggedIn(false);
-            localStorage.removeItem('userId');
-            localStorage.removeItem('email');
-            localStorage.removeItem('name');
-            localStorage.removeItem('isAdmin');
-        }
+    const handleLogout = () => {
+        setLoggedIn(false);
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('sessionid');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('name');
+        sessionStorage.removeItem('isAdmin');
     };
 
     const handleEdit = (index) => {
@@ -253,25 +275,43 @@ function MainPage() {
 
     const handleStatusChange = async (projectName, newStatus, currentStatus) => {
         console.log(newStatus);
-        const response = await fetch(`${API_URL}/updateproject/${projectName}/${newStatus}`, {
+        const response = await fetch(`${API_URL}/project/${projectName}/update_status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'userId': localStorage.getItem('userId')
-            }
+                'userId': sessionStorage.getItem('userId'),
+                'sessionid': sessionStorage.getItem('sessionid')
+            },
+            body: newStatus
         });
+
+        console.log('newStatus', newStatus)
 
         if (response.ok) {
             setProjects(projects.map(project =>
                 project.name === projectName ? { ...project, status: newStatus } : project
             ));
         } else {
-            alert('상태를 변경하는데 실패했습니다.');
+            // 에러 메세지 추가
+            const errorMEssage = await response.text();
+            alert(errorMEssage?.trim().length === 0 ? '상태를 변경하는데 실패했습니다.' : errorMEssage);
             setProjects(projects.map(project =>
                 project.name === projectName ? { ...project, status: currentStatus } : project
             ));
         }
     };
+    
+    const [accountInfo, setAccountInfo] = useState({
+        plAccount: null,
+        testerAccount: null,
+        devAccount: null
+    })
+    const changeAccountInfo = (type, value) => {
+        setAccountInfo((prevState) => ({
+            ...prevState,
+            [type]: value
+        }))
+    }
 
     return (
         <div className="main-container">
@@ -299,7 +339,7 @@ function MainPage() {
                             <th>개요</th>
                             <th>프로젝트 생성날짜</th>
                             <th>상태</th>
-                            {localStorage.getItem('isAdmin') === 'true' && <th>수정</th>}
+                            {sessionStorage.getItem('isAdmin') === 'true' && <th>수정</th>}
                             <th>삭제</th>
                         </tr>
                     </thead>
@@ -319,17 +359,20 @@ function MainPage() {
                                 <td>{project.description}</td>
                                 <td>{project.createdAt}</td>
                                 <td>
-                                    <Form.Control
+                                <Form.Control
                                         as="select"
                                         value={project.status}
                                         onChange={(e) => handleStatusChange(project.name, e.target.value, project.status)}
                                     >
-                                        <option value="진행중">진행중</option>
-                                        <option value="완료">완료</option>
-                                        <option value="보류">보류</option>
+                                        {/*프로젝트 상태 변경 API (스트링만 받음) -> 변경 가능 상태 : Not Started, In Progress, Completed, Paused, Cancelled*/}
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Paused">Paused</option>
+                                        <option value="Cancelled">Cancelled</option>
                                     </Form.Control>
                                 </td>
-                                {localStorage.getItem('isAdmin') === 'true' && (
+                                {sessionStorage.getItem('isAdmin') === 'true' && (
                                     <td>
                                         <Button variant="warning" onClick={() => handleEdit(index)}>수정</Button>
                                     </td>
@@ -366,46 +409,32 @@ function MainPage() {
                         </Form.Group>
                         <Form.Group controlId="formPLAccount">
                             <Form.Label>PL 계정 *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="plAccount"
-                                value={newProject.plAccount}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">PL 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
+                            <Form.Control as="select" name="plAccount" value={accountInfo?.plAccount}
+                                          onChange={( e ) => changeAccountInfo('plAccount', e.target.value)} required>
+                                <option key={'choose..'} value={null}>선택하세요.</option>
+                                {userList?.map(option => (
+                                    <option key={option.userid} value={option.userid}>{option.username}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formTesterAccount">
                             <Form.Label>Tester 계정 *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="testerAccount"
-                                value={newProject.testerAccount}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">Tester 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
+                            <Form.Control as="select" name="testerAccount" value={accountInfo?.testerAccount}
+                                          onChange={( e ) => changeAccountInfo('testerAccount', e.target.value)}
+                                          required>
+                                <option key={'choose..'} value={null}>선택하세요.</option>
+                                {userList?.map(option => (
+                                    <option key={option.userid} value={option.userid}>{option.username}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formDevAccount">
                             <Form.Label>Dev 계정 *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="devAccount"
-                                value={newProject.devAccount}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">Dev 계정 선택</option>
-                                {userIds.map(userId => (
-                                    <option key={userId} value={userId}>{userId}</option>
+                            <Form.Control as="select" name="devAccount" value={accountInfo?.devAccount}
+                                          onChange={( e ) => changeAccountInfo('devAccount', e.target.value)} required>
+                                <option key={'choose..'} value={null}>선택하세요.</option>
+                                {userList?.map(option => (
+                                    <option key={option.userid} value={option.userid}>{option.username}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>

@@ -112,7 +112,7 @@ public class CreateIssue {
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus("new"); // status를 "new"로 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
-                    issueDTO.setWriterId(1L); // writerId
+                    issueDTO.setWriterId("1L"); // writerId
                     issueDTO.setDevId(null); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component

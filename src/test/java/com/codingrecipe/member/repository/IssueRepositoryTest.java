@@ -41,12 +41,12 @@ public class IssueRepositoryTest {
         List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
         List<IssueEntity> list = new ArrayList<>();
         IssueEntity issueEntity1 = IssueEntity.builder()
-                .title("title").writerId(1L).description("test")
+                .title("title").writerId("1L").description("test")
                 .status("new").projectEntity(projectEntity1)
                 .comments(issueCommentEntityList).build();
 
         IssueEntity issueEntity2 = IssueEntity.builder()
-                .title("title").writerId(1L).description("test")
+                .title("title").writerId("1L").description("test")
                 .status("new").projectEntity(projectEntity1)
                 .comments(issueCommentEntityList).build();
 

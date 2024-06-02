@@ -30,9 +30,19 @@ public class UserRoleService {
     private final ProjectRepository projectRepository;
     @Transactional
     public void add_user_role(UserRoleDTO userRoleDTO, MemberDTO memberDTO, Long projectid) {
-        System.out.println("유저 권한 추가");
-        ProjectEntity projectEntity = projectRepository.findById(projectid).orElse(null);
-        projectEntity = entityManager.merge(projectEntity);
+        System.out.println("유저 권한 추가: "+ projectid);
+        ProjectEntity projectEntity = null;
+        try {
+            projectEntity = projectRepository.findByProjectid(projectid).orElseGet(() -> null);
+            System.out.println("projectEntity: "+projectEntity);
+            System.out.println(projectEntity.getProjectdescription());
+            projectEntity = projectRepository.save(projectEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(projectEntity == null) return;
+        System.out.println("null 아님.");
 
         // Check if the member already exists
         Optional<MemberEntity> existingMember = memberRepository.findByUserid(memberDTO.getUserid());
@@ -60,7 +70,7 @@ public class UserRoleService {
     //     else{
     //         System.out.println("해당 유저가 존재하지 않습니다.");
     //     }
-        
+
     // }
     // 다른 작업하다가 왜 존재하는지 이유를 찾지 못 했음.
     @Transactional

@@ -16,6 +16,7 @@ public class MemberDTOSecure {
     public String userid;
     public String username;
     public String email;
+    public String role;
 
     public static MemberDTOSecure toMemberDTOSecure(MemberDTO memberDto) {
         MemberDTOSecure memberDTOSecure = new MemberDTOSecure();
@@ -40,7 +41,7 @@ public class MemberDTOSecure {
                Objects.equals(username, that.username) &&
                Objects.equals(email, that.email);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(userid, username, email);

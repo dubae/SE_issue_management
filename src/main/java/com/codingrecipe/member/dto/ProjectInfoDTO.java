@@ -12,6 +12,7 @@ public class ProjectInfoDTO {
     public String projectname;
     public String projectdescription;
     public String projectcreatedtime;
+    public String status;
     public List<MemberDTOSecure> members;
 
 }
