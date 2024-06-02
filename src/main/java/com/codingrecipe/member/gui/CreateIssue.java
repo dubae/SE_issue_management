@@ -3,6 +3,7 @@ package com.codingrecipe.member.gui;
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class CreateIssue {
     private JTextArea textAreaDescription;
     private JComboBox<String> comboBoxPriority;
 
+    private MemberService memberService;
     private IssueService issueService;
     private ProjectService projectService;
     private String username;
@@ -126,7 +128,7 @@ public class CreateIssue {
                     issueService.addNewIssue(issueDTO);
 
                     // 생성된 이슈 페이지로 이동
-                    UserPage userPage = new UserPage(issueService, projectService, username, password);
+                    UserPage userPage = new UserPage(issueService, projectService, memberService, username, password);
                     userPage.showFrame();
                     frame.dispose();
                 } catch (Exception ex) {
@@ -141,7 +143,7 @@ public class CreateIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(issueService, projectService, username, password);
+                UserPage userPage = new UserPage(issueService, projectService, memberService, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }

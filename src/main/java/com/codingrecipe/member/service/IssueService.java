@@ -59,21 +59,6 @@ public class IssueService {
      * 새 이슈 추가하기
      */
     public void addNewIssue(IssueDTO issueDTO) {
-        if (issueDTO != null && issueDTO.getProjectDTO() != null) {
-            IssueEntity issueEntity = IssueEntity.toIssueEntity(issueDTO);
-            // Null 체크 추가
-            if (issueDTO.getProjectDTO() != null) {
-                issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
-            } else {
-                // Null 값 처리
-                System.out.println("ProjectDTO가 Null입니다.");
-            }
-            issueEntity.setCreatedAt(LocalDate.now());
-            issueRepository.save(issueEntity);
-        } else {
-            // Null 값 처리
-            System.out.println("IssueDTO 또는 ProjectDTO가 Null입니다.");
-        }
         IssueEntity issueEntity = IssueEntity.toIssueEntity(issueDTO);
         // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
         issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
@@ -81,7 +66,6 @@ public class IssueService {
         issueEntity.setId(1L);
         issueRepository.save(issueEntity);
     }
-
 
     /**
      * 이슈 삭제하기

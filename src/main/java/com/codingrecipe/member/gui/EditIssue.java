@@ -2,6 +2,7 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
@@ -17,14 +18,16 @@ public class EditIssue {
 
     private final IssueService issueService;
     private final ProjectService projectService;
+    private final MemberService memberService;
     private final String username;
     private final String password;
     private final Long userid;
     private final IssueDTO issueDTO;
 
-    public EditIssue(IssueService issueService, ProjectService projectService, Long userid, String username, String password, IssueDTO issueDTO) {
+    public EditIssue(IssueService issueService, ProjectService projectService, MemberService memberService, Long userid, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
         this.projectService = projectService;
+        this.memberService = memberService;
         this.username = username;
         this.password = password;
         this.userid = userid;
@@ -96,13 +99,11 @@ public class EditIssue {
                 issueDTO.setDescription(description);
                 issueDTO.setPriority(priority);
                 issueDTO.setStatus(status);
-                issueDTO.setFixerId(userid.toString()); // 수정한 사람의 userid를 fixerid로 설정
+                issueDTO.setFixerId(userid.toString()); // userid가 fixerid
 
-                // 이슈 업데이트
                 issueService.changeStatus(issueDTO.getId(), status);
 
-                // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService,username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
@@ -114,8 +115,7 @@ public class EditIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService,username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }

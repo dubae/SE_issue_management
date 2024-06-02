@@ -60,17 +60,18 @@ public class LoginScreen {
                 String email = textFieldEmail.getText();
                 String password = new String(passwordField.getPassword());
 
+                //adminpage 따로 만들기
                 if (validateInputs(email, password)) {
                     if (email.equals("admin") && password.equals("0000")) {
                         JOptionPane.showMessageDialog(frame, "관리자 로그인 성공!");
-                        CreateProject createProject = new CreateProject(issueService, projectService, email, password);
-                        createProject.showFrame();
+                        AdminPage adminPage = new AdminPage(issueService, projectService, memberService, email, password);
+                        adminPage.showFrame();
                         frame.dispose();
                     } else {
                         MemberDTO memberDTO = memberService.findByUserId(email, true);
                         if (memberDTO != null && memberDTO.getPassword().equals(password)) {
                             JOptionPane.showMessageDialog(frame, "로그인 성공!");
-                            UserPage userPage = new UserPage(issueService, projectService, email, password);
+                            UserPage userPage = new UserPage(issueService, projectService, memberService, email, password);
                             userPage.showFrame();
                             frame.dispose();
                         } else {
@@ -90,7 +91,7 @@ public class LoginScreen {
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                MainScreen mainScreen = new MainScreen(memberService, issueService,projectService);
+                MainScreen mainScreen = new MainScreen(memberService, issueService, projectService);
                 mainScreen.showFrame();
             }
         });

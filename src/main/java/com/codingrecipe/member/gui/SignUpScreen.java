@@ -45,11 +45,11 @@ public class SignUpScreen {
         frame.getContentPane().add(textFieldUserId);
         textFieldUserId.setColumns(10);
 
-        JLabel lblEmail = new JLabel("Email:"); // Added email label
+        JLabel lblEmail = new JLabel("Email:");
         lblEmail.setBounds(50, 100, 80, 25);
         frame.getContentPane().add(lblEmail);
 
-        textFieldEmail = new JTextField(); // Added email text field
+        textFieldEmail = new JTextField();
         textFieldEmail.setBounds(150, 100, 180, 25);
         frame.getContentPane().add(textFieldEmail);
         textFieldEmail.setColumns(10);
@@ -77,8 +77,8 @@ public class SignUpScreen {
 
         btnSignUp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String userid = textFieldUserId.getText(); // Retrieve userid
-                String email = textFieldEmail.getText(); // Retrieve email
+                String userid = textFieldUserId.getText();
+                String email = textFieldEmail.getText();
                 String username = textFieldUsername.getText();
                 String password = new String(passwordField.getPassword());
 

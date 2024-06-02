@@ -2,6 +2,7 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
@@ -13,12 +14,14 @@ public class ViewIssue {
     private JFrame frame;
     private final IssueService issueService;
     private final ProjectService projectService;
+    private final MemberService memberService;
     private final String username;
     private final String password;
 
-    public ViewIssue(IssueService issueService, ProjectService projectService, String username, String password) {
+    public ViewIssue(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
         this.projectService = projectService;
+        this.memberService = memberService;
         this.username = username;
         this.password = password;
         initialize();
@@ -41,7 +44,7 @@ public class ViewIssue {
 
             btnIssue.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    IssueDetailsPage issueDetailsPage = new IssueDetailsPage(issueService, projectService, username, password, issue);
+                    IssueDetailsPage issueDetailsPage = new IssueDetailsPage(issueService, projectService, memberService,username, password, issue);
                     issueDetailsPage.showFrame();
                     frame.dispose();
                 }
@@ -55,7 +58,7 @@ public class ViewIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(issueService, projectService, username, password);
+                UserPage userPage = new UserPage(issueService, projectService, memberService, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }

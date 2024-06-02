@@ -16,11 +16,11 @@ public class MainScreen {
     public MainScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
         this.memberService = memberService;
         this.issueService = issueService;
-        this.projectService = projectService; // ProjectService 인스턴스 초기화
+        this.projectService = projectService;
         if (!GraphicsEnvironment.isHeadless()) {
             initialize();
         } else {
-            System.out.println("헤드리스 모드에서 실행중");
+            System.out.println("헤드리스 모드에서 실행중"); //에러확인용
         }
     }
 

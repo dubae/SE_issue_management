@@ -1,4 +1,3 @@
-// UserPage.java
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.service.IssueService;
@@ -9,7 +8,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class UserPage {
+public class AdminPage {
     private JFrame frame;
     private final IssueService issueService;
     private final ProjectService projectService;
@@ -17,7 +16,7 @@ public class UserPage {
     private final String username;
     private final String password;
 
-    public UserPage(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public AdminPage(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
         this.projectService = projectService;
         this.memberService = memberService;
@@ -38,39 +37,36 @@ public class UserPage {
 
         btnCreateProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateProject createProject = new CreateProject(issueService, projectService, memberService,username, password);
+                CreateProject createProject = new CreateProject(issueService, projectService, memberService, username, password);
                 createProject.showFrame();
                 frame.dispose();
             }
         });
 
-        JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(150, 150, 150, 30);
-        frame.getContentPane().add(btnCreateIssue);
+        JButton btnEditProject = new JButton("Edit Project");
+        btnEditProject.setBounds(150, 150, 150, 30);
+        frame.getContentPane().add(btnEditProject);
 
-
-        btnCreateIssue.addActionListener(new ActionListener() {
+        btnEditProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, projectService, username);
-                createIssue.showFrame();
+                ChooseProject chooseProject = new ChooseProject(issueService, projectService, memberService, username, password);
+                chooseProject.showFrame();
                 frame.dispose();
             }
         });
 
-        JButton btnViewIssues = new JButton("View Issues");
-        btnViewIssues.setBounds(150, 200, 150, 30);
-        frame.getContentPane().add(btnViewIssues);
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(150, 200, 150, 30);
+        frame.getContentPane().add(btnBack);
 
-        btnViewIssues.addActionListener(new ActionListener() {
+        btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService, username, password);
-                viewIssue.showFrame();
+                LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+                loginScreen.showFrame();
                 frame.dispose();
             }
         });
-
     }
-
 
     public void showFrame() {
         frame.setVisible(true);

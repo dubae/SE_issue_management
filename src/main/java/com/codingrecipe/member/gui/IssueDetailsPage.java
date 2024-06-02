@@ -3,6 +3,7 @@ package com.codingrecipe.member.gui;
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.entity.IssueEntity;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
@@ -14,13 +15,15 @@ public class IssueDetailsPage {
     private JFrame frame;
     private final IssueService issueService;
     private final ProjectService projectService;
+    private final MemberService memberService;
     private final String username;
     private final String password;
     private final IssueDTO issueDTO;
 
-    public IssueDetailsPage(IssueService issueService, ProjectService projectService, String username, String password, IssueDTO issueDTO) {
+    public IssueDetailsPage(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
         this.projectService = projectService;
+        this.memberService = memberService;
         this.username = username;
         this.password = password;
         this.issueDTO = issueDTO;
@@ -80,7 +83,7 @@ public class IssueDetailsPage {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
@@ -117,7 +120,6 @@ public class IssueDetailsPage {
                         break;
                 }
                 if (searchResults != null) {
-                    // Display the search results in a new window
                     displaySearchResults(searchResults);
                 } else {
                     JOptionPane.showMessageDialog(frame, "No search results found for " + fieldName + ": " + fieldValue);
