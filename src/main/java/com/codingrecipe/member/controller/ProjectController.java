@@ -32,6 +32,9 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.codingrecipe.member.session.SessionManager;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -78,7 +81,7 @@ public class ProjectController {
             projectinfoDTO.setProjectname(project.getProjectname());
             projectinfoDTO.setProjectdescription(project.getProjectdescription());
             projectinfoDTO.setProjectcreatedtime(project.getProjectcreatedtime());
-            projectinfoDTO.setStatus(project.getStatus());
+            projectinfoDTO.setProjectstatus(project.getProjectstatus());
             projectUserDTO = new ArrayList<>();
             projectUserDTO = userRoleService.findByProjectId(project.getProjectid());
             System.out.println(projectUserDTO);
@@ -297,7 +300,9 @@ public class ProjectController {
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        System.out.println(projectname);
         ProjectDTO projectDTO = projectService.findByProjectName(projectname);
+        System.out.println(projectDTO);
         if (projectDTO == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -316,4 +321,36 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @Transactional
+    @GetMapping("/api/project/{projectname}/{userid}/getrole")
+    public ResponseEntity<List<String>> user_project_role(@PathVariable String projectname, @PathVariable String userid, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        ProjectEntity projectEntity = projectService.findByProjectNameEntity(projectname);
+        if (SessionManager.getSession(sessionid).equals("admin")){
+            
+        }
+        else if (projectEntity == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<UserRoleDTO> userRoleDTO = userRoleService.findByProjectAndMember(projectEntity, MemberEntity.toMemberEntity(memberService.findByUserId(userid)));
+        if (SessionManager.getSession(sessionid).equals("admin") && userRoleDTO.size() == 0) {
+            List<String> data = new ArrayList<>();
+            data.add("admin");
+            return ResponseEntity.status(HttpStatus.OK).body(data);
+        }
+        if (userRoleDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<String> roles = new ArrayList<>();
+        for (UserRoleDTO userRole : userRoleDTO) {
+            roles.add(userRole.getRole());
+        }
+        System.out.println(roles.toString());
+        return ResponseEntity.status(HttpStatus.OK).body(roles);
+        
+    }
+    
 }

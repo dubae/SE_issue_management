@@ -151,6 +151,14 @@ function ProjectDetailPage() {
                     'projectid': projectId,
                 }
             });
+            const response2 = await fetch(`${API_URL}/project/${project.name}/${sessionStorage.getItem('userId')}/getrole`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
+                }
+            });
+            
+        
             
             if (!response.ok) {
                 let errorMsg = `HTTP error! Status: ${response.status}`;
@@ -163,7 +171,10 @@ function ProjectDetailPage() {
             }
             
             const data = await response.json();
+            console.log('response2', response2)
+            const roles = await response2.json();
             console.log('data', data)
+            console.log('roles', roles)
             
             if (!data || !data.userid || !data.email || !data.username) {
                 throw new Error('Incomplete response data');
@@ -173,7 +184,7 @@ function ProjectDetailPage() {
                 userId: data.userid,
                 email: data.email,
                 name: data.username,
-                role: data?.role
+                role: roles.join(', ')
             });
             
             setShowUserInfo(true);
@@ -185,6 +196,8 @@ function ProjectDetailPage() {
     const calculateIssueUpdateCount = (issues) => {
         return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);
     };
+
+    
 
     return (
         <div className="project-detail-container">
@@ -199,7 +212,7 @@ function ProjectDetailPage() {
                 <Link to={`/project/${projectId}/issues?projectName=${project.name}`}><Button variant="info">이슈 목록</Button></Link>
                 <Button variant="success" onClick={handleToggleModal}>이슈 등록</Button>
                 <Modal isOpen={isModalOpen} onRequestClose={handleToggleModal}>
-                    <IssueForm onIssueAdded={handleAddIssue} projectId={projectId} fetchIssues={fetchIssues} />
+                    <IssueForm onIssueAdded={handleAddIssue} projectId={projectId} />
                     <Button onClick={handleToggleModal}>닫기</Button>
                 </Modal>
             </div>

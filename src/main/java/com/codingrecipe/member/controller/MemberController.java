@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import com.codingrecipe.member.session.SessionManager;
@@ -95,7 +96,7 @@ public class MemberController {
             }
         }
     }
-
+    @Transactional
     @GetMapping("/api/member/{userid}")
     public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
@@ -106,17 +107,7 @@ public class MemberController {
         if (member == null) {
             return ResponseEntity.notFound().build();
         }
-
-        System.out.println("member toString:" +member.toString());
         MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
-
-        String projectid = request.getHeader("projectid");
-        System.out.println("projectid: "+projectid);
-        if(!ObjectUtils.isEmpty(projectid)) {
-            List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(Long.valueOf(projectid));
-            UserRoleDTO userRoleDTO = userRoleDTOList.stream().filter(item -> item.getUserid().equals(userid)).findFirst().get();
-            memberDTOSecure.setRole(userRoleDTO.getRole());
-        }
 
         return ResponseEntity.ok(memberDTOSecure);
     }

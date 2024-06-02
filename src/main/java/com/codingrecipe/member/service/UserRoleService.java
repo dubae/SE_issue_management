@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.dto.UserRoleDTO;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProjectEntity;
@@ -139,6 +140,19 @@ public class UserRoleService {
 
     public UserRoleEntity findByProjectAndRole(ProjectEntity project, String role) {
         return userRoleRepository.findByProjectAndRole(project, role).orElse(null);
+    }
+
+    public List<UserRoleDTO> findByProjectAndMember(ProjectEntity project, MemberEntity member) {
+        Optional<List<UserRoleEntity>> userRoleEntities = userRoleRepository.findByProjectAndMember(project, member);
+        if (userRoleEntities != null) {
+            List<UserRoleDTO> userRoleDTOs = new ArrayList<>();
+            for (UserRoleEntity userRoleEntity : userRoleEntities.get()) {
+                userRoleDTOs.add(UserRoleDTO.toUserRoleDTO(userRoleEntity));
+            }
+            return userRoleDTOs;
+        } else {
+            return null;
+        }
     }
 
 }

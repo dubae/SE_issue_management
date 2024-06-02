@@ -18,3 +18,12 @@
   justify-content: flex-end;
   margin-top: 20px;
 }
+
+.account-group {
+  display: flex;
+  align-items: center;
+}
+
+.delete-button {
+  margin-left: 10px; /* 삭제 버튼과 입력 컨트롤 사이의 여백을 지정합니다. */
+}

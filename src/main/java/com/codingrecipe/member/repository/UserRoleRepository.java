@@ -11,7 +11,7 @@ import com.codingrecipe.member.entity.UserRoleEntity;
 import java.util.List;
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long>{
-    Optional<UserRoleEntity> findByProjectAndMember(ProjectEntity project, MemberEntity member);
+    Optional<List<UserRoleEntity>> findByProjectAndMember(ProjectEntity project, MemberEntity member);
     Optional<List<UserRoleEntity>> findByProject(ProjectEntity project);
     Optional<List<UserRoleEntity>> findByMember(MemberEntity member);
     Optional<UserRoleEntity> findByProjectAndMemberAndRole(ProjectEntity project, MemberEntity member, String role);
