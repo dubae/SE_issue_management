@@ -165,7 +165,7 @@ public class IssueController {
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/{issueId}/devId")
-    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
+    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam String devId, Model model, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -267,15 +267,15 @@ public class IssueController {
      *  추천된 개발자는 List<Long>에 담겨 반환됩니다.
      [ 1, 3, 12] 이런 형태로 반환.
      */
-    @PostMapping("/project/{projectId}/issue/{issueId}/suggestDev")
-    @ResponseBody
-    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
-        String sessionid = request.getHeader("sessionid");
-        if (SessionManager.getSession(sessionid) == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        List<Long> devIds = issueService.suggestDev(issueId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
-    }
+//    @PostMapping("/project/{projectId}/issue/{issueId}/suggestDev")
+//    @ResponseBody
+//    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
+//        String sessionid = request.getHeader("sessionid");
+//        if (SessionManager.getSession(sessionid) == null){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        List<Long> devIds = issueService.suggestDev(issueId);
+//        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
+//    }
 
 }

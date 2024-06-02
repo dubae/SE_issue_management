@@ -109,7 +109,7 @@ public class IssueService {
     /**
      * 한 이슈의 개발자(devId) 변경하기.
      */
-    public void changeDevId(Long id, Long devId) {
+    public void changeDevId(Long id, String devId) {
         Optional<IssueEntity> issueEntity = issueRepository.findById(id);
         issueEntity.get().setDevId(devId);
         issueRepository.save(issueEntity.get());
@@ -213,47 +213,47 @@ public class IssueService {
      * 이슈의 아이디를 인자로 넘겨줌.
      * 새 이슈와 같은 component를 가장 많이 해결한 개발자의 id를 반환.
      */
-    public List<Long> suggestDev(Long id){
-        IssueDTO issueDTO=findById(id);
-        String targetComponent=issueDTO.getComponent();
-        HashMap<Long, Integer> devMap=new HashMap<>();
-        List<IssueDTO> issueDTOList = findByStatus("closed").stream()
-                .filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent))
-                .collect(Collectors.toList());
-        int max=0;
-        Long bestDev=1L;
-
-
-        Long fixerId;
-
-        for (IssueDTO issueDTO1 : issueDTOList) {
-            fixerId = issueDTO1.getFixerId();
-            devMap.get(fixerId);
-            devMap.put(fixerId, devMap.getOrDefault(fixerId, 0) + 1);
-            if (devMap.get(fixerId) > max) {
-                max = devMap.get(fixerId);
-                bestDev = fixerId;
-            }
-        }
-
-        List<Long> keySet = new ArrayList<>(devMap.keySet());
-
-        // Value 값으로 오름차순 정렬
-        keySet.sort(new Comparator<Long>() {
-            @Override
-            public int compare(Long o1, Long o2) {
-                return devMap.get(o2).compareTo(devMap.get(o1));
-            }
-        });
-
-        if (keySet.isEmpty()) {
-            keySet.add(1L);
-        }
-        return keySet.subList(0, Math.min(3, keySet.size()));
-
-
-
-
-    }
+//    public List<Long> suggestDev(Long id){
+//        IssueDTO issueDTO=findById(id);
+//        String targetComponent=issueDTO.getComponent();
+//        HashMap<Long, Integer> devMap=new HashMap<>();
+//        List<IssueDTO> issueDTOList = findByStatus("closed").stream()
+//                .filter(issueDTO1 -> issueDTO1.getComponent().equals(targetComponent))
+//                .collect(Collectors.toList());
+//        int max=0;
+//        Long bestDev=1L;
+//
+//
+//        Long fixerId;
+//
+//        for (IssueDTO issueDTO1 : issueDTOList) {
+//            fixerId = issueDTO1.getFixerId();
+//            devMap.get(fixerId);
+//            devMap.put(fixerId, devMap.getOrDefault(fixerId, 0) + 1);
+//            if (devMap.get(fixerId) > max) {
+//                max = devMap.get(fixerId);
+//                bestDev = fixerId;
+//            }
+//        }
+//
+//        List<Long> keySet = new ArrayList<>(devMap.keySet());
+//
+//        // Value 값으로 오름차순 정렬
+//        keySet.sort(new Comparator<Long>() {
+//            @Override
+//            public int compare(Long o1, Long o2) {
+//                return devMap.get(o2).compareTo(devMap.get(o1));
+//            }
+//        });
+//
+//        if (keySet.isEmpty()) {
+//            keySet.add(1L);
+//        }
+//        return keySet.subList(0, Math.min(3, keySet.size()));
+//
+//
+//
+//
+//    }
 
 }
