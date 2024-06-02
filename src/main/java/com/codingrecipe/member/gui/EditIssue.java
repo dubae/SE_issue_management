@@ -1,6 +1,7 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -17,6 +18,7 @@ public class EditIssue {
     private JComboBox<String> comboBoxStatus;
 
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
     private final String username;
@@ -24,8 +26,9 @@ public class EditIssue {
     private final Long userid;
     private final IssueDTO issueDTO;
 
-    public EditIssue(IssueService issueService, ProjectService projectService, MemberService memberService, Long userid, String username, String password, IssueDTO issueDTO) {
+    public EditIssue(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, Long userid, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
         this.username = username;
@@ -99,11 +102,16 @@ public class EditIssue {
                 issueDTO.setDescription(description);
                 issueDTO.setPriority(priority);
                 issueDTO.setStatus(status);
-                issueDTO.setFixerId(userid.toString()); // userid가 fixerid
+                issueDTO.setFixerId(userid.toString()); // userid가 fixerId
 
-                issueService.changeStatus(issueDTO.getId(), status);
+                // fixerId가 설정되면 상태를 fixed로 변경
+                if (!userid.toString().equals(issueDTO.getFixerId())) {
+                    issueDTO.setStatus("fixed");
+                }
 
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService,username, password);
+                issueService.changeStatus(issueDTO.getId(), issueDTO.getStatus());
+
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
@@ -115,7 +123,7 @@ public class EditIssue {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService,username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService,projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }

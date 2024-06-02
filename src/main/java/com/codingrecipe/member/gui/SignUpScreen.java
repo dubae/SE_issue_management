@@ -1,6 +1,7 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -17,11 +18,13 @@ public class SignUpScreen {
     private JPasswordField passwordField;
     private final MemberService memberService;
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
 
-    public SignUpScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
+    public SignUpScreen(MemberService memberService, IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService) {
         this.memberService = memberService;
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         initialize();
     }
@@ -90,7 +93,7 @@ public class SignUpScreen {
                     memberDTO.setPassword(password);
                     memberService.register(memberDTO);
                     JOptionPane.showMessageDialog(frame, "회원 가입 성공!");
-                    LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+                    LoginScreen loginScreen = new LoginScreen(memberService, issueService, issueCommentService, projectService);
                     loginScreen.showFrame();
                     frame.dispose();
                 } else {

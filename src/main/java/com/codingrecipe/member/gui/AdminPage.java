@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -11,13 +12,15 @@ import java.awt.event.ActionListener;
 public class AdminPage {
     private JFrame frame;
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
     private final String username;
     private final String password;
 
-    public AdminPage(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public AdminPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
         this.username = username;
@@ -37,7 +40,7 @@ public class AdminPage {
 
         btnCreateProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateProject createProject = new CreateProject(issueService, projectService, memberService, username, password);
+                CreateProject createProject = new CreateProject(issueService, issueCommentService, projectService, memberService, username, password);
                 createProject.showFrame();
                 frame.dispose();
             }
@@ -49,7 +52,7 @@ public class AdminPage {
 
         btnEditProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ChooseProject chooseProject = new ChooseProject(issueService, projectService, memberService, username, password);
+                ChooseProject chooseProject = new ChooseProject(issueService, issueCommentService, projectService, memberService, username, password);
                 chooseProject.showFrame();
                 frame.dispose();
             }
@@ -61,7 +64,7 @@ public class AdminPage {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+                LoginScreen loginScreen = new LoginScreen(memberService, issueService, issueCommentService, projectService);
                 loginScreen.showFrame();
                 frame.dispose();
             }

@@ -18,6 +18,8 @@ public class IssueCommentDTO extends  BaseDTO{
     private Long issueId;
 
 
+
+
     /**
      * 생성자 방식
      */

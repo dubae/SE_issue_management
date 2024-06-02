@@ -1,6 +1,7 @@
 // UserPage.java
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -12,13 +13,15 @@ import java.awt.event.ActionListener;
 public class UserPage {
     private JFrame frame;
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
     private final String username;
     private final String password;
 
-    public UserPage(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public UserPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
         this.username = username;
@@ -38,7 +41,7 @@ public class UserPage {
 
         btnCreateProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateProject createProject = new CreateProject(issueService, projectService, memberService,username, password);
+                CreateProject createProject = new CreateProject(issueService, issueCommentService,projectService, memberService,username, password);
                 createProject.showFrame();
                 frame.dispose();
             }
@@ -51,7 +54,7 @@ public class UserPage {
 
         btnCreateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, projectService, username);
+                CreateIssue createIssue = new CreateIssue(issueService, projectService, memberService, username, password);
                 createIssue.showFrame();
                 frame.dispose();
             }
@@ -63,7 +66,7 @@ public class UserPage {
 
         btnViewIssues.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, memberService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService,projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }

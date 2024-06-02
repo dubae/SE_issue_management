@@ -2,9 +2,11 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -21,14 +23,16 @@ public class EditProject {
     private JButton btnUpdate;
 
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
     private final Long projectId;
     private final String username;
     private final String password;
 
-    public EditProject(IssueService issueService, ProjectService projectService, MemberService memberService, Long projectId, String username, String password) {
+    public EditProject(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, Long projectId, String username, String password) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
         this.projectId = projectId;
@@ -117,7 +121,7 @@ public class EditProject {
                 projectDTO.setProjectdescription(projectDescription);
                 projectService.register(projectDTO);
 
-                AdminPage adminPage = new AdminPage(issueService, projectService, memberService, username, password);
+                AdminPage adminPage = new AdminPage(issueService, issueCommentService,projectService, memberService, username, password);
                 adminPage.showFrame();
                 frame.dispose();
             }
@@ -129,7 +133,7 @@ public class EditProject {
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ChooseProject chooseProject = new ChooseProject(issueService, projectService, memberService, username, password);
+                ChooseProject chooseProject = new ChooseProject(issueService, issueCommentService,projectService, memberService, username, password);
                 chooseProject.showFrame();
                 frame.dispose();
             }

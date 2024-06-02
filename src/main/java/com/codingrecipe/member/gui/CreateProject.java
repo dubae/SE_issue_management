@@ -2,6 +2,7 @@ package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.MemberService;
@@ -23,13 +24,15 @@ public class CreateProject {
     private JButton btnCreate;
 
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
     private final String username;
     private final String password;
 
-    public CreateProject(IssueService issueService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public CreateProject(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
         this.username = username;
@@ -117,12 +120,12 @@ public class CreateProject {
                         projectService.register(projectDTO);
 
                         // 생성된 프로젝트로 이동
-                        AdminPage adminPage = new AdminPage(issueService, projectService, memberService, username, password);
+                        AdminPage adminPage = new AdminPage(issueService,issueCommentService, projectService, memberService, username, password);
                         adminPage.showFrame();
                         frame.dispose();
                     } else {
                         JOptionPane.showMessageDialog(frame, "Can only be accessed by admin.");
-                        UserPage userPage = new UserPage(issueService, projectService, memberService, username, password);
+                        UserPage userPage = new UserPage(issueService, issueCommentService,projectService, memberService, username, password);
                         userPage.showFrame();
                         frame.dispose();
                     }
