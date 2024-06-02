@@ -77,6 +77,7 @@ public class IssueEntity extends BaseEntity{
 
         issueEntity.setId(issueDTO.getId());
         issueEntity.setWriterId(issueDTO.getWriterId());
+
         //issueEntity.getProjectEntity().setProjectid(issueDTO.getProjectId());
         //issueEntity.getProjectEntity() 부분이 null일 수 있는 문제 발견.
 

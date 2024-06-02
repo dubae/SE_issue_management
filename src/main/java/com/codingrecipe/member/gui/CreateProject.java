@@ -1,67 +1,115 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.ProjectService;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CreateProject {
     private JFrame frame;
+    private JTextField textFieldProjectId;
     private JTextField textFieldProjectName;
-    private JTextArea textAreaProjectDescription;
+    private JTextField textFieldProjectDescription;
+    private JButton btnCreate;
 
-    public CreateProject() {
+    private final IssueService issueService;
+    private final ProjectService projectService;
+    private final String username;
+    private final String password;
+
+    public CreateProject(IssueService issueService, ProjectService projectService, String username, String password) {
+        this.issueService = issueService;
+        this.projectService = projectService;
+        this.username = username;
+        this.password = password;
         initialize();
     }
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 400, 300);
+        frame.setBounds(100, 100, 450, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        JLabel lblProjectId = new JLabel("Project ID:");
+        lblProjectId.setBounds(50, 30, 100, 20);
+        frame.getContentPane().add(lblProjectId);
+
+        textFieldProjectId = new JTextField();
+        textFieldProjectId.setBounds(150, 30, 250, 25);
+        frame.getContentPane().add(textFieldProjectId);
+
         JLabel lblProjectName = new JLabel("Project Name:");
-        lblProjectName.setBounds(50, 30, 100, 25);
+        lblProjectName.setBounds(50, 70, 100, 20);
         frame.getContentPane().add(lblProjectName);
 
         textFieldProjectName = new JTextField();
-        textFieldProjectName.setBounds(150, 30, 200, 25);
+        textFieldProjectName.setBounds(150, 70, 250, 25);
         frame.getContentPane().add(textFieldProjectName);
 
         JLabel lblProjectDescription = new JLabel("Description:");
-        lblProjectDescription.setBounds(50, 70, 100, 25);
+        lblProjectDescription.setBounds(50, 110, 100, 20);
         frame.getContentPane().add(lblProjectDescription);
 
-        textAreaProjectDescription = new JTextArea();
-        textAreaProjectDescription.setBounds(150, 70, 200, 100);
-        frame.getContentPane().add(textAreaProjectDescription);
+        textFieldProjectDescription = new JTextField();
+        textFieldProjectDescription.setBounds(150, 110, 250, 25);
+        frame.getContentPane().add(textFieldProjectDescription);
 
-        JButton btnCreate = new JButton("Create");
-        btnCreate.setBounds(150, 200, 100, 30);
+        btnCreate = new JButton("Create Project");
+        btnCreate.setBounds(150, 160, 150, 30);
         frame.getContentPane().add(btnCreate);
 
         btnCreate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String projectName = textFieldProjectName.getText();
-                String projectDescription = textAreaProjectDescription.getText();
+                try {
+                    if ("admin".equals(username) && "0000".equals(password)) {
+                        Long projectId;
+                        try {
+                            projectId = Long.parseLong(textFieldProjectId.getText());
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid Project ID. Please enter a valid number.");
+                            return;
+                        }
 
-                // 프로젝트 생성 로직 추가 (DB 저장 등)
-                JOptionPane.showMessageDialog(frame, "Project Created: " + projectName);
-                // 프로젝트 생성 후 관리자 모드로 돌아가기
-                Admin admin = new Admin();
-                admin.showFrame();
-                frame.dispose();
-            }
-        });
+                        String projectName = textFieldProjectName.getText();
+                        String projectDescription = textFieldProjectDescription.getText();
 
-        JButton btnBack = new JButton("Back");
-        btnBack.setBounds(270, 200, 80, 30);
-        frame.getContentPane().add(btnBack);
+                        // 프로젝트 이름 중복 확인
+                        if (projectService.isExistProjectName(projectName)) {
+                            JOptionPane.showMessageDialog(frame, "Project name already exists. Please choose a different name.");
+                            return;
+                        }
 
-        btnBack.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Admin admin = new Admin();
-                admin.showFrame();
-                frame.dispose();
+                        String projectCreatedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        String projectStatus = "Active"; // 프로젝트 상태를 기본값으로 설정
+
+                        // 프로젝트 생성
+                        ProjectDTO projectDTO = new ProjectDTO();
+                        projectDTO.setProjectid(projectId);
+                        projectDTO.setProjectname(projectName);
+                        projectDTO.setProjectdescription(projectDescription);
+                        projectDTO.setProjectcreatedtime(projectCreatedTime);
+                        projectDTO.setProjectstatus(projectStatus);
+                        projectService.register(projectDTO);
+
+                        // 생성된 프로젝트로 이동
+                        UserPage userPage = new UserPage(issueService, projectService, username, password);
+                        userPage.showFrame();
+                        frame.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Can only be accessed by admin.");
+                        UserPage userPage = new UserPage(issueService, projectService, username, password);
+                        userPage.showFrame();
+                        frame.dispose();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }

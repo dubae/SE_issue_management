@@ -14,4 +14,6 @@ public class AddProjectDTO {
     private List<String> pl;
     private List<String> dev;
     private List<String> tester;
+
 }
+
