@@ -242,6 +242,8 @@ class IssueServiceTest {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
         when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
 
+        assertEquals(issueService.suggestDev(1L).get(0),"2L");
+        assertEquals(issueService.suggestDev(1L).get(1),"1L");
 
         System.out.println(issueService.suggestDev(1L));
     }

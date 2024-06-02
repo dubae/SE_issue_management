@@ -237,20 +237,16 @@ public class IssueService {
                 .collect(Collectors.toList());
         // issueDTOList에는 해결된(closed) 이슈 중 컴포넌트가 같은 이슈들만 모아놓았다.
 
-//        int max=0;
-//        String bestDev="NON";
-//
-//
-//        String fixerId;
-//
-//        for (IssueDTO issueDTO1 : issueDTOList) {
-//            fixerId = issueDTO1.getFixerId();
-//            devMap.put(fixerId, devMap.getOrDefault(fixerId, 0) + 1);
-//            if (devMap.get(fixerId) > max) {
-//                max = devMap.get(fixerId);
-//                bestDev = fixerId;
-//            }
-//        }
+        int max=0;
+        String bestDev="NON";
+
+
+        String fixerId;
+
+        for (IssueDTO issueDTO1 : issueDTOList) {
+            fixerId = issueDTO1.getFixerId();
+            devMap.put(fixerId, devMap.getOrDefault(fixerId, 0) + 1);
+        }
 
         List<String> keySet = new ArrayList<>(devMap.keySet());
 
