@@ -45,6 +45,7 @@ public class UserPage {
         btnCreateIssue.setBounds(150, 150, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
+
         btnCreateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CreateIssue createIssue = new CreateIssue(issueService, projectService, username);

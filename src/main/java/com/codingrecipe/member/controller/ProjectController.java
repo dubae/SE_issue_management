@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
@@ -31,6 +31,7 @@ import com.codingrecipe.member.service.UserRoleService;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import com.codingrecipe.member.session.SessionManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,20 +43,20 @@ public class ProjectController {
     private final ProjectService projectService;
     private final MemberService memberService;
     private final UserRoleService userRoleService;
-    private final TransactionTemplate transactionTemplate;
 
 
     @GetMapping("/api/projects")
-    public ResponseEntity<List<ProjectInfoDTO>> project_get(HttpSession session){
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<ProjectInfoDTO>> project_get(HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<ProjectDTO> projects;
-        if (session.getAttribute("userid").equals("admin")) {
+        if (SessionManager.getSession(sessionid).equals("admin")){
             projects = projectService.findAll();
         }
         else{
-            String userId = (String) session.getAttribute("userid");
+            String userId = (String) SessionManager.getSession(sessionid);
             Set<UserRoleDTO> roles = new HashSet<UserRoleDTO>();
             projects = new ArrayList<>();
             List<UserRoleDTO> userRoleDTO = userRoleService.findByUserId(userId);
@@ -96,19 +97,19 @@ public class ProjectController {
 
     @Transactional
     @PostMapping("/api/addproject")
-    public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> add_project_post(@RequestBody AddProjectDTO addProjectDTO, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         ProjectDTO projectDTO = addProjectDTO.getProjectDTO();
         if (projectService.isExistProjectName(projectDTO.getProjectname())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } else {
-                        List<String> user_list = new ArrayList<>();
+            List<String> user_list = new ArrayList<>();
             user_list.addAll(addProjectDTO.getPl());
             user_list.addAll(addProjectDTO.getDev());
             user_list.addAll(addProjectDTO.getTester());
-            user_list.addAll(addProjectDTO.getPm());
 
             Set<String> user_set = new HashSet<>(user_list);
             List<String> user_list_no_dup = new ArrayList<>(user_set);
@@ -139,12 +140,6 @@ public class ProjectController {
                 MemberDTO memberDTO = memberService.findByUserId(userid);
                 userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
             }
-            for (String userid : addProjectDTO.getPm()) {
-                userRoleDTO.setUserid(userid);
-                userRoleDTO.setRole("PM");
-                MemberDTO memberDTO = memberService.findByUserId(userid);
-                userRoleService.add_user_role(userRoleDTO, memberDTO, projectid);
-            }
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
@@ -152,8 +147,9 @@ public class ProjectController {
     //프로젝트 상태 변경 API (스트링만 받음) -> 변경 가능 상태 : Not Started, In Progress, Completed, Paused, Cancelled
     @Transactional
     @PostMapping("/api/project/{projectname}/update_status")
-    public ResponseEntity<String> update_status_post(HttpSession session, @PathVariable String projectname, @RequestBody String status) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> update_status_post(@PathVariable String projectname, @RequestBody String status, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!status.equals("Not Started") && !status.equals("In Progress") && !status.equals("Completed") && !status.equals("Paused") && !status.equals("Cancelled")) {
@@ -168,8 +164,9 @@ public class ProjectController {
     }
 
     @GetMapping("/api/project/{projectname}")
-    public ResponseEntity<ProjectDetailDTO> project_get(@PathVariable String projectname, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<ProjectDetailDTO> project_get(@PathVariable String projectname, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -181,7 +178,6 @@ public class ProjectController {
         List<UserRoleDTO> userRoleDTOList = userRoleService.findByProjectId(projectDTO.getProjectid());
         List<MemberDTOSecure> PL = new ArrayList<>();
         List<MemberDTOSecure> DEV = new ArrayList<>();
-        List<MemberDTOSecure> PM = new ArrayList<>();
         List<MemberDTOSecure> TESTER = new ArrayList<>();
 
         for (UserRoleDTO userRole : userRoleDTOList) {
@@ -193,26 +189,23 @@ public class ProjectController {
                 case "DEV":
                     DEV.add(MemberDTOSecure.toMemberDTOSecure(memberDTO));
                     break;
-                case "PM":
-                    PM.add(MemberDTOSecure.toMemberDTOSecure(memberDTO));
-                    break;
                 case "TESTER":
                     TESTER.add(MemberDTOSecure.toMemberDTOSecure(memberDTO));
                     break;
             }
         }
 
-        ProjectDetailDTO projectDetailDTO = new ProjectDetailDTO(projectDTO, PL, DEV, PM, TESTER);
+        ProjectDetailDTO projectDetailDTO = new ProjectDetailDTO(projectDTO, PL, DEV, TESTER);
         return ResponseEntity.status(HttpStatus.OK).body(projectDetailDTO);
     }
 
     @GetMapping("/api/project/{projectname}/{role}/list_addable_user")
-    public ResponseEntity<List<MemberDTOSecure>> role_addable_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
-        System.out.println(role);
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<MemberDTOSecure>> role_addable_user_list(@PathVariable String projectname, @PathVariable String role, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("PM") && !role.equals("TESTER")) {
+        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("TESTER")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -231,11 +224,12 @@ public class ProjectController {
     }
 
     @GetMapping("/api/project/{projectname}/{role}/list_user")
-    public ResponseEntity<List<MemberDTOSecure>> role_user_list(HttpSession session, @PathVariable String projectname, @PathVariable String role) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<MemberDTOSecure>> role_user_list(@PathVariable String projectname, @PathVariable String role, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("PM") && !role.equals("TESTER")) {
+        if (!role.equals("PL") && !role.equals("DEV") && !role.equals("TESTER")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<UserRoleDTO> userRoleDTOs = userRoleService.findByProjectId(projectService.findByProjectName(projectname).getProjectid());
@@ -250,8 +244,9 @@ public class ProjectController {
     }
     @Transactional
     @PostMapping("/api/project/{projectname}/adduser")
-    public ResponseEntity<String> add_user_post(HttpSession session, @RequestBody List<UserRoleDTO> userRoleDTO, @PathVariable String projectname) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> add_user_post(@RequestBody List<UserRoleDTO> userRoleDTO, @PathVariable String projectname, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
@@ -274,10 +269,12 @@ public class ProjectController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
     @Transactional
     @GetMapping("/api/project/{projectname}/delete")
-    public ResponseEntity<String> delete_project_get(HttpSession session, @PathVariable String projectname) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> delete_project_get(@PathVariable String projectname, HttpServletRequest request){
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         ProjectDTO projectDTO = projectService.findByProjectName(projectname);
@@ -290,7 +287,7 @@ public class ProjectController {
             MemberDTO memberDTO = memberService.findByUserId(userRole.getUserid());
             if (userRole.getRole().equals("PL")) PL.add(memberDTO);
         }
-        if (!session.getAttribute("userid").equals("admin") && !PL.contains(memberService.findByUserId((String) session.getAttribute("userid")))) {
+        if (!SessionManager.getSession(sessionid).equals("admin") && !PL.contains(memberService.findByUserId((String) SessionManager.getSession(sessionid)))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (projectService.deleteByProjectName(projectname)) {

@@ -7,12 +7,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import com.codingrecipe.member.session.SessionManager;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -45,16 +49,22 @@ public class MemberController {
     
         
     @GetMapping("/api/login_status")
-    public ResponseEntity<String> login_get(HttpSession session) {
-        if (session.getAttribute("userid") != null) {
+    public ResponseEntity<String> login_get(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        System.out.println(sessionid);
+        if (SessionManager.getSession(sessionid) != null){
             return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpSession session) {
-        if (session.getAttribute("userid") != null) {
+    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        System.out.println(memberDTO.getUserid());
+        System.out.println(memberDTO.getPassword());
+        System.out.println(sessionid);
+        if (SessionManager.getSession(sessionid) != null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO findMember = memberService.findByUserId(memberDTO.getUserid(), true);
@@ -64,11 +74,12 @@ public class MemberController {
         } else {
             if (findMember.getPassword().equals(memberDTO.getPassword())) {
                 System.out.println("로그인 성공");
-                if (session.getAttribute("userid") != null) {
-                    session.invalidate();
+                if (sessionid != null && SessionManager.getSession(sessionid) != null) {
+                    SessionManager.removeSession(sessionid);
                 }
-                session.setAttribute("userid", findMember.getUserid());
-                return ResponseEntity.status(HttpStatus.OK).build();
+                String key = SessionManager.generateKey();
+                SessionManager.setSession(key, findMember.getUserid());
+                return ResponseEntity.status(HttpStatus.OK).body(key);
             } else {
                 System.out.println("로그인 실패");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -77,8 +88,9 @@ public class MemberController {
     }
 
     @GetMapping("/api/member/{userid}")
-    public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         MemberDTO member = memberService.findByUserId(userid);
@@ -90,28 +102,30 @@ public class MemberController {
     }
 
     @GetMapping("/api/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        session.invalidate();
+        SessionManager.removeSession(sessionid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/api/user/{userid}/delete")
-    public ResponseEntity<String> delete(@PathVariable String userid, HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<String> delete(@PathVariable String userid, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (!session.getAttribute("userid").equals(userid) && !session.getAttribute("userid").equals("admin")) {
+        if (!SessionManager.getSession(sessionid).equals(userid) && !SessionManager.getSession(sessionid).equals("admin")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (memberService.findByUserId(userid) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (memberService.deleteByUserId(userid)) {
-            if (session.getAttribute("userid").equals(userid)){
-                session.invalidate();
+            if (SessionManager.getSession(sessionid).equals(userid)){
+                SessionManager.removeSession(sessionid);
             }
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
@@ -119,8 +133,9 @@ public class MemberController {
         }
     }
     @GetMapping("/api/user_list")
-    public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpSession session) {
-        if (session.getAttribute("userid") == null) {
+    public ResponseEntity<List<MemberDTOSecure>> addProjectGet(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         List<MemberDTO> memberDTOList = memberService.findAll();
@@ -128,4 +143,20 @@ public class MemberController {
         List<MemberDTOSecure> memberDTOSecureList = MemberDTOSecure.toMemberDTOSecureList(memberDTOList);
         return ResponseEntity.status(HttpStatus.OK).body(memberDTOSecureList);
     }
+    
+    @GetMapping("/api/myinfo")
+    public ResponseEntity<MemberDTOSecure> get_my_info(HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userid = (String) SessionManager.getSession(sessionid);
+        MemberDTO member = memberService.findByUserId(userid);
+        if (member == null) {
+            return ResponseEntity.notFound().build();
+        }
+        MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
+        return ResponseEntity.ok(memberDTOSecure);
+    }
+    
 }
