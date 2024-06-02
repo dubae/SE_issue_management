@@ -2,16 +2,21 @@ package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.session.SessionManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -26,46 +31,31 @@ public class IssueController {
     }
 
     /**
-    프로젝트 별 이슈 리스트 반환(Json-IssueDto)
+     프로젝트 별 이슈 리스트 반환(Json-IssueDto)
      {
-        id:1,
-        writerId:1,
-        projectId:1,
-        devId:1,
-        fixerId:1,
-        title:"test",
-        status:"new",
-        component:"test",
-        priority: "test",
-        significance: "test",
-        description:"test"
+     id:1,
+     writerId:1,
+     projectId:1,
+     devId:1,
+     fixerId:1,
+     title:"test",
+     status:"new",
+     component:"test",
+     priority: "test",
+     significance: "test",
+     description:"test"
      }
      */
     @GetMapping("/project/{projectId}/issue")
     @ResponseBody
-    public List<IssueDTO> issue(@PathVariable("projectId") Long projectId, Model model) {
-        return issueService.findByProjectId(projectId);
+    public ResponseEntity<List<IssueDTO>> issue(@PathVariable("projectId") Long projectId, Model model, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findByProjectId(projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
-    //json형태로 받을 거면 위에 선택, 인터페이스는 아래 선택.
-//    @GetMapping("/project/{projectId}/issue")
-//    public String issue(@PathVariable("projectId") Long projectId, Model model) {
-//        List<IssueDTO> issues = issueService.findByProjectId(projectId);
-//        model.addAttribute("issues", issues);
-//        return "issues";
-//    }
-
-
-//    /**
-//     * 프로젝트 별 이슈 추가 사이트 구현(필요x)
-//     */
-//    @GetMapping("/project/{projectId}/issue/new")
-//    public String newIssue(@PathVariable("projectId") Long projectId, Model model) {
-//        model.addAttribute("projectId", projectId);
-//        model.addAttribute("issueDTO", new IssueDTO());
-//        return "addissue";
-//    }
-
-
 
     /**
      * 프로젝트 별 이슈 추가(Json-IssueDto 형태)
@@ -85,13 +75,14 @@ public class IssueController {
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/new")
-    public void addIssue(@ModelAttribute IssueDTO issueDTO, Model model) {
-        /**
-         * 현재 내가 무슨 계정으로 로그인 되어 있는지
-         * memberId값을 자동으로 issueDto에 연결시켜야 함.
-         */
-       // issueDTO.setWriterId(/** 여기에 입력할 것! */);
+    public ResponseEntity<Void> addIssue(@ModelAttribute IssueDTO issueDTO, Model model, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        // issueDTO.setWriterId(/** 여기에 입력할 것! */);
         issueService.addNewIssue(issueDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -113,96 +104,130 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}/issue/{issueId}")
     @ResponseBody
-    public IssueDTO issue_info(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueID, Model model) {
-        return issueService.findById(issueID);
-
+    public ResponseEntity<IssueDTO> issue_info(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueID, Model model, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        IssueDTO issue = issueService.findById(issueID);
+        return ResponseEntity.status(HttpStatus.OK).body(issue);
     }
 
     /**
      * 이름으로 이슈 찾기. issueDto의 리스트로 반환되며, 댓글 역시 같이 반환됨. fetch속도 ?
      [
-        {
-         id:1,
-         writerId:1,
-         projectId:1,
-         devId:1,
-         fixerId:1,
-         title:"test",
-         status:"new",
-         component:"test",
-         priority: "test",
-         significance: "test",
-         description:"test"
-        }
+     {
+     id:1,
+     writerId:1,
+     projectId:1,
+     devId:1,
+     fixerId:1,
+     title:"test",
+     status:"new",
+     component:"test",
+     priority: "test",
+     significance: "test",
+     description:"test"
+     }
      ]
      */
     @GetMapping("/project/{projectId}/issue/findByTitle")
     @ResponseBody
-    public List<IssueDTO> findByTitle(@PathVariable("projectId") Long projectId, @RequestParam String title) {
-        return issueService.findByTitle(title);
+    public ResponseEntity<List<IssueDTO>> findByTitle(@PathVariable("projectId") Long projectId, @RequestParam String title, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findByTitle(title);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
 
     /**
      * 이슈의 상태 변경하기(new->assigned ...)
      * * 유저의 자격 확인해야 하는지는 나중에 논의.
-        /project/{projectId}/issue/{issueId}/status?status=new
+     /project/{projectId}/issue/{issueId}/status?status=new
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/{issueId}/status")
-    public void changeStatus(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,@RequestParam String status, Model model) {
-        issueService.changeStatus(issueId,status);
+    public ResponseEntity<Void> changeStatus(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam String status, Model model, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        issueService.changeStatus(issueId, status);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
      * 이슈의 개발자 지정(변경)하기. 개발자 id를 req.param으로 넣기.
      * * 유저의 자격 확인(PL)해야 하는지는 나중에 논의.
-         /project/{projectId}/issue/{issueId}/devId?devId=11
+     /project/{projectId}/issue/{issueId}/devId?devId=11
      */
     @ModelAttribute
     @PostMapping("/project/{projectId}/issue/{issueId}/devId")
-    public void changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,@RequestParam Long devId, Model model){
-        issueService.changeDevId(issueId,devId);
+    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        issueService.changeDevId(issueId, devId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
      * 이슈를 상태로 검색하기(status)
      * @RequestParam 으로 status 넘겨주세요.
     /project/{projectId}/issue/findByStatus?status=new
-     return [ {IssueDto} ... ]
+    return [ {IssueDto} ... ]
      */
     @GetMapping("/project/{projectId}/issue/findByStatus")
     @ResponseBody
-    public List<IssueDTO> findByStatus(@PathVariable("projectId") Long projectId, @RequestParam String status) {
-        return issueService.findByStatus(status);
+    public ResponseEntity<List<IssueDTO>> findByStatus(@PathVariable("projectId") Long projectId, @RequestParam String status, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findByStatus(status);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
 
     /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      * @RequestParam으로 writerId 넘겨주세요.
     /project/{projectId}/issue/findByWriterId?writerId=1
-     return [ {issuedto}... ]
+    return [ {issuedto}... ]
      */
     @GetMapping("/project/{projectId}/issue/findByWriterId")
     @ResponseBody
-    public List<IssueDTO> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam Long writerId) {
-        return issueService.findByWriterId(writerId);
+    public ResponseEntity<List<IssueDTO>> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam Long writerId, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findByWriterId(writerId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
 
     /** ----------------------이슈 통계 관련 API ------------------------------**/
 
     /**
      * 특정 월에 발생한 이슈들을 반환.
-          /project/1/issue/month/5
-             return [ {issuedto json} .. ]
+     /project/1/issue/month/5
+     return [ {issuedto json} .. ]
      */
     @GetMapping("/project/{projectId}/issue/month/{month}")
     @ResponseBody
-    public List<IssueDTO> findByMonth(@PathVariable("projectId") Long projectId, @PathVariable("month") int month) {
-        return issueService.findIssuesByMonth(Month.of(month));
+    public ResponseEntity<List<IssueDTO>> findByMonth(@PathVariable("projectId") Long projectId, @PathVariable("month") int month, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findIssuesByMonth(Month.of(month));
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
 
 
-     /**
+    /**
      * 특정 날짜에 발생한 이슈들을 반환. List<issueDto>
      *      @RequestParam으로 year, month, day  넘겨주세요.
      *      /project/{projectId}/issue/findByDate?year=2024&month=5&day=27
@@ -210,33 +235,47 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}/issue/findByDate")
     @ResponseBody
-    public List<IssueDTO> findByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day) {
-        return issueService.findIssuesByDate(LocalDate.of(year, month, day));
+    public ResponseEntity<List<IssueDTO>> findByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<IssueDTO> issues = issueService.findIssuesByDate(LocalDate.of(year, month, day));
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(issues));
     }
 
     /**
      * 특정 날짜에 발생한 이슈의 개수를 반환.
      * @RequestParam으로 year, month, day  넘겨주세요.
-        /project/{projectId}/issue/countIssueByDate
+    /project/{projectId}/issue/countIssueByDate
      * return 으로 json이 아닌 그냥 int형으로 반환됨.
      */
     @GetMapping("/project/{projectId}/issue/countIssueByDate")
     @ResponseBody
-    public int countIssueByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day) {
-        return issueService.countIssuesByDate(LocalDate.of(year, month, day));
+    public ResponseEntity<Integer> countIssueByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int count = issueService.countIssuesByDate(LocalDate.of(year, month, day));
+        return ResponseEntity.status(HttpStatus.OK).body(count);
     }
-
 
     /**
      *  특정 이슈에 대한 개발자를 추천해줌. (PL이 아직 이슈에 대해 개발자를 배정하지 않은 상황)
      *  추천 개발자는 DB의 데이터 수에 따라 1~3명을 추천.
      *  추천된 개발자는 List<Long>에 담겨 반환됩니다.
-        [ 1, 3, 12] 이런 형태로 반환.
+     [ 1, 3, 12] 이런 형태로 반환.
      */
     @PostMapping("/project/{projectId}/issue/{issueId}/suggestDev")
     @ResponseBody
-    public List<Long> suggestion(@PathVariable Long issueId) {
-        return issueService.suggestDev(issueId);
+    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Long> devIds = issueService.suggestDev(issueId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
     }
 
 }

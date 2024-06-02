@@ -45,6 +45,7 @@ public class UserPage {
         btnCreateIssue.setBounds(150, 150, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
 
+
         btnCreateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CreateIssue createIssue = new CreateIssue(issueService, projectService, username);
@@ -52,7 +53,21 @@ public class UserPage {
                 frame.dispose();
             }
         });
+
+        JButton btnViewIssues = new JButton("View Issues");
+        btnViewIssues.setBounds(150, 200, 150, 30);
+        frame.getContentPane().add(btnViewIssues);
+
+        btnViewIssues.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                viewIssue.showFrame();
+                frame.dispose();
+            }
+        });
+
     }
+
 
     public void showFrame() {
         frame.setVisible(true);

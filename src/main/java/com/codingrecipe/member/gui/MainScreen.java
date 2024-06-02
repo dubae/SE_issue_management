@@ -10,14 +10,13 @@ import java.awt.*;
 public class MainScreen {
     private JFrame frame;
     private final MemberService memberService;
-    private IssueService issueService;
-    private ProjectService projectService;
+    private final IssueService issueService;
+    private final ProjectService projectService;
 
-
-    //헤드리스모드 확인
-    public MainScreen(MemberService memberService, IssueService issueService) {
+    public MainScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
         this.memberService = memberService;
         this.issueService = issueService;
+        this.projectService = projectService; // ProjectService 인스턴스 초기화
         if (!GraphicsEnvironment.isHeadless()) {
             initialize();
         } else {
@@ -52,7 +51,6 @@ public class MainScreen {
         });
     }
 
-    //헤드리스 모드 확인
     public void showFrame() {
         if (!GraphicsEnvironment.isHeadless()) {
             frame.setVisible(true);

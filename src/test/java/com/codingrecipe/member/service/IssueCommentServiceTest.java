@@ -86,7 +86,7 @@ public class IssueCommentServiceTest {
         IssueCommentDTO issueCommentDTO = new IssueCommentDTO();
         issueCommentDTO.setIssueId(1L);
 
-        when(issueRepository.findById(1L)).thenReturn(Optional.of(issueEntity));
+        //when(issueRepository.findById(1L)).thenReturn(Optional.of(issueEntity));
         when(issueCommentRepository.save(any(IssueCommentEntity.class))).thenReturn(new IssueCommentEntity());
 
         issueCommentService.save(issueCommentDTO);

@@ -90,7 +90,7 @@ public class LoginScreen {
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                MainScreen mainScreen = new MainScreen(memberService, issueService);
+                MainScreen mainScreen = new MainScreen(memberService, issueService,projectService);
                 mainScreen.showFrame();
             }
         });

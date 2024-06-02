@@ -222,7 +222,7 @@ public class IssueService {
                 .collect(Collectors.toList());
         int max=0;
         Long bestDev=1L;
-        
+
 
         Long fixerId;
 
