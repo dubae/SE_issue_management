@@ -40,7 +40,7 @@ public class MemberDTOSecure {
                Objects.equals(username, that.username) &&
                Objects.equals(email, that.email);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(userid, username, email);

@@ -4,8 +4,6 @@ package com.codingrecipe.member.dto;
 import com.codingrecipe.member.entity.IssueCommentEntity;
 import lombok.*;
 
-import javax.persistence.Column;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,7 +11,7 @@ import javax.persistence.Column;
 @ToString
 public class IssueCommentDTO extends  BaseDTO{
     private Long id;
-    private Long writerId;
+    private String writerId;
     private String content;
     private Long issueId;
 

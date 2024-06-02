@@ -10,6 +10,7 @@ import './IssueDetailPage.css';
 const API_URL = 'http://localhost:8080/api';
 
 function IssueDetailPage() {
+    
     const navigate = useNavigate();
     const { projectId, issueId } = useParams();
     const [searchParams] = useSearchParams();
@@ -26,7 +27,7 @@ function IssueDetailPage() {
         component: '',
         priority: '',
         description: '',
-        modifyCount: 0,
+        //modifyCount: 0, 프론트에서 할 수 있으면 넣어도 될 ㄷ스
         createdAt: '',
         comments: []
     });
@@ -42,7 +43,11 @@ function IssueDetailPage() {
 
     const fetchIssue = async () => {
         try {
-            const response = await axios.get(`${API_URL}/issue/detail/${issueId}`); //경로
+            const response = await axios.get(`${API_URL}/project/${projectId}/issue/${issueId}`, {
+                headers: {
+                    'sessionid': sessionStorage.getItem('sessionid')
+                }
+            }); //경로
             setIssue(response.data);
             setUpdateData({
                 assignee: response.data.devId,
@@ -56,12 +61,42 @@ function IssueDetailPage() {
 
     const fetchMembers = async () => {
         try {
-            const response = await axios.get(`${API_URL}/projects/${projectId}/members`);
-            setMembers(response.data);
+            const result = await fetch(API_URL+'/user_list', {
+                method:'POST',
+                headers: {
+                    userid: sessionStorage.getItem('userid'),
+                    sessionid: sessionStorage.getItem('sessionid')
+                },
+            });
+            
+            console.log('result', result)
+            
+            const list = ((await result.json()) || []);
+            setMembers(list);
         } catch (error) {
             console.error('Error fetching members:', error);
         }
     };
+    
+    // 서버 재시작 후, 메인 페이지로 이동되기 위함.
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await fetch(API_URL+'/login_status', {
+                    method:'POST',
+                    headers: {
+                        userid: sessionStorage.getItem('userid'),
+                        sessionid: sessionStorage.getItem('sessionid')
+                    },
+                });
+                if (!result?.ok) navigate("/");
+                console.log('result', result, await result.text())
+            } catch (err) {
+                console.log('error!!!', err)
+                navigate("/");
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         fetchIssue();
@@ -75,7 +110,11 @@ function IssueDetailPage() {
         const newUpdateData = { ...updateData, [name]: value };
 
         try {
-            await axios.post(`${API_URL}/issue/${issueId}/info`, newUpdateData);
+            await axios.post(`${API_URL}/issue/${issueId}/info`, newUpdateData, {
+                headers: {
+                    'sessionid': sessionStorage.getItem('sessionid')
+                }
+            });
             setUpdateData(newUpdateData);
             setIssue(prevIssue => ({ ...prevIssue, ...newUpdateData }));
         } catch (error) {

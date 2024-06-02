@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Form } from 'react-bootstrap';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import Pagination from '../components/Pagination';
@@ -9,6 +9,7 @@ import './IssueListPage.css';
 const API_URL = 'http://localhost:8080/api';
 
 function IssueListPage() {
+  const navigate = useNavigate();
   const { projectId } = useParams();
   const [searchParams] = useSearchParams();
   const projectName = searchParams.get('projectName');
@@ -37,9 +38,31 @@ function IssueListPage() {
   const [issues, setIssues] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const issuesPerPage = 10;
+  
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await fetch(API_URL+'/login_status', {
+          method:'POST',
+          headers: {
+            userid: sessionStorage.getItem('userid'),
+            sessionid: sessionStorage.getItem('sessionid')
+          },
+        });
+        if (!result?.ok) navigate("/");
+        console.log('result', result, await result.text())
+      } catch (err) {
+        navigate("/");
+      }
+    })();
+  }, [])
 
   useEffect(() => {
-    axios.get(`${API_URL}/project/${projectId}/issue`)
+    axios.get(`${API_URL}/issues/${projectId}`, {
+      headers: {
+        'sessionid': sessionStorage.getItem("sessionid")
+      }
+    })
       .then(response => {
         setIssues(response.data);
       })

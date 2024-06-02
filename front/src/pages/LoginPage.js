@@ -4,13 +4,13 @@ React는 세션을 사용할 수 없음.
 -> 서버에서 세션을 사용하도록 함
 -> 서버로 로그인 요청을 보내고 로그인이 되면 서버에서 세션 문자열을 하나 만들어서
     클라이언트에게 보내주는 방식으로 구현
-
-    localStorage.setItem('sessionid', response.data);
-    코드가 다음과 같이 받은 로그인 엔드포인트로부터 받은 응답을 localStorage에 저장하고 다른 요청을 할때 꺼내서 사용
+    
+    sessionStorage.setItem('sessionid', response.data);
+    코드가 다음과 같이 받은 로그인 엔드포인트로부터 받은 응답을 sessionStorage에 저장하고 다른 요청을 할때 꺼내서 사용
     로그인 한 후 다른 요청을 보낼 땐 이 세션 문자열을 헤더에 담아서 보내주면 됨
-    로그아웃 하시면 localStorage에서 삭제하면 됨
-
-    localStorage.getItem('sessionid');
+    로그아웃 하시면 sessionStorage에서 삭제하면 됨
+    
+    sessionStorage.getItem('sessionid');
     const response = await axios.post('http://localhost:8080/api/projects', {보낼 data}, {
       headers: {
         'sessionid': `${sessionid}`
@@ -23,7 +23,7 @@ React는 세션을 사용할 수 없음.
     서버가 이 세션 문자열을 받아서 세션을 확인하고 로그인 여부를 판단합니다.
 
     프론트 껐다가 실행하면 로그인이 유지되던데 이건 세션 때문에 로그인 풀리도록 해주셔야 합니다.
-
+    
 */
 
 import React, { useState } from 'react';
@@ -47,7 +47,7 @@ function LoginPage() {
     if (isAuthenticated === false){
       sessionid = null;
     }else{
-      sessionid = localStorage.getItem('sessionId');
+      sessionid = sessionStorage.getItem('sessionId');
     }
     try {
       const response = await axios.post(`${API_URL}/login`, {
@@ -59,25 +59,28 @@ function LoginPage() {
       },
       withCredentials: true
     });
+      
+      console.log('response', response);
       if (response.status === 200) {
         isAuthenticated = true; // 이 부분은 실제 인증 여부에 따라 변경해야 합니다.
         console.log(response.data);
-        localStorage.setItem('sessionid', response.data);
+        sessionStorage.setItem('sessionid', response.data);
         alert('로그인이 완료되었습니다.');
       }
-      const isAdmin = response.data.isAdmin; // 관리자 여부를 응답에서 받아온다고 가정합니다.
+      const isAdmin = userId === "admin"; // 관리자 여부를 응답에서 받아온다고 가정합니다.
 
       if (isAuthenticated) {
         if (isAdmin) {
           alert('관리자 권한 허용되었습니다.');
         }
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('isAdmin', isAdmin);
+        sessionStorage.setItem('userId', userId);
+        sessionStorage.setItem('isAdmin', isAdmin);
         navigate('/');
       } else {
         alert('로그인 실패. 아이디와 비밀번호를 확인하세요.');
       }
     } catch (error) {
+      console.log('error', error)
       if (error.response) {
         // 서버가 클라이언트 오류에 대한 응답을 보냈을 때
         alert(error.response.data); // 에러 메시지 출력

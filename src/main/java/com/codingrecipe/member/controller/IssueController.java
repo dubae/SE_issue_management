@@ -19,7 +19,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @Transactional
 public class IssueController {
 
@@ -46,9 +46,8 @@ public class IssueController {
      description:"test"
      }
      */
-    @GetMapping("/project/{projectId}/issue")
-    @ResponseBody
-    public ResponseEntity<List<IssueDTO>> issue(@PathVariable("projectId") Long projectId, Model model, HttpServletRequest request) {
+    @GetMapping("/api/issues/{projectId}")
+    public ResponseEntity<List<IssueDTO>> issue(@PathVariable("projectId") Long projectId, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -73,9 +72,9 @@ public class IssueController {
      *         description:"test"
      *      }
      */
-    @ModelAttribute
-    @PostMapping("/project/{projectId}/issue/new")
-    public ResponseEntity<Void> addIssue(@ModelAttribute IssueDTO issueDTO, Model model, HttpServletRequest request) {
+    @PostMapping("/api/project/{projectId}/issue/new")
+    public ResponseEntity<Void> addIssue(@RequestBody IssueDTO issueDTO, Model model, HttpServletRequest request) {
+        System.out.println("hihihi");
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -102,8 +101,7 @@ public class IssueController {
      description:"test"
      }
      */
-    @GetMapping("/project/{projectId}/issue/{issueId}")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/{issueId}")
     public ResponseEntity<IssueDTO> issue_info(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueID, Model model, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -131,8 +129,7 @@ public class IssueController {
      }
      ]
      */
-    @GetMapping("/project/{projectId}/issue/findByTitle")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/findByTitle")
     public ResponseEntity<List<IssueDTO>> findByTitle(@PathVariable("projectId") Long projectId, @RequestParam String title, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -147,8 +144,7 @@ public class IssueController {
      * * 유저의 자격 확인해야 하는지는 나중에 논의.
      /project/{projectId}/issue/{issueId}/status?status=new
      */
-    @ModelAttribute
-    @PostMapping("/project/{projectId}/issue/{issueId}/status")
+    @PostMapping("/api/project/{projectId}/issue/{issueId}/status")
     public ResponseEntity<Void> changeStatus(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam String status, Model model, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -163,9 +159,8 @@ public class IssueController {
      * * 유저의 자격 확인(PL)해야 하는지는 나중에 논의.
      /project/{projectId}/issue/{issueId}/devId?devId=11
      */
-    @ModelAttribute
-    @PostMapping("/project/{projectId}/issue/{issueId}/devId")
-    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam String devId, Model model, HttpServletRequest request) {
+    @PostMapping("/api/project/{projectId}/issue/{issueId}/devId")
+    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -180,8 +175,7 @@ public class IssueController {
     /project/{projectId}/issue/findByStatus?status=new
     return [ {IssueDto} ... ]
      */
-    @GetMapping("/project/{projectId}/issue/findByStatus")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/findByStatus")
     public ResponseEntity<List<IssueDTO>> findByStatus(@PathVariable("projectId") Long projectId, @RequestParam String status, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -197,9 +191,8 @@ public class IssueController {
     /project/{projectId}/issue/findByWriterId?writerId=1
     return [ {issuedto}... ]
      */
-    @GetMapping("/project/{projectId}/issue/findByWriterId")
-    @ResponseBody
-    public ResponseEntity<List<IssueDTO>> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam Long writerId, HttpServletRequest request) {
+    @GetMapping("/api/project/{projectId}/issue/findByWriterId")
+    public ResponseEntity<List<IssueDTO>> findByWriterId(@PathVariable("projectId") Long projectId, @RequestParam String writerId, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -215,8 +208,7 @@ public class IssueController {
      /project/1/issue/month/5
      return [ {issuedto json} .. ]
      */
-    @GetMapping("/project/{projectId}/issue/month/{month}")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/month/{month}")
     public ResponseEntity<List<IssueDTO>> findByMonth(@PathVariable("projectId") Long projectId, @PathVariable("month") int month, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -233,8 +225,7 @@ public class IssueController {
      *      /project/{projectId}/issue/findByDate?year=2024&month=5&day=27
      *      return [ {issuedto json} .. ]
      */
-    @GetMapping("/project/{projectId}/issue/findByDate")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/findByDate")
     public ResponseEntity<List<IssueDTO>> findByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -250,8 +241,7 @@ public class IssueController {
     /project/{projectId}/issue/countIssueByDate
      * return 으로 json이 아닌 그냥 int형으로 반환됨.
      */
-    @GetMapping("/project/{projectId}/issue/countIssueByDate")
-    @ResponseBody
+    @GetMapping("/api/project/{projectId}/issue/countIssueByDate")
     public ResponseEntity<Integer> countIssueByDate(@PathVariable("projectId") Long projectId, @RequestParam int year, @RequestParam int month, @RequestParam int day, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
@@ -267,15 +257,19 @@ public class IssueController {
      *  추천된 개발자는 List<Long>에 담겨 반환됩니다.
      [ 1, 3, 12] 이런 형태로 반환.
      */
-//    @PostMapping("/project/{projectId}/issue/{issueId}/suggestDev")
-//    @ResponseBody
-//    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
-//        String sessionid = request.getHeader("sessionid");
-//        if (SessionManager.getSession(sessionid) == null){
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-//        List<Long> devIds = issueService.suggestDev(issueId);
-//        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
-//    }
+    @PostMapping("/api/project/{projectId}/issue/{issueId}/suggestDev")
+    public ResponseEntity<List<Long>> suggestion(@PathVariable Long issueId, HttpServletRequest request) {
+        String sessionid = request.getHeader("sessionid");
+        if (SessionManager.getSession(sessionid) == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Long> devIds = issueService.suggestDev(issueId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>(devIds));
+    }
 
+//    @PostMapping("/api/issue/{issueId}/info")
+//    public ResponseEntity<?> updateIssueInfo(@PathVariable Long issueId, @RequestBody IssueUpdateDTO issueUpdateDTO) {
+//        issueService.updateInfo(issueId, issueUpdateDTO);
+//        return ResponseEntity.ok().build();
+//    }
 }

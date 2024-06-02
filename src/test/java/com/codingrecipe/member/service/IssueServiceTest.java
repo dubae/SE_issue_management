@@ -203,7 +203,7 @@ class IssueServiceTest {
     void testFindByWriterId() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
 
-        List<IssueDTO> issueDTOs = issueService.findByWriterId(1L);
+        List<IssueDTO> issueDTOs = issueService.findByWriterId("1L");
 
         assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getWriterId().equals(1L)).toList().size());
     }
@@ -334,12 +334,12 @@ class IssueServiceTest {
 //         List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
 //         List<IssueEntity> list = new ArrayList<>();
 //         IssueEntity issueEntity1 = IssueEntity.builder()
-//         .title("title").writerId(1L).description("test")
+//         .title("title").writerId("1L").description("test")
 //         .status("new").projectEntity(projectEntity1)
 //         .comments(issueCommentEntityList).build();
 //
 //         IssueEntity issueEntity2 = IssueEntity.builder()
-//         .title("title").writerId(1L).description("test")
+//         .title("title").writerId("1L").description("test")
 //         .status("new").projectEntity(projectEntity1)
 //         .comments(issueCommentEntityList).build();
 //
@@ -357,17 +357,17 @@ class IssueServiceTest {
 //        List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
 //
 //        IssueEntity issueEntity1 = IssueEntity.builder()
-//                .title("title").writerId(1L).description("test")
+//                .title("title").writerId("1L").description("test")
 //                .status("new").projectEntity(projectEntity)
 //                .comments(issueCommentEntityList).build();
 //
 //        IssueEntity issueEntity2 = IssueEntity.builder()
-//                .title("title").writerId(1L).description("test")
+//                .title("title").writerId("1L").description("test")
 //                .status("new").projectEntity(projectEntity)
 //                .comments(issueCommentEntityList).build();
 //
 //        IssueEntity issueEntity3 = IssueEntity.builder()
-//                .title("title").writerId(1L).description("test")
+//                .title("title").writerId("1L").description("test")
 //                .status("new").projectEntity(projectEntity)
 //                .comments(issueCommentEntityList).build();
 //

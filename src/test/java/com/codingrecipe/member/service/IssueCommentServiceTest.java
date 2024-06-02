@@ -49,10 +49,10 @@ public class IssueCommentServiceTest {
 
 
         comment1 = new IssueCommentEntity().builder()
-                .id(1L).writerId(1L).content("content1").issueEntity(issueEntity1).build();
+                .id(1L).writerId("1L").content("content1").issueEntity(issueEntity1).build();
 
         comment2 = new IssueCommentEntity().builder()
-                .id(2L).writerId(1L).content("content2").issueEntity(issueEntity1).build();
+                .id(2L).writerId("1L").content("content2").issueEntity(issueEntity1).build();
 
         issueComments = new ArrayList<>();
         issueComments.add(comment1);

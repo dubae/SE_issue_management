@@ -25,7 +25,7 @@ public class IssueCommentEntity extends BaseEntity{
     private Long id;
 
     @Column(nullable = false, length = 20)
-    private Long writerId;
+    private String writerId;
 
     @Column(nullable = false, length = 20)
     private String content;

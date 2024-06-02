@@ -6,7 +6,8 @@ const Header = ({ projectId, projectName, issueTitle }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('userId');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('sessionid');
         navigate('/');
     };
 
