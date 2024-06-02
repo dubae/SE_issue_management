@@ -160,7 +160,7 @@ public class IssueController {
      /project/{projectId}/issue/{issueId}/devId?devId=11
      */
     @PostMapping("/api/project/{projectId}/issue/{issueId}/devId")
-    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam Long devId, Model model, HttpServletRequest request) {
+    public ResponseEntity<Void> changeDevId(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId, @RequestParam String devId, Model model, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
         if (SessionManager.getSession(sessionid) == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

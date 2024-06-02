@@ -133,7 +133,7 @@ class IssueServiceTest {
         issueEntityList.add(issueEntity3);
 
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-
+        when(projectRepository.findByProjectid(1L)).thenReturn(Optional.of(projectEntity1));
 
         issueService.addNewIssue(new IssueDTO(issueEntity3));
         assertEquals(issueEntity3.getId(), issueService.findByTitle("title3").get(0).getId());
@@ -205,7 +205,7 @@ class IssueServiceTest {
 
         List<IssueDTO> issueDTOs = issueService.findByWriterId("1L");
 
-        assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getWriterId().equals(1L)).toList().size());
+        assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getWriterId().equals("1L")).toList().size());
     }
 
     @Test
@@ -237,14 +237,14 @@ class IssueServiceTest {
 
     }
 
-//    @Test
-//    void testSuggestDev(){
-//        when(issueRepository.findAll()).thenReturn(issueEntityList);
-//        when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
-//
-//
-//        System.out.println(issueService.suggestDev(1L));
-//    }
+    @Test
+    void testSuggestDev(){
+        when(issueRepository.findAll()).thenReturn(issueEntityList);
+        when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
+
+
+        System.out.println(issueService.suggestDev(1L));
+    }
 
 
 

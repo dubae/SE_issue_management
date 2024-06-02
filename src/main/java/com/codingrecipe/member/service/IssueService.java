@@ -76,7 +76,6 @@ public class IssueService {
         System.out.println("issueEntity: "+ issueEntity.toString());
         issueEntity.setProjectEntity(findProjectEntity);
         issueEntity.setCreatedAt(LocalDate.now());
-        issueEntity.setId(1L);
         issueRepository.save(issueEntity);
     }
 
