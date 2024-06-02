@@ -43,7 +43,7 @@ public class IssueCommentServiceTest {
         closeable = MockitoAnnotations.openMocks(this);
 
         issueEntity1  = IssueEntity.builder()
-                .id(1L).title("title1").writerId(1L).description("test")
+                .id(1L).title("title1").writerId("1L").description("test")
                 .status("new").component("comp1")
                 .build();
 

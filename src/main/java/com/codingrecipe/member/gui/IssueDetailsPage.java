@@ -113,7 +113,7 @@ public class IssueDetailsPage {
                         searchResults = issueService.findByComponent(fieldValue);
                         break;
                     case "Priority":
-                        searchResults = issueService.findByPriority(fieldValue);
+                        //searchResults = issueService.findByPriority(fieldValue);
                         break;
                 }
                 if (searchResults != null) {
