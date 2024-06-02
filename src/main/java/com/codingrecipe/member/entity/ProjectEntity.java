@@ -34,7 +34,7 @@ public class ProjectEntity {
     @Column(name = "status", nullable = false)
     private String projectstatus;
 
-    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "projectEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Builder.Default
     private List<IssueEntity> issueEntityList = new ArrayList<>();
 

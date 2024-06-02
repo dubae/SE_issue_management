@@ -102,7 +102,7 @@ public class EditIssue {
                 issueService.changeStatus(issueDTO.getId(), status);
 
                 // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
@@ -115,7 +115,7 @@ public class EditIssue {
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // 이전 페이지로 이동
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }

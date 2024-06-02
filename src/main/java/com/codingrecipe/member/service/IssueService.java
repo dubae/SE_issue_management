@@ -74,6 +74,12 @@ public class IssueService {
             // Null 값 처리
             System.out.println("IssueDTO 또는 ProjectDTO가 Null입니다.");
         }
+        IssueEntity issueEntity = IssueEntity.toIssueEntity(issueDTO);
+        // issueEntity.setProjectEntity(projectRepository.findByProjectid(issueDTO.getProjectId()).get());
+        issueEntity.setProjectEntity(ProjectEntity.toProjectEntity(issueDTO.getProjectDTO()));
+        issueEntity.setCreatedAt(LocalDate.now());
+        issueEntity.setId(1L);
+        issueRepository.save(issueEntity);
     }
 
 

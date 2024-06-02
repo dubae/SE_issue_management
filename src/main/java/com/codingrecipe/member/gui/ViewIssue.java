@@ -15,14 +15,12 @@ public class ViewIssue {
     private final ProjectService projectService;
     private final String username;
     private final String password;
-    private final Long userid;
 
-    public ViewIssue(IssueService issueService, ProjectService projectService, Long userid, String username, String password) {
+    public ViewIssue(IssueService issueService, ProjectService projectService, String username, String password) {
         this.issueService = issueService;
         this.projectService = projectService;
         this.username = username;
         this.password = password;
-        this.userid = userid;
         initialize();
     }
 
@@ -43,7 +41,7 @@ public class ViewIssue {
 
             btnIssue.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    IssueDetailsPage issueDetailsPage = new IssueDetailsPage(issueService, projectService, userid, username, password, issue);
+                    IssueDetailsPage issueDetailsPage = new IssueDetailsPage(issueService, projectService, username, password, issue);
                     issueDetailsPage.showFrame();
                     frame.dispose();
                 }
@@ -51,18 +49,19 @@ public class ViewIssue {
 
             y += 30;
         }
-        JButton btnBack = new JButton("Back");
+        JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, y, 100, 25);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserPage userPage = new UserPage(issueService, projectService, userid, username, password);
+                UserPage userPage = new UserPage(issueService, projectService, username, password);
                 userPage.showFrame();
                 frame.dispose();
             }
         });
     }
+
 
     public void showFrame() {
         frame.setVisible(true);

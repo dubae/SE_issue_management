@@ -1,6 +1,7 @@
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.entity.IssueEntity;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.ProjectService;
 
@@ -15,15 +16,13 @@ public class IssueDetailsPage {
     private final ProjectService projectService;
     private final String username;
     private final String password;
-    private final Long userid;
     private final IssueDTO issueDTO;
 
-    public IssueDetailsPage(IssueService issueService, ProjectService projectService, Long userid, String username, String password, IssueDTO issueDTO) {
+    public IssueDetailsPage(IssueService issueService, ProjectService projectService, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
         this.projectService = projectService;
         this.username = username;
         this.password = password;
-        this.userid = userid;
         this.issueDTO = issueDTO;
         initialize();
     }
@@ -75,22 +74,23 @@ public class IssueDetailsPage {
         textAreaDescription.setBounds(50, 210, 350, 150);
         frame.getContentPane().add(textAreaDescription);
 
-        JButton btnBack = new JButton("Back");
+        JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, 420, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, userid, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
         });
 
-        addSearchButton("Title", issueDTO.getTitle(), 50, 370, 150, 30);
-        addSearchButton("Status", issueDTO.getStatus(), 200, 370, 150, 30);
-        addSearchButton("Component", issueDTO.getComponent(), 50, 400, 150, 30);
-        addSearchButton("Priority", issueDTO.getPriority(), 200, 400, 150, 30);
+        addSearchButton("Title", issueDTO.getTitle(), 100, 90, 100, 30);
+        addSearchButton("Status", issueDTO.getStatus(), 100, 120, 100, 30);
+        addSearchButton("Component", issueDTO.getStatus(), 100, 150, 100, 30);
+        addSearchButton("Priority", issueDTO.getStatus(), 100, 180, 100, 30);
+
     }
 
     private void addSearchButton(String fieldName, String fieldValue, int x, int y, int width, int height) {
@@ -100,6 +100,7 @@ public class IssueDetailsPage {
 
         btnSearch.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // issueService에 findByPriority 추가함
                 List<IssueDTO> searchResults = null;
                 switch (fieldName) {
                     case "Title":
@@ -111,14 +112,12 @@ public class IssueDetailsPage {
                     case "Component":
                         searchResults = issueService.findByComponent(fieldValue);
                         break;
-                        /*
                     case "Priority":
-                        searchResults = issueService.findByPriority(fieldValue);
+                        //searchResults = issueService.findByPriority(fieldValue);
                         break;
-
-                         */
                 }
                 if (searchResults != null) {
+                    // Display the search results in a new window
                     displaySearchResults(searchResults);
                 } else {
                     JOptionPane.showMessageDialog(frame, "No search results found for " + fieldName + ": " + fieldValue);
@@ -140,6 +139,8 @@ public class IssueDetailsPage {
 
         searchResultsFrame.setVisible(true);
     }
+
+
 
     public void showFrame() {
         frame.setVisible(true);
