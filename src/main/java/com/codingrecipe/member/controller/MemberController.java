@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import com.codingrecipe.member.session.SessionManager;
@@ -95,7 +96,7 @@ public class MemberController {
             }
         }
     }
-
+    @Transactional
     @GetMapping("/api/member/{userid}")
     public ResponseEntity<MemberDTOSecure> getMember(@PathVariable String userid, HttpServletRequest request) {
         String sessionid = request.getHeader("sessionid");
@@ -106,7 +107,6 @@ public class MemberController {
         if (member == null) {
             return ResponseEntity.notFound().build();
         }
-
         MemberDTOSecure memberDTOSecure = MemberDTOSecure.toMemberDTOSecure(member);
 
         return ResponseEntity.ok(memberDTOSecure);

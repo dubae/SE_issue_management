@@ -4,6 +4,8 @@ package com.codingrecipe.member.dto;
 import com.codingrecipe.member.entity.IssueCommentEntity;
 import lombok.*;
 
+import javax.persistence.Column;
+
 @Getter
 @Setter
 @NoArgsConstructor
