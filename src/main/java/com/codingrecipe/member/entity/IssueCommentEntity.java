@@ -41,13 +41,13 @@ public class IssueCommentEntity extends BaseEntity{
     public static IssueCommentEntity toIssueCommentEntity(IssueCommentDTO issueCommentDTO) {
         IssueCommentEntity issueCommentEntity = new IssueCommentEntity();
 
-       //
+        //
         issueCommentEntity.setId(issueCommentDTO.getId());
         issueCommentEntity.setContent(issueCommentDTO.getContent());
         issueCommentEntity.setWriterId(issueCommentDTO.getWriterId());
 
         return issueCommentEntity;
     }
-    
+
 
 }

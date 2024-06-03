@@ -40,7 +40,7 @@ public class IssueCommentDTO extends  BaseDTO{
 
         issueCommentDTO.setId(issueCommentEntity.getId());
         issueCommentDTO.setWriterId(issueCommentEntity.getWriterId());
-       issueCommentDTO.setIssueId(issueCommentEntity.getIssueEntity().getId());
+        issueCommentDTO.setIssueId(issueCommentEntity.getIssueEntity().getId());
         issueCommentDTO.setContent(issueCommentEntity.getContent());
 
         return issueCommentDTO;

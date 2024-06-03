@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class IssueDetailsPage {
     private JFrame frame;
@@ -110,7 +109,7 @@ public class IssueDetailsPage {
                     newComment.setContent(commentText);
                     newComment.setWriterId(Long.parseLong(username));
                     newComment.setIssueId(issueDTO.getId());
-                    newComment.setCreatedAt(LocalDate.from(LocalDateTime.now()));
+                    newComment.setCreatedAt(LocalDate.now()); // LocalDate 사용
                     issueCommentService.save(newComment);
                     issueDTO.getIssueCommentDTOList().add(newComment);
                     updateComments();
@@ -136,9 +135,11 @@ public class IssueDetailsPage {
 
     private void updateComments() {
         textAreaComments.setText("");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         for (IssueCommentDTO comment : issueDTO.getIssueCommentDTOList()) {
-            textAreaComments.append(comment.getWriterId() + " (" + comment.getCreatedAt().format(formatter) + "): " + comment.getContent() + "\n");
+            LocalDateTime dateTime = comment.getCreatedAt().atStartOfDay();
+            textAreaComments.append(comment.getWriterId() + " (" + dateTime.format(dateFormatter) + " " + dateTime.format(timeFormatter) + "): " + comment.getContent() + "\n");
         }
     }
 

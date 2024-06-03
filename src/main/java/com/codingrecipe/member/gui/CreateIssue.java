@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public class CreateIssue {
@@ -116,7 +117,7 @@ public class CreateIssue {
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
                     String assignee = (String) comboBoxAssignee.getSelectedItem();
-                    LocalDateTime createdAt = LocalDateTime.now();
+                    LocalDate createdAt = LocalDate.now();
 
                     // 프로젝트 선택
                     if (projectButtonGroup.getSelection() == null) {
@@ -139,7 +140,7 @@ public class CreateIssue {
                     issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
-                    issueDTO.setCreatedAt(createdAt.toLocalDate()); // 생성 시간 오류 남 ㅠ
+                    issueDTO.setCreatedAt(createdAt); // 생성 시간 설정
 
                     issueDTO.setProjectDTO(projectService.findByProjectId(selectedProjectId));
 
