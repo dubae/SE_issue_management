@@ -85,11 +85,10 @@ public class ProjectService {
     }
     @Transactional
     public boolean deleteByProjectName(String projectname) {
-        long deletedCountBefore = projectRepository.count(); // 삭제 작업 전 레코드 수
+        long deletedCountBefore = projectRepository.count();
         projectRepository.deleteByProjectname(projectname);
         System.out.println(projectname);
-        long deletedCountAfter = projectRepository.count(); // 삭제 작업 후 레코드 수
-        // 삭제 작업 전후 레코드 수가 다르면 삭제가 이루어진 것으로 간주
+        long deletedCountAfter = projectRepository.count();
         if (deletedCountBefore > deletedCountAfter) {
             return true;
         }

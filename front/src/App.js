@@ -9,6 +9,7 @@ import SignupPage from './pages/SignUpPage';
 
 
 function App() {
+  
   return (
     <Router>
       <Routes>

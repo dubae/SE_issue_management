@@ -1,8 +1,10 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.IssueDTO;
+import com.codingrecipe.member.dto.IssueUpdateDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
 import com.codingrecipe.member.entity.IssueEntity;
+import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProjectEntity;
 import com.codingrecipe.member.repository.IssueRepository;
 import com.codingrecipe.member.repository.ProjectRepository;
@@ -268,4 +270,22 @@ public class IssueService {
 
     }
 
+    public void updateInfo(Long issueId, IssueUpdateDTO issueUpdateDTO) {
+        Optional<IssueEntity> issueEntity = issueRepository.findById(issueId);
+        if(!issueEntity.isPresent()) throw new Error("not found issue");
+        IssueEntity issue = issueEntity.get();
+
+        // 클라이언트에서 변경된 속성값만 보내도록 하고, 여기서 변경된 사항만 체크해서 수정.
+        // 코멘트가 변경사항에 따라 추가되야 한다면, 여기에 추가하면 될 것으로 보여요!
+        if(issueUpdateDTO.getStatus() != null) {
+            issue.setStatus(issueUpdateDTO.getStatus());
+        } else if(issueUpdateDTO.getPriority() != null) {
+            issue.setPriority(issueUpdateDTO.getPriority());
+        } else if(issueUpdateDTO.getAssignee() != null) {
+            issue.setDevId(issueUpdateDTO.getAssignee());
+        }
+
+        issueRepository.save(issue);
+
+    }
 }

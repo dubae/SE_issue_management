@@ -151,16 +151,7 @@ function ProjectDetailPage() {
                     'projectid': projectId,
                 }
             });
-
-
-
-
-            /* 여기에 test 대신 프로젝트 이름이 들어가야 함*/
-
-
-
-
-            const response2 = await fetch(`${API_URL}/project/test/${sessionStorage.getItem('userId')}/getrole`, {
+            const response2 = await fetch(`${API_URL}/project/${project.name}/${sessionStorage.getItem('userId')}/getrole`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
@@ -180,6 +171,7 @@ function ProjectDetailPage() {
             }
             
             const data = await response.json();
+            console.log('response2', response2)
             const roles = await response2.json();
             console.log('data', data)
             console.log('roles', roles)
@@ -204,6 +196,8 @@ function ProjectDetailPage() {
     const calculateIssueUpdateCount = (issues) => {
         return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);
     };
+
+    
 
     return (
         <div className="project-detail-container">
@@ -240,7 +234,7 @@ function ProjectDetailPage() {
             <div className="issue-statistics">
                 <h2>이슈 통계</h2>
                 <p>이슈 생성 횟수: {allIssues.length}</p>
-                <p>이슈 업데이트 횟수: {calculateIssueUpdateCount(allIssues)}</p>
+                
             </div>
 
             <UserInfoModal

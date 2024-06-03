@@ -1,5 +1,7 @@
 package com.codingrecipe.member.entity;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 import javax.persistence.*;
@@ -16,8 +18,8 @@ import com.codingrecipe.member.dto.UserRoleDTO;
 @Setter
 @Table(name = "member_role")
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+//@AllArgsConstructor
+//@Builder
 public class UserRoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

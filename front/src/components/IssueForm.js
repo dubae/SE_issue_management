@@ -6,7 +6,7 @@ const IssueForm = ({ onIssueAdded }) => {
         component: '',
         title: '',
         description: '',
-        priority: 'major',
+        priority: 'Major',
     });
 
     const handleChange = (e) => {
@@ -85,7 +85,7 @@ const IssueForm = ({ onIssueAdded }) => {
                     >
                         <option value="blocker">Blocker</option>
                         <option value="critical">Critical</option>
-                        <option value="major">Major</option>
+                        <option value="Major">Major</option>
                         <option value="minor">Minor</option>
                         <option value="trivial">Trivial</option>
                     </Form.Control>
