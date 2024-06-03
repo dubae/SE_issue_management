@@ -78,12 +78,10 @@ class UserRoleServiceTest {
                 .projectid(1L)
                 .build();
 
-        memberDTO = MemberDTO.builder()
-                .userid("testuser")
-                .username("Test User")
-                .password("password")
-                .email("testuser@example.com")
-                .build();
+        memberDTO.setUserid("testuser");
+        memberDTO.setUsername("Test User");
+        memberDTO.setPassword("password");
+        memberDTO.setEmail("testuser@example.com");
 
         when(projectRepository.findById(1L)).thenReturn(Optional.of(projectEntity));
         when(memberRepository.findByUserid("testuser")).thenReturn(Optional.of(memberEntity));
