@@ -50,6 +50,7 @@ public class IssueDTO extends BaseDTO{
         this.updatedAt=issueEntity.getUpdatedAt();
         this.fixerId=issueEntity.getFixerId();
 
+
         this.projectDTO=ProjectDTO.toProjectDTO(issueEntity.getProjectEntity());
         for(IssueCommentEntity issueCommentEntity:issueEntity.getComments()){
             issueCommentDTOList.add(new IssueCommentDTO(issueCommentEntity));

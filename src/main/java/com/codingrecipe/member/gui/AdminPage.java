@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class UserPage {
+public class AdminPage {
     private JFrame frame;
     private final IssueService issueService;
     private final IssueCommentService issueCommentService;
@@ -18,7 +18,7 @@ public class UserPage {
     private final String username;
     private final String password;
 
-    public UserPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public AdminPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueService = issueService;
         this.issueCommentService = issueCommentService;
         this.projectService = projectService;
@@ -35,7 +35,7 @@ public class UserPage {
         frame.getContentPane().setLayout(null);
 
         JButton btnCreateProject = new JButton("Create Project");
-        btnCreateProject.setBounds(150, 50, 150, 30);
+        btnCreateProject.setBounds(150, 100, 150, 30);
         frame.getContentPane().add(btnCreateProject);
 
         btnCreateProject.addActionListener(new ActionListener() {
@@ -46,38 +46,26 @@ public class UserPage {
             }
         });
 
-        JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(150, 100, 150, 30);
-        frame.getContentPane().add(btnCreateIssue);
+        JButton btnEditProject = new JButton("Edit Project");
+        btnEditProject.setBounds(150, 150, 150, 30);
+        frame.getContentPane().add(btnEditProject);
 
-        btnCreateIssue.addActionListener(new ActionListener() {
+        btnEditProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateIssue createIssue = new CreateIssue(issueService, projectService, memberService, username, password);
-                createIssue.showFrame();
+                ChooseProject chooseProject = new ChooseProject(issueService, issueCommentService, projectService, memberService, username, password);
+                chooseProject.showFrame();
                 frame.dispose();
             }
         });
 
-        JButton btnViewIssues = new JButton("View Issues");
-        btnViewIssues.setBounds(150, 150, 150, 30);
-        frame.getContentPane().add(btnViewIssues);
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(150, 200, 150, 30);
+        frame.getContentPane().add(btnBack);
 
-        btnViewIssues.addActionListener(new ActionListener() {
+        btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
-                viewIssue.showFrame();
-                frame.dispose();
-            }
-        });
-
-        JButton btnViewStatistics = new JButton("View Statistics");
-        btnViewStatistics.setBounds(150, 200, 150, 30);
-        frame.getContentPane().add(btnViewStatistics);
-
-        btnViewStatistics.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                IssueStatisticsPage issueStatisticsPage = new IssueStatisticsPage(issueService, issueCommentService,projectService, memberService, username, password);
-                issueStatisticsPage.showFrame();
+                LoginScreen loginScreen = new LoginScreen(memberService, issueService, issueCommentService, projectService);
+                loginScreen.showFrame();
                 frame.dispose();
             }
         });

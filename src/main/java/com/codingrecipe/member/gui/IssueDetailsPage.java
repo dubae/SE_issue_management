@@ -1,26 +1,36 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.dto.IssueCommentDTO;
 import com.codingrecipe.member.dto.IssueDTO;
-import com.codingrecipe.member.entity.IssueEntity;
+import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class IssueDetailsPage {
     private JFrame frame;
     private final IssueService issueService;
+    private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
+    private final MemberService memberService;
     private final String username;
     private final String password;
     private final IssueDTO issueDTO;
+    private JTextArea textAreaComments;
+    private JTextField textFieldComment;
 
-    public IssueDetailsPage(IssueService issueService, ProjectService projectService, String username, String password, IssueDTO issueDTO) {
+    public IssueDetailsPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
         this.projectService = projectService;
+        this.memberService = memberService;
         this.username = username;
         this.password = password;
         this.issueDTO = issueDTO;
@@ -29,7 +39,7 @@ public class IssueDetailsPage {
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 450, 500);
+        frame.setBounds(100, 100, 450, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -49,20 +59,30 @@ public class IssueDetailsPage {
         lblStatusValue.setBounds(150, 60, 250, 20);
         frame.getContentPane().add(lblStatusValue);
 
+        JLabel lblReporter = new JLabel("Reporter:");
+        lblReporter.setBounds(50, 90, 100, 20);
+        frame.getContentPane().add(lblReporter);
+
+        // Reporter ID로 사용자 이름 가져오기
+        MemberDTO reporter = memberService.findByUserId(issueDTO.getWriterId(), false);
+        JLabel lblReporterValue = new JLabel(reporter != null ? reporter.getUsername() : "Unknown");
+        lblReporterValue.setBounds(150, 90, 250, 20);
+        frame.getContentPane().add(lblReporterValue);
+
         JLabel lblComponent = new JLabel("Component:");
-        lblComponent.setBounds(50, 90, 100, 20);
+        lblComponent.setBounds(50, 120, 100, 20);
         frame.getContentPane().add(lblComponent);
 
         JLabel lblComponentValue = new JLabel(issueDTO.getComponent());
-        lblComponentValue.setBounds(150, 90, 250, 20);
+        lblComponentValue.setBounds(150, 120, 250, 20);
         frame.getContentPane().add(lblComponentValue);
 
         JLabel lblPriority = new JLabel("Priority:");
-        lblPriority.setBounds(50, 120, 100, 20);
+        lblPriority.setBounds(50, 150, 100, 20);
         frame.getContentPane().add(lblPriority);
 
         JLabel lblPriorityValue = new JLabel(issueDTO.getPriority());
-        lblPriorityValue.setBounds(150, 120, 250, 20);
+        lblPriorityValue.setBounds(150, 150, 250, 20);
         frame.getContentPane().add(lblPriorityValue);
 
         JLabel lblDescription = new JLabel("Description:");
@@ -71,76 +91,69 @@ public class IssueDetailsPage {
 
         JTextArea textAreaDescription = new JTextArea();
         textAreaDescription.setText(issueDTO.getDescription());
-        textAreaDescription.setBounds(50, 210, 350, 150);
+        textAreaDescription.setBounds(50, 210, 350, 100);
         frame.getContentPane().add(textAreaDescription);
 
-        JButton btnBack = new JButton("뒤로가기");
-        btnBack.setBounds(50, 420, 100, 30);
+        JLabel lblComments = new JLabel("Comments:");
+        lblComments.setBounds(50, 320, 100, 20);
+        frame.getContentPane().add(lblComments);
+
+        textAreaComments = new JTextArea();
+        textAreaComments.setBounds(50, 350, 350, 100);
+        textAreaComments.setEditable(false);
+        frame.getContentPane().add(textAreaComments);
+
+        textFieldComment = new JTextField();
+        textFieldComment.setBounds(50, 460, 250, 25);
+        frame.getContentPane().add(textFieldComment);
+
+        JButton btnAddComment = new JButton("Add Comment");
+        btnAddComment.setBounds(310, 460, 120, 25);
+        frame.getContentPane().add(btnAddComment);
+
+        btnAddComment.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String commentText = textFieldComment.getText();
+                if (!commentText.isEmpty()) {
+                    IssueCommentDTO newComment = new IssueCommentDTO();
+                    newComment.setContent(commentText);
+                    MemberDTO commenter = memberService.findByUserId(username, false); //
+                    if (commenter != null) {
+                        newComment.setWriterId(String.valueOf(Long.parseLong(commenter.getUserid())));
+                    }
+                    newComment.setIssueId(issueDTO.getId());
+                    newComment.setCreatedAt(LocalDate.now());
+                    issueCommentService.save(newComment);
+                    issueDTO.getIssueCommentDTOList().add(newComment);
+                    updateComments();
+                    textFieldComment.setText("");
+                }
+            }
+        });
+
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(50, 520, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, projectService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
         });
 
-        addSearchButton("Title", issueDTO.getTitle(), 100, 90, 100, 30);
-        addSearchButton("Status", issueDTO.getStatus(), 100, 120, 100, 30);
-        addSearchButton("Component", issueDTO.getStatus(), 100, 150, 100, 30);
-        addSearchButton("Priority", issueDTO.getStatus(), 100, 180, 100, 30);
-
+        updateComments();
     }
 
-    private void addSearchButton(String fieldName, String fieldValue, int x, int y, int width, int height) {
-        JButton btnSearch = new JButton("Search " + fieldName);
-        btnSearch.setBounds(x, y, width, height);
-        frame.getContentPane().add(btnSearch);
-
-        btnSearch.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // issueService에 findByPriority 추가함
-                List<IssueDTO> searchResults = null;
-                switch (fieldName) {
-                    case "Title":
-                        searchResults = issueService.findByTitle(fieldValue);
-                        break;
-                    case "Status":
-                        searchResults = issueService.findByStatus(fieldValue);
-                        break;
-                    case "Component":
-                        searchResults = issueService.findByComponent(fieldValue);
-                        break;
-                    case "Priority":
-                        //searchResults = issueService.findByPriority(fieldValue);
-                        break;
-                }
-                if (searchResults != null) {
-                    // Display the search results in a new window
-                    displaySearchResults(searchResults);
-                } else {
-                    JOptionPane.showMessageDialog(frame, "No search results found for " + fieldName + ": " + fieldValue);
-                }
-            }
-        });
+    private void updateComments() {
+        textAreaComments.setText("");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        for (IssueCommentDTO comment : issueDTO.getIssueCommentDTOList()) {
+            MemberDTO writer = memberService.findByUserId(String.valueOf(comment.getWriterId()), false);
+            textAreaComments.append((writer != null ? writer.getUsername() : "Unknown") + " (" + comment.getCreatedAt().format(formatter) + "): " + comment.getContent() + "\n");
+        }
     }
-
-    private void displaySearchResults(List<IssueDTO> searchResults) {
-        JFrame searchResultsFrame = new JFrame();
-        searchResultsFrame.setBounds(200, 200, 600, 400);
-        searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        searchResultsFrame.getContentPane().setLayout(null);
-
-        JList<String> resultList = new JList<>(searchResults.stream().map(IssueDTO::getTitle).toArray(String[]::new));
-        JScrollPane scrollPane = new JScrollPane(resultList);
-        scrollPane.setBounds(50, 50, 500, 250);
-        searchResultsFrame.getContentPane().add(scrollPane);
-
-        searchResultsFrame.setVisible(true);
-    }
-
-
 
     public void showFrame() {
         frame.setVisible(true);

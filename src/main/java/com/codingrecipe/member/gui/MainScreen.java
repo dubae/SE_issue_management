@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -12,15 +13,17 @@ public class MainScreen {
     private final MemberService memberService;
     private final IssueService issueService;
     private final ProjectService projectService;
+    private final IssueCommentService issueCommentService;
 
-    public MainScreen(MemberService memberService, IssueService issueService, ProjectService projectService) {
+    public MainScreen(MemberService memberService, IssueService issueService, ProjectService projectService, IssueCommentService issueCommentService) {
         this.memberService = memberService;
         this.issueService = issueService;
-        this.projectService = projectService; // ProjectService 인스턴스 초기화
+        this.projectService = projectService;
+        this.issueCommentService = issueCommentService;
         if (!GraphicsEnvironment.isHeadless()) {
             initialize();
         } else {
-            System.out.println("헤드리스 모드에서 실행중");
+            System.out.println("헤드리스 모드에서 실행중"); //에러확인용
         }
     }
 
@@ -39,13 +42,13 @@ public class MainScreen {
         frame.getContentPane().add(btnSignUp);
 
         btnLogin.addActionListener(e -> {
-            LoginScreen loginScreen = new LoginScreen(memberService, issueService, projectService);
+            LoginScreen loginScreen = new LoginScreen(memberService, issueService, issueCommentService,projectService);
             loginScreen.showFrame();
             frame.dispose();
         });
 
         btnSignUp.addActionListener(e -> {
-            SignUpScreen signUpScreen = new SignUpScreen(memberService, issueService, projectService);
+            SignUpScreen signUpScreen = new SignUpScreen(memberService, issueService, issueCommentService,projectService);
             signUpScreen.showFrame();
             frame.dispose();
         });

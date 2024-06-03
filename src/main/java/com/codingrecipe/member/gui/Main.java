@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
@@ -22,6 +23,14 @@ public class Main implements CommandLineRunner {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private final IssueCommentService issueCommentService;
+
+    public Main(IssueCommentService issueCommentService) {
+        this.issueCommentService = issueCommentService;
+    }
+
+
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Main.class, args);
@@ -29,7 +38,7 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        MainScreen mainScreen = new MainScreen(memberService, issueService, projectService); // ProjectService 인스턴스 전달
+        MainScreen mainScreen = new MainScreen(memberService, issueService, projectService, issueCommentService); // ProjectService 인스턴스 전달
         mainScreen.showFrame();
     }
 }

@@ -45,6 +45,7 @@ public class IssueService {
     /**
      * 제목으로 이슈 찾기. 리스트 반환.
      */
+    @Transactional
     public List<IssueDTO> findByTitle(String title) {
 
         List<IssueDTO> issueDTOList = new ArrayList<>();
@@ -84,6 +85,7 @@ public class IssueService {
     /**
      * 이슈 삭제하기
      */
+    @Transactional
     public void deleteIssue(IssueDTO issueDTO) {
         issueRepository.delete(IssueEntity.toIssueEntity(issueDTO));
     }
@@ -91,6 +93,7 @@ public class IssueService {
     /**
      * 프로젝트id로 이슈 반환하기
      */
+    @Transactional
     public List<IssueDTO> findByProjectId(Long projectId) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
@@ -115,6 +118,7 @@ public class IssueService {
     /**
      * 이슈의 상태 변경하기. (new->assigned ->..)
      */
+    @Transactional
     public void changeStatus(Long id, String status) {
         Optional<IssueEntity> issueEntity = issueRepository.findById(id);
         issueEntity.get().setStatus(status);
@@ -124,6 +128,7 @@ public class IssueService {
     /**
      * 한 이슈의 개발자(devId) 변경하기.
      */
+    @Transactional
     public void changeDevId(Long id, String devId) {
         Optional<IssueEntity> issueEntity = issueRepository.findById(id);
         issueEntity.get().setDevId(devId);
@@ -133,6 +138,7 @@ public class IssueService {
     /**
      * status(상태)로 이슈 검색하기
      */
+    @Transactional
     public List<IssueDTO> findByStatus(String status) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
@@ -148,6 +154,7 @@ public class IssueService {
     /**
      * compontent(개발 부분)로 이슈 검색하기
      */
+    @Transactional
     public List<IssueDTO> findByComponent(String component) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
@@ -163,7 +170,8 @@ public class IssueService {
     /**
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
-    public List<IssueDTO> findByWriterId(String writerId) {
+    @Transactional
+    public List<IssueDTO> findByWriterId(Long writerId) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
         for (IssueEntity issueEntity : issueEntityList) {
@@ -182,6 +190,7 @@ public class IssueService {
     /**
      * 특정 날짜에 발생한 이슈들을 반환
      */
+    @Transactional
     public List<IssueDTO> findIssuesByDate(LocalDate date) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
@@ -197,6 +206,7 @@ public class IssueService {
      * 특정 월에 발생한 이슈들을 반환.
      * Month는 enum객체임을 명심.
      */
+    @Transactional
     public List<IssueDTO> findIssuesByMonth(Month month) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
@@ -212,6 +222,7 @@ public class IssueService {
     /**
      * 특정 날짜에 발생한 이슈의 개수를 반환.
      */
+    @Transactional
     public int countIssuesByDate(LocalDate date) {
         int count = 0;
         List<IssueEntity> issueEntityList = issueRepository.findAll();

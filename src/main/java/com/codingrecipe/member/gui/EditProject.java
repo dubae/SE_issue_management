@@ -6,35 +6,36 @@ import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class CreateProject {
+public class EditProject {
     private JFrame frame;
     private JTextField textFieldProjectName;
     private JTextField textFieldProjectDescription;
     private JComboBox<String> comboBoxPL;
     private JComboBox<String> comboBoxTester;
     private JComboBox<String> comboBoxDev;
-    private JButton btnCreate;
+    private JButton btnUpdate;
 
     private final IssueService issueService;
     private final IssueCommentService issueCommentService;
     private final ProjectService projectService;
     private final MemberService memberService;
+    private final Long projectId;
     private final String username;
     private final String password;
 
-    public CreateProject(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
+    public EditProject(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, Long projectId, String username, String password) {
         this.issueService = issueService;
         this.issueCommentService = issueCommentService;
         this.projectService = projectService;
         this.memberService = memberService;
+        this.projectId = projectId;
         this.username = username;
         this.password = password;
         initialize();
@@ -86,52 +87,55 @@ public class CreateProject {
         comboBoxDev.setBounds(150, 190, 250, 25);
         frame.getContentPane().add(comboBoxDev);
 
+        // Load members into combo boxes
         loadMembersIntoComboBoxes();
 
-        btnCreate = new JButton("Create Project");
-        btnCreate.setBounds(150, 230, 150, 30);
-        frame.getContentPane().add(btnCreate);
+        btnUpdate = new JButton("Update Project");
+        btnUpdate.setBounds(150, 230, 150, 30);
+        frame.getContentPane().add(btnUpdate);
 
-        btnCreate.addActionListener(new ActionListener() {
+        ProjectDTO projectDTO = projectService.findByProjectId(projectId);
+        if (projectDTO != null) {
+            textFieldProjectName.setText(projectDTO.getProjectname());
+            textFieldProjectDescription.setText(projectDTO.getProjectdescription());
+
+            comboBoxPL.setSelectedItem(projectDTO.getProjectname());
+            comboBoxTester.setSelectedItem(projectDTO.getProjectdescription());
+            comboBoxDev.setSelectedItem(projectDTO.getProjectname());
+        }
+
+        btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if ("admin".equals(username) && "0000".equals(password)) {
-                        String projectName = textFieldProjectName.getText();
-                        String projectDescription = textFieldProjectDescription.getText();
-                        String projectPL = (String) comboBoxPL.getSelectedItem();
-                        String projectTester = (String) comboBoxTester.getSelectedItem();
-                        String projectDev = (String) comboBoxDev.getSelectedItem();
+                String projectName = textFieldProjectName.getText();
+                String projectDescription = textFieldProjectDescription.getText();
+                String projectPL = (String) comboBoxPL.getSelectedItem();
+                String projectTester = (String) comboBoxTester.getSelectedItem();
+                String projectDev = (String) comboBoxDev.getSelectedItem();
 
-                        // 프로젝트 이름 중복 확인
-                        if (projectService.isExistProjectName(projectName)) {
-                            JOptionPane.showMessageDialog(frame, "Project name already exists. Please choose a different name.");
-                            return;
-                        }
-
-                        String projectCreatedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                        String projectStatus = "Active";
-
-                        // 프로젝트 생성
-                        ProjectDTO projectDTO = new ProjectDTO();
-                        projectDTO.setProjectname(projectName);
-                        projectDTO.setProjectdescription(projectDescription);
-                        projectDTO.setProjectcreatedtime(projectCreatedTime);
-                        projectDTO.setProjectstatus(projectStatus);
-                        projectService.register(projectDTO);
-
-                        // 생성된 프로젝트로 이동
-                        AdminPage adminPage = new AdminPage(issueService,issueCommentService, projectService, memberService, username, password);
-                        adminPage.showFrame();
-                        frame.dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "Can only be accessed by admin.");
-                        UserPage userPage = new UserPage(issueService, issueCommentService,projectService, memberService, username, password);
-                        userPage.showFrame();
-                        frame.dispose();
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                if (!projectDTO.getProjectname().equals(projectName) && projectService.isExistProjectName(projectName)) {
+                    JOptionPane.showMessageDialog(frame, "Project name already exists. Please choose a different name.");
+                    return;
                 }
+
+                projectDTO.setProjectname(projectName);
+                projectDTO.setProjectdescription(projectDescription);
+                projectService.register(projectDTO);
+
+                AdminPage adminPage = new AdminPage(issueService, issueCommentService,projectService, memberService, username, password);
+                adminPage.showFrame();
+                frame.dispose();
+            }
+        });
+
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(50, 230, 100, 30);
+        frame.getContentPane().add(btnBack);
+
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ChooseProject chooseProject = new ChooseProject(issueService, issueCommentService,projectService, memberService, username, password);
+                chooseProject.showFrame();
+                frame.dispose();
             }
         });
     }
