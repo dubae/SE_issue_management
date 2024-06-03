@@ -13,7 +13,7 @@ function IssueForm({ onIssueAdded, projectId, fetchIssues }) {
     component: '',
     status: 'New',
     fixerId: '',
-    devId: '',
+    //devId: '',
   });
 
   useEffect(() => {

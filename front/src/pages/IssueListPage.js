@@ -55,7 +55,7 @@ function IssueListPage() {
         navigate("/");
       }
     })();
-  }, [])
+  }, [navigate]);
 
   useEffect(() => {
     axios.get(`${API_URL}/issues/${projectId}`, {
@@ -180,7 +180,7 @@ function IssueListPage() {
                 <td>{issue.status}</td>
                 <td>{issue.priority}</td>
                 <td>{issue.createdAt}</td>
-                <td>{issue.fixerId}</td>
+                <td>{issue.status === 'Closed' ? issue.devId : issue.fixerId}</td>
                 <td>{issue.devId}</td>
               </tr>
             ))}

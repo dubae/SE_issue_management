@@ -163,7 +163,7 @@ function IssueDetailPage() {
                     <Dropdown
                         label="Fixer"
                         name="fixer"
-                        options={members.map(member => ({ value: member.userid, label: member.username }))}
+                        options={members.map(member => ({ value: member.devId, label: member.username }))}
                         value={updateData.assignee}
                         onChange={handleChange}
                     />
