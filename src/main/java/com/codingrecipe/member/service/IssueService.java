@@ -171,7 +171,7 @@ public class IssueService {
      * 글쓴이 id(writerId)로 이슈 검색하기
      */
     @Transactional
-    public List<IssueDTO> findByWriterId(Long writerId) {
+    public List<IssueDTO> findByWriterId(String writerId) {
         List<IssueDTO> issueDTOList = new ArrayList<>();
         List<IssueEntity> issueEntityList = issueRepository.findAll();
         for (IssueEntity issueEntity : issueEntityList) {

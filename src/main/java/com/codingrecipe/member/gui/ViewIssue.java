@@ -63,7 +63,7 @@ public class ViewIssue {
                     JMenuItem editIssue = new JMenuItem("Edit Issue");
                     editIssue.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            EditIssue editIssuePage = new EditIssue(issueService, issueCommentService, projectService, memberService, Long.parseLong(username), username, password, issue);
+                            EditIssue editIssuePage = new EditIssue(issueService, issueCommentService, projectService, memberService, username, username, password, issue);
                             editIssuePage.showFrame();
                             frame.dispose();
                         }

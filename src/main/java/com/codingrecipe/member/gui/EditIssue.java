@@ -28,10 +28,10 @@ public class EditIssue {
     private final MemberService memberService;
     private final String username;
     private final String password;
-    private final Long userid;
+    private final String userid;
     private final IssueDTO issueDTO;
 
-    public EditIssue(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, Long userid, String username, String password, IssueDTO issueDTO) {
+    public EditIssue(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String userid, String username, String password, IssueDTO issueDTO) {
         this.issueService = issueService;
         this.issueCommentService = issueCommentService;
         this.projectService = projectService;

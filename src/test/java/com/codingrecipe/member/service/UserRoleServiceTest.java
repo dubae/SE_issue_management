@@ -78,6 +78,7 @@ class UserRoleServiceTest {
                 .projectid(1L)
                 .build();
 
+        memberDTO=new MemberDTO();
         memberDTO.setUserid("testuser");
         memberDTO.setUsername("Test User");
         memberDTO.setPassword("password");
