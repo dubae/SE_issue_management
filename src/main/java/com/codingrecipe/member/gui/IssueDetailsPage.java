@@ -117,7 +117,10 @@ public class IssueDetailsPage {
                 if (!commentText.isEmpty()) {
                     IssueCommentDTO newComment = new IssueCommentDTO();
                     newComment.setContent(commentText);
-                    newComment.setWriterId(Long.parseLong(username));
+                    MemberDTO commenter = memberService.findByUserId(username, false); //
+                    if (commenter != null) {
+                        newComment.setWriterId(Long.parseLong(commenter.getUserid()));
+                    }
                     newComment.setIssueId(issueDTO.getId());
                     newComment.setCreatedAt(LocalDate.now());
                     issueCommentService.save(newComment);
