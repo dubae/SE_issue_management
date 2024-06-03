@@ -60,11 +60,11 @@ public class IssueEntity extends BaseEntity{
     @Column
     private String fixerId;
 
-    @OneToMany(mappedBy = "issueEntity", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "issueEntity", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
     private List<IssueCommentEntity> comments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REMOVE})
     @JoinColumn(name="project_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ProjectEntity projectEntity;
