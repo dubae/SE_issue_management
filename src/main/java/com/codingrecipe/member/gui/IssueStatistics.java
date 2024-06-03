@@ -1,4 +1,4 @@
-package com.codingrecipe.member.statistics;
+package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.service.IssueService;

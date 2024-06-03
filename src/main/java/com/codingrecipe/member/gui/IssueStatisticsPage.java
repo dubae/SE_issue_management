@@ -4,7 +4,7 @@ import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
 import com.codingrecipe.member.service.MemberService;
 import com.codingrecipe.member.service.ProjectService;
-import com.codingrecipe.member.statistics.IssueStatistics;
+import com.codingrecipe.member.gui.IssueStatistics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +82,7 @@ public class IssueStatisticsPage {
         JPanel panel = new JPanel();
         panel.add(btnShowDailyTrend);
         panel.add(btnShowMonthlyTrend);
-        panel.add(btnBack); // 뒤로가기 버튼을 같은 패널에 추가
+        panel.add(btnBack);
 
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
     }

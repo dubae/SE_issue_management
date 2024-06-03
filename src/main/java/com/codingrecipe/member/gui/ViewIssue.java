@@ -52,7 +52,7 @@ public class ViewIssue {
         JScrollPane scrollPane = new JScrollPane(issuePanel);
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-        JButton btnBack = new JButton("Back");
+        JButton btnBack = new JButton("뒤로가기");
         btnBack.addActionListener(e -> {
             UserPage userPage = new UserPage(issueService, issueCommentService, projectService, memberService, username, password);
             userPage.showFrame();
