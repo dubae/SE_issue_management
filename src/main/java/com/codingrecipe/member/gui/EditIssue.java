@@ -100,8 +100,10 @@ public class EditIssue {
         comboBoxAssignee.setBounds(150, 280, 150, 25);
         comboBoxAssignee.addItem("No Assignee"); // No Assignee 옵션 추가
         List<MemberDTO> members = memberService.findAll();
-        for (MemberDTO member : members) {
-            comboBoxAssignee.addItem(member.getUserid());
+        if (members != null && !members.isEmpty()) {
+            for (MemberDTO member : members) {
+                comboBoxAssignee.addItem(member.getUserid());
+            }
         }
         comboBoxAssignee.setSelectedItem(issueDTO.getDevId() == null ? "No Assignee" : issueDTO.getDevId());
         frame.getContentPane().add(comboBoxAssignee);
@@ -116,15 +118,16 @@ public class EditIssue {
                     String title = textFieldTitle.getText();
                     String description = textAreaDescription.getText();
                     String priority = (String) comboBoxPriority.getSelectedItem();
+                    String status = (String) comboBoxStatus.getSelectedItem();
                     String assignee = (String) comboBoxAssignee.getSelectedItem();
 
                     issueDTO.setTitle(title);
                     issueDTO.setDescription(description);
                     issueDTO.setPriority(priority);
-                    issueDTO.setStatus("fixed"); // 상태를 fixed로 설정
+                    issueDTO.setStatus(status);
                     issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId 설정
 
-                    issueService.addNewIssue(issueDTO);
+                    issueService.addNewIssue(issueDTO); // 수정된 Issue 업데이트 메소드로 변경
 
                     // 이슈 수정에 대한 코멘트 추가
                     if (userid != null && issueDTO.getId() != null) {
