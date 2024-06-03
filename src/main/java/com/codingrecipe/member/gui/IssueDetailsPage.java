@@ -69,46 +69,55 @@ public class IssueDetailsPage {
         lblReporterValue.setBounds(150, 90, 250, 20);
         frame.getContentPane().add(lblReporterValue);
 
+        JLabel lblAssignee = new JLabel("Assignee:");
+        lblAssignee.setBounds(50, 120, 100, 20);
+        frame.getContentPane().add(lblAssignee);
+
+        MemberDTO assignee = memberService.findByUserId(issueDTO.getDevId(), false);
+        JLabel lblAssigneeValue = new JLabel(assignee != null ? assignee.getUsername() : "No Assignee");
+        lblAssigneeValue.setBounds(150, 120, 250, 20);
+        frame.getContentPane().add(lblAssigneeValue); // lblAssigneeValue를 추가
+
         JLabel lblComponent = new JLabel("Component:");
-        lblComponent.setBounds(50, 120, 100, 20);
+        lblComponent.setBounds(50, 150, 100, 20);
         frame.getContentPane().add(lblComponent);
 
         JLabel lblComponentValue = new JLabel(issueDTO.getComponent());
-        lblComponentValue.setBounds(150, 120, 250, 20);
+        lblComponentValue.setBounds(150, 150, 250, 20);
         frame.getContentPane().add(lblComponentValue);
 
         JLabel lblPriority = new JLabel("Priority:");
-        lblPriority.setBounds(50, 150, 100, 20);
+        lblPriority.setBounds(50, 180, 100, 20);
         frame.getContentPane().add(lblPriority);
 
         JLabel lblPriorityValue = new JLabel(issueDTO.getPriority());
-        lblPriorityValue.setBounds(150, 150, 250, 20);
+        lblPriorityValue.setBounds(150, 180, 250, 20);
         frame.getContentPane().add(lblPriorityValue);
 
         JLabel lblDescription = new JLabel("Description:");
-        lblDescription.setBounds(50, 180, 100, 20);
+        lblDescription.setBounds(50, 210, 100, 20);
         frame.getContentPane().add(lblDescription);
 
         JTextArea textAreaDescription = new JTextArea();
         textAreaDescription.setText(issueDTO.getDescription());
-        textAreaDescription.setBounds(50, 210, 350, 100);
+        textAreaDescription.setBounds(50, 240, 350, 100);
         frame.getContentPane().add(textAreaDescription);
 
         JLabel lblComments = new JLabel("Comments:");
-        lblComments.setBounds(50, 320, 100, 20);
+        lblComments.setBounds(50, 350, 100, 20);
         frame.getContentPane().add(lblComments);
 
         textAreaComments = new JTextArea();
-        textAreaComments.setBounds(50, 350, 350, 100);
+        textAreaComments.setBounds(50, 380, 350, 100);
         textAreaComments.setEditable(false);
         frame.getContentPane().add(textAreaComments);
 
         textFieldComment = new JTextField();
-        textFieldComment.setBounds(50, 460, 250, 25);
+        textFieldComment.setBounds(50, 490, 250, 25);
         frame.getContentPane().add(textFieldComment);
 
         JButton btnAddComment = new JButton("Add Comment");
-        btnAddComment.setBounds(310, 460, 120, 25);
+        btnAddComment.setBounds(310, 490, 120, 25);
         frame.getContentPane().add(btnAddComment);
 
         btnAddComment.addActionListener(new ActionListener() {
@@ -117,7 +126,7 @@ public class IssueDetailsPage {
                 if (!commentText.isEmpty()) {
                     IssueCommentDTO newComment = new IssueCommentDTO();
                     newComment.setContent(commentText);
-                    MemberDTO commenter = memberService.findByUserId(username, false); //
+                    MemberDTO commenter = memberService.findByUserId(username, false);
                     if (commenter != null) {
                         newComment.setWriterId(String.valueOf(Long.parseLong(commenter.getUserid())));
                     }
@@ -132,7 +141,7 @@ public class IssueDetailsPage {
         });
 
         JButton btnBack = new JButton("Back");
-        btnBack.setBounds(50, 520, 100, 30);
+        btnBack.setBounds(50, 530, 100, 30);
         frame.getContentPane().add(btnBack);
 
         btnBack.addActionListener(new ActionListener() {
