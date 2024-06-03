@@ -1,4 +1,3 @@
-// UserPage.java
 package com.codingrecipe.member.gui;
 
 import com.codingrecipe.member.service.IssueCommentService;
@@ -36,21 +35,20 @@ public class UserPage {
         frame.getContentPane().setLayout(null);
 
         JButton btnCreateProject = new JButton("Create Project");
-        btnCreateProject.setBounds(150, 100, 150, 30);
+        btnCreateProject.setBounds(150, 50, 150, 30);
         frame.getContentPane().add(btnCreateProject);
 
         btnCreateProject.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CreateProject createProject = new CreateProject(issueService, issueCommentService,projectService, memberService,username, password);
+                CreateProject createProject = new CreateProject(issueService, issueCommentService, projectService, memberService, username, password);
                 createProject.showFrame();
                 frame.dispose();
             }
         });
 
         JButton btnCreateIssue = new JButton("Create Issue");
-        btnCreateIssue.setBounds(150, 150, 150, 30);
+        btnCreateIssue.setBounds(150, 100, 150, 30);
         frame.getContentPane().add(btnCreateIssue);
-
 
         btnCreateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -61,19 +59,29 @@ public class UserPage {
         });
 
         JButton btnViewIssues = new JButton("View Issues");
-        btnViewIssues.setBounds(150, 200, 150, 30);
+        btnViewIssues.setBounds(150, 150, 150, 30);
         frame.getContentPane().add(btnViewIssues);
 
         btnViewIssues.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService,projectService, memberService, username, password);
+                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
                 viewIssue.showFrame();
                 frame.dispose();
             }
         });
 
-    }
+        JButton btnViewStatistics = new JButton("View Statistics");
+        btnViewStatistics.setBounds(150, 200, 150, 30);
+        frame.getContentPane().add(btnViewStatistics);
 
+        btnViewStatistics.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                IssueStatisticsPage issueStatisticsPage = new IssueStatisticsPage(issueService);
+                issueStatisticsPage.showFrame();
+                frame.dispose();
+            }
+        });
+    }
 
     public void showFrame() {
         frame.setVisible(true);

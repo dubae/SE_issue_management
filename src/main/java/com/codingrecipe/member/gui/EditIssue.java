@@ -1,5 +1,6 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.dto.IssueCommentDTO;
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.dto.MemberDTO;
 import com.codingrecipe.member.service.IssueCommentService;
@@ -10,6 +11,7 @@ import com.codingrecipe.member.service.ProjectService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.List;
 
 public class EditIssue {
@@ -110,23 +112,40 @@ public class EditIssue {
 
         btnUpdateIssue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String title = textFieldTitle.getText();
-                String description = textAreaDescription.getText();
-                String priority = (String) comboBoxPriority.getSelectedItem();
-                String status = (String) comboBoxStatus.getSelectedItem();
-                String assignee = (String) comboBoxAssignee.getSelectedItem();
+                try {
+                    String title = textFieldTitle.getText();
+                    String description = textAreaDescription.getText();
+                    String priority = (String) comboBoxPriority.getSelectedItem();
+                    String assignee = (String) comboBoxAssignee.getSelectedItem();
 
-                issueDTO.setTitle(title);
-                issueDTO.setDescription(description);
-                issueDTO.setPriority(priority);
-                issueDTO.setStatus(assignee.equals("No Assignee") ? "new" : "assigned"); // 상태 설정
-                issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId 설정
+                    issueDTO.setTitle(title);
+                    issueDTO.setDescription(description);
+                    issueDTO.setPriority(priority);
+                    issueDTO.setStatus("fixed"); // 상태를 fixed로 설정
+                    issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId 설정
 
-                issueService.addNewIssue(issueDTO);
+                    issueService.addNewIssue(issueDTO);
 
-                ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
-                viewIssue.showFrame();
-                frame.dispose();
+                    // 이슈 수정에 대한 코멘트 추가
+                    if (userid != null && issueDTO.getId() != null) {
+                        IssueCommentDTO comment = new IssueCommentDTO();
+                        comment.setWriterId(userid);
+                        comment.setIssueId(issueDTO.getId());
+                        comment.setContent("Issue updated by " + username);
+                        comment.setCreatedAt(LocalDate.now());
+                        issueCommentService.save(comment);
+
+                        issueDTO.getIssueCommentDTOList().add(comment);
+                    } else {
+                        System.out.println("Error: userid or issueDTO.getId() is null");
+                    }
+
+                    ViewIssue viewIssue = new ViewIssue(issueService, issueCommentService, projectService, memberService, username, password);
+                    viewIssue.showFrame();
+                    frame.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
