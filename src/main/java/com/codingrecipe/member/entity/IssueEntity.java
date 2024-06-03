@@ -87,7 +87,7 @@ public class IssueEntity extends BaseEntity{
         issueEntity.setStatus(issueDTO.getStatus());
         issueEntity.setComponent(issueDTO.getComponent());
         issueEntity.setPriority(issueDTO.getPriority());
-        issueEntity.setSignificance(issueDTO.getSignificance());
+        //issueEntity.setSignificance(issueDTO.getSignificance());
         issueEntity.setDescription(issueDTO.getDescription());
         issueEntity.setCreatedAt(issueDTO.getCreatedAt());
         issueEntity.setFixerId(issueDTO.getFixerId());

@@ -197,6 +197,8 @@ function ProjectDetailPage() {
         return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);
     };
 
+    
+
     return (
         <div className="project-detail-container">
             <header className="header">
@@ -232,7 +234,7 @@ function ProjectDetailPage() {
             <div className="issue-statistics">
                 <h2>이슈 통계</h2>
                 <p>이슈 생성 횟수: {allIssues.length}</p>
-
+                
             </div>
 
             <UserInfoModal
