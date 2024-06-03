@@ -1,86 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import './ProjectDetailPage.css';
 import axios from 'axios';
-import Header from '../components/Header';
-import CommentSection from '../components/CommentSection';
-import Dropdown from '../components/Dropdown2';
+import Modal from 'react-modal';
+import IssueForm from '../pages/IssueForm';
 import UserInfoModal from '../components/UserInfoModal';
-import './IssueDetailPage.css';
 
 const API_URL = 'http://localhost:8080/api';
 
-function IssueDetailPage() {
-    
+function ProjectDetailPage() {
     const navigate = useNavigate();
-    const { projectId, issueId } = useParams();
-    const [searchParams] = useSearchParams();
-    const projectName = searchParams.get('projectName');
+    const { projectId } = useParams();
+
+    const [project, setProject] = useState({ name: '' });
+    const [allIssues, setAllIssues] = useState([]);
+    const [filteredIssues, setFilteredIssues] = useState([]);
+    const [timeFrame, setTimeFrame] = useState('month');
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('sessionid');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('name');
+        navigate('/');
+    };
+
+    const handleAddIssue = (newIssue) => {
+        handleToggleModal();
+        setAllIssues(prevIssues => [...prevIssues, newIssue]);
+    };
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
-    const [issue, setIssue] = useState({
-        id: null,
-        writerId: '',
-        projectId: null,
-        devId: '',
-        fixerId: '',
-        title: '',
-        status: '',
-        component: '',
-        priority: '',
-        description: '',
-        //modifyCount: 0, 프론트에서 할 수 있으면 넣어도 될 ㄷ스
-        createdAt: '',
-        comments: []
+    
+    const [userInfo, setUserInfo] = useState({
+        userId: sessionStorage.getItem('userId') || '',
+        email: sessionStorage.getItem('email') || '',
+        name: sessionStorage.getItem('name') || ''
     });
+    
+    const handleToggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+    
 
-    const [members, setMembers] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [showUserModal, setShowUserModal] = useState(false);
-    const [updateData, setUpdateData] = useState({
-        assignee: '',
-        priority: '',
-        status: ''
-    });
 
-    const fetchIssue = async () => {
+
+    const fetchProject = async () => {
         try {
-            const response = await axios.get(`${API_URL}/project/${projectId}/issue/${issueId}`, {
+            const userId = sessionStorage.getItem('userId');
+            const response = await axios.get(`${API_URL}/projects`, {
                 headers: {
-                    'sessionid': sessionStorage.getItem('sessionid')
+                    'userId': userId,
+                    'sessionid': sessionStorage.getItem("sessionid")
                 }
-            }); //경로
-            
-            console.log('response.data', response.data)
-            setIssue(response.data);
-            setUpdateData({
-                assignee: response.data.devId,
-                priority: response.data.priority,
-                status: response.data.status
             });
+            const projects = response.data;
+            const selectedProject = projects.find(proj => proj.projectid.toString() === projectId);
+            if (selectedProject) {
+                setProject({
+                    name: selectedProject.projectname,
+                });
+            } else {
+                console.error('Project not found');
+            }
         } catch (error) {
-            console.error('Error fetching issue:', error);
+            console.error('Error fetching projects:', error);
         }
     };
 
-    const fetchMembers = async () => {
+    const fetchIssues = async () => {
         try {
-            const result = await fetch(API_URL+'/user_list', {
-                method:'POST',
+            const userId = sessionStorage.getItem('userId');
+            const response = await axios.get(`${API_URL}/issues/${projectId}`, {
                 headers: {
-                    userid: sessionStorage.getItem('userid'),
-                    sessionid: sessionStorage.getItem('sessionid')
+                    'userId': userId,
+                    'sessionid': sessionStorage.getItem("sessionid")
                 },
+                method:'GET'
             });
-            
-            console.log('result', result)
-            
-            const list = ((await result.json()) || []);
-            setMembers(list);
+            const data = response.data;
+            setAllIssues(data);
+            filterIssues(data, timeFrame);
         } catch (error) {
-            console.error('Error fetching members:', error);
+            console.error('Error fetching issues:', error);
         }
     };
     
-    // 서버 재시작 후, 메인 페이지로 이동되기 위함.
     useEffect(() => {
         (async () => {
             try {
@@ -92,7 +99,6 @@ function IssueDetailPage() {
                     },
                 });
                 if (!result?.ok) navigate("/");
-                console.log('result', result, await result.text())
             } catch (err) {
                 console.log('error!!!', err)
                 navigate("/");
@@ -101,99 +107,130 @@ function IssueDetailPage() {
     }, []);
 
     useEffect(() => {
-        fetchIssue();
-        fetchMembers();
-    }, [projectId, issueId]);
+        (async() => {
+            await fetchProject();
+            await fetchIssues();
+        })();
+    }, [projectId]);
 
-    const handleChange = async (e) => {
-        const { name, value } = e.target;
-        console.log('Name:', name);
-        console.log('Value:', value);
-        const newUpdateData = { ...updateData, [name]: value };
+    useEffect(() => {
+        filterIssues(allIssues, timeFrame);
+    }, [timeFrame, allIssues]);
 
+    const filterIssues = (issues, timeFrame) => {
+        const now = new Date();
+        let filtered = [];
+
+        switch (timeFrame) {
+            case 'month':
+                filtered = issues.filter(issue => new Date(issue.createdAt) >= new Date(now.getFullYear(), now.getMonth(), 1));
+                break;
+            case 'week':
+                const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+                filtered = issues.filter(issue => new Date(issue.createdAt) >= startOfWeek);
+                break;
+            case 'day':
+                filtered = issues.filter(issue => new Date(issue.createdAt).toDateString() === now.toDateString());
+                break;
+            default:
+                filtered = issues;
+                break;
+        }
+
+        setFilteredIssues(filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    };
+
+    const [showUserInfo, setShowUserInfo] = useState(false);
+    const handleCloseUserInfo = () => setShowUserInfo(false);
+    const handleShowUserInfo = async () => {
         try {
-            // 서버단에서 어떤 값이 바뀌었는지 알기 위해 바뀐 부분만 전송
-            await axios.post(`${API_URL}/issue/${issueId}/info`, { [name]: value }, {
+            const response = await fetch(`${API_URL}/member/${sessionStorage.getItem('userId')}`, {
                 headers: {
-                    'sessionid': sessionStorage.getItem('sessionid')
+                    'Content-Type': 'application/json',
+                    'sessionid': sessionStorage.getItem('sessionid'), // 세션 ID를 헤더에 포함
+                    'projectid': projectId,
                 }
             });
-            setUpdateData(newUpdateData);
-            setIssue(prevIssue => ({ ...prevIssue, ...newUpdateData }));
+            
+            if (!response.ok) {
+                let errorMsg = `HTTP error! Status: ${response.status}`;
+                if (response.status === 401) {
+                    errorMsg = 'Unauthorized access. Please log in again.';
+                } else if (response.status === 404) {
+                    errorMsg = 'User not found.';
+                }
+                throw new Error(errorMsg);
+            }
+            
+            const data = await response.json();
+            console.log('data', data)
+            
+            if (!data || !data.userid || !data.email || !data.username) {
+                throw new Error('Incomplete response data');
+            }
+            
+            setUserInfo({
+                userId: data.userid,
+                email: data.email,
+                name: data.username,
+                role: data?.role
+            });
+            
+            setShowUserInfo(true);
         } catch (error) {
-            console.error('Error updating issue info:', error);
+            console.error('Error fetching user info:', error.message);
         }
-    };
+    }
 
-    const handleUserClick = (userId) => {
-        const user = members.find(member => member.userid === userId);
-        if (user) {
-            setSelectedUser(user);
-            setShowUserModal(true);
-        }
-    };
-
-    const handleCloseUserModal = () => {
-        setShowUserModal(false);
-        setSelectedUser(null);
+    const calculateIssueUpdateCount = (issues) => {
+        return issues.reduce((count, issue) => count + (issue.modifyCount || 0), 0);
     };
 
     return (
-        <div className="issue-detail-container">
-            <Header projectId={projectId} projectName={projectName} issueTitle={issue.title} />
-            <div className="issue-details">
-                <div className="left-panel">
-                    <h2>이슈 설명</h2>
-                    <p>{issue.description}</p>
-                    <CommentSection comments={issue.comments || []} onUserClick={handleUserClick} />
+        <div className="project-detail-container">
+            <header className="header">
+                <h1><Link to="/">프로젝트</Link>/{project.name}</h1>
+                <div className="auth-buttons">
+                    <Button variant="primary" onClick={handleShowUserInfo}>내 정보 보기</Button>
+                    <Button variant="primary" onClick={handleLogout}>로그아웃</Button>
                 </div>
-                <div className="right-panel">
-                    <p>Component: {issue.component}</p>
-                    <p>Reported Date : {issue.createdAt}</p>
-                    <Dropdown
-                        label="Assignee"
-                        name="assignee"
-                        options={members.map(member => ({ value: member.userid, label: member.username }))}
-                        value={updateData.assignee}
-                        onChange={handleChange}
-                    />
-                    <Dropdown
-                        label="Priority"
-                        name="priority"
-                        options={[
-                            { value: 'Blocker', label: 'Blocker' },
-                            { value: 'Critical', label: 'Critical' },
-                            { value: 'Major', label: 'Major' },
-                            { value: 'Minor', label: 'Minor' },
-                            { value: 'Trivial', label: 'Trivial' }
-                        ]}
-                        value={updateData.priority}
-                        onChange={handleChange}
-                    />
-                    <Dropdown
-                        label="Status"
-                        name="status"
-                        options={[
-                            { value: 'New', label: 'New' },
-                            { value: 'Assigned', label: 'Assigned' },
-                            { value: 'Resolved', label: 'Resolved' },
-                            { value: 'Closed', label: 'Closed' },
-                            { value: 'Reopened', label: 'Reopened' }
-                        ]}
-                        value={updateData.status}
-                        onChange={handleChange}
-                    />
-                </div>
+            </header>
+            <div className="navigation-buttons">
+                <Link to={`/project/${projectId}/issues?projectName=${project.name}`}><Button variant="info">이슈 목록</Button></Link>
+                <Button variant="success" onClick={handleToggleModal}>이슈 등록</Button>
+                <Modal isOpen={isModalOpen} onRequestClose={handleToggleModal}>
+                    <IssueForm onIssueAdded={handleAddIssue} projectId={projectId} fetchIssues={fetchIssues} />
+                    <Button onClick={handleToggleModal}>닫기</Button>
+                </Modal>
             </div>
-            {selectedUser && (
-                <UserInfoModal
-                    show={showUserModal}
-                    handleClose={handleCloseUserModal}
-                    userInfo={selectedUser}
-                />
-            )}
+            <div className="filter-buttons">
+                <Button variant={timeFrame === 'month' ? 'primary' : 'secondary'} onClick={() => setTimeFrame('month')}>월별</Button>
+                <Button variant={timeFrame === 'week' ? 'primary' : 'secondary'} onClick={() => setTimeFrame('week')}>주별</Button>
+                <Button variant={timeFrame === 'day' ? 'primary' : 'secondary'} onClick={() => setTimeFrame('day')}>일별</Button>
+            </div>
+            <div className="issue-timeline">
+                <h2>이슈 타임 라인</h2>
+                <ul>
+                    {filteredIssues.map((issue, index) => (
+                        <li key={index}>
+                            [{issue.writerId}]이 <Link to={`/project/${projectId}/issues/${issue.id}?projectName=${project.name}`}>{issue.title}</Link>[{issue.component}] {'Update'} | {new Date(issue.createdAt).toLocaleDateString()} | {new Date(issue.createdAt).toLocaleTimeString()}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div className="issue-statistics">
+                <h2>이슈 통계</h2>
+                <p>이슈 생성 횟수: {allIssues.length}</p>
+                <p>이슈 업데이트 횟수: {calculateIssueUpdateCount(allIssues)}</p>
+            </div>
+
+            <UserInfoModal
+                show={showUserInfo}
+                handleClose={handleCloseUserInfo}
+                userInfo={userInfo}
+            />
         </div>
     );
 }
 
-export default IssueDetailPage;
+export default ProjectDetailPage;

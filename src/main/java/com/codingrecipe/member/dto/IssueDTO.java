@@ -26,7 +26,7 @@ public class IssueDTO extends BaseDTO{
     private String status; //enum?
     private String component;
     private String priority;
-    private String significance;
+    //private String significance;
     private String description;
     private ProjectDTO projectDTO;
     private String userId;
@@ -46,7 +46,7 @@ public class IssueDTO extends BaseDTO{
         this.status= issueEntity.getStatus(); //enum?
         this.component= issueEntity.getComponent();
         this.priority= issueEntity.getPriority();
-        this.significance= issueEntity.getSignificance();
+        //this.significance= issueEntity.getSignificance();
         this.description=issueEntity.getDescription();
         this.createdAt=issueEntity.getCreatedAt();
         this.updatedAt=issueEntity.getUpdatedAt();
@@ -72,7 +72,7 @@ public class IssueDTO extends BaseDTO{
         issueDTO.setStatus(issueEntity.getStatus());
         issueDTO.setComponent(issueEntity.getComponent());
         issueDTO.setPriority(issueEntity.getPriority());
-        issueDTO.setSignificance(issueEntity.getSignificance());
+        //issueDTO.setSignificance(issueEntity.getSignificance());
         issueDTO.setDescription(issueEntity.getDescription());
         issueDTO.setCreatedAt(issueEntity.getCreatedAt());
         issueDTO.setUpdatedAt(issueEntity.getUpdatedAt());

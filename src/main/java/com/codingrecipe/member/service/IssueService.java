@@ -3,10 +3,12 @@ package com.codingrecipe.member.service;
 import com.codingrecipe.member.dto.IssueDTO;
 import com.codingrecipe.member.dto.IssueUpdateDTO;
 import com.codingrecipe.member.dto.ProjectDTO;
+import com.codingrecipe.member.entity.IssueCommentEntity;
 import com.codingrecipe.member.entity.IssueEntity;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProjectEntity;
 import com.codingrecipe.member.repository.IssueRepository;
+import com.codingrecipe.member.repository.IssueCommentRepository;
 import com.codingrecipe.member.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,13 @@ public class IssueService {
 
     private final IssueRepository issueRepository;
     private final ProjectRepository projectRepository;
+    private final IssueCommentRepository issueCommentRepository;
 
     @Autowired
-    public IssueService(IssueRepository issueRepository, ProjectRepository projectRepository) {
+    public IssueService(IssueRepository issueRepository, ProjectRepository projectRepository, IssueCommentRepository issueCommentRepository) {
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
+        this.issueCommentRepository = issueCommentRepository;
     }
 
     /**
@@ -271,22 +275,48 @@ public class IssueService {
 
     }
 
-    public void updateInfo(Long issueId, IssueUpdateDTO issueUpdateDTO) {
+        public void updateInfo(Long issueId, IssueUpdateDTO issueUpdateDTO) {
         Optional<IssueEntity> issueEntity = issueRepository.findById(issueId);
-        if(!issueEntity.isPresent()) throw new Error("not found issue");
+        if (!issueEntity.isPresent()) throw new Error("not found issue");
         IssueEntity issue = issueEntity.get();
 
-        // 클라이언트에서 변경된 속성값만 보내도록 하고, 여기서 변경된 사항만 체크해서 수정.
-        // 코멘트가 변경사항에 따라 추가되야 한다면, 여기에 추가하면 될 것으로 보여요!
-        if(issueUpdateDTO.getStatus() != null) {
+        boolean statusChanged = false;
+        boolean priorityChanged = false;
+        boolean assigneeChanged = false;
+
+        if (issueUpdateDTO.getStatus() != null && !issueUpdateDTO.getStatus().equals(issue.getStatus())) {
             issue.setStatus(issueUpdateDTO.getStatus());
-        } else if(issueUpdateDTO.getPriority() != null) {
+            statusChanged = true;
+        } 
+        if (issueUpdateDTO.getPriority() != null && !issueUpdateDTO.getPriority().equals(issue.getPriority())) {
             issue.setPriority(issueUpdateDTO.getPriority());
-        } else if(issueUpdateDTO.getAssignee() != null) {
+            priorityChanged = true;
+        }
+        if (issueUpdateDTO.getAssignee() != null && !issueUpdateDTO.getAssignee().equals(issue.getDevId())) {
             issue.setDevId(issueUpdateDTO.getAssignee());
+            assigneeChanged = true;
         }
 
         issueRepository.save(issue);
 
+        // Add comments for changes
+        if (statusChanged) {
+            addComment(issue, "Status changed to: " + issueUpdateDTO.getStatus());
+        }
+        if (priorityChanged) {
+            addComment(issue, "Priority changed to: " + issueUpdateDTO.getPriority());
+        }
+        if (assigneeChanged) {
+            addComment(issue, "Assignee changed to: " + issueUpdateDTO.getAssignee());
+        }
+    }
+
+    private void addComment(IssueEntity issue, String commentText) {
+        IssueCommentEntity comment = new IssueCommentEntity();
+        comment.setIssueEntity(issue);
+        comment.setContent(commentText);
+        comment.setWriterId("System"); // or fetch the username from context/session
+        issueCommentRepository.save(comment);
     }
 }
+
