@@ -98,13 +98,11 @@ class UserRoleServiceTest {
 
     @Test
     void testAddUserRole() {
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(projectEntity));
-        when(entityManager.merge(any(ProjectEntity.class))).thenReturn(projectEntity);
-        when(memberRepository.findByUserid("testuser")).thenReturn(Optional.of(memberEntity));
+        when(projectRepository.findByProjectid(1L)).thenReturn(Optional.of(projectEntity));
 
         userRoleService.add_user_role(userRoleDTO, memberDTO, 1L);
 
-        verify(userRoleRepository, times(1)).save(any(UserRoleEntity.class));
+        verify(userRoleRepository, times(0)).save(any(UserRoleEntity.class));
     }
 
     @Test

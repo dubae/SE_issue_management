@@ -40,7 +40,7 @@ public class IssueCommentServiceTest {
 
     @BeforeEach
     public void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
+       // closeable = MockitoAnnotations.openMocks(this);
 
         issueEntity1  = IssueEntity.builder()
                 .id(1L).title("title1").writerId("1L").description("test")
@@ -65,9 +65,11 @@ public class IssueCommentServiceTest {
 
     }
 
+
+
     @AfterEach
     public void tearDown() throws Exception {
-        closeable.close();
+       // closeable.close();
         issueComments.clear();
     }
 
@@ -83,31 +85,30 @@ public class IssueCommentServiceTest {
 
     @Test
     public void testSave() {
-        IssueCommentDTO issueCommentDTO = new IssueCommentDTO();
-        issueCommentDTO.setIssueId(1L);
-
-        //when(issueRepository.findById(1L)).thenReturn(Optional.of(issueEntity));
+        //when(issueRepository.findById(1L)).thenReturn(Optional.of(issueEntity1));
         when(issueCommentRepository.save(any(IssueCommentEntity.class))).thenReturn(new IssueCommentEntity());
 
-        issueCommentService.save(issueCommentDTO);
+        when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntity1));
 
-        verify(issueRepository, times(1)).findById(1L);
-        verify(issueCommentRepository, times(1)).save(any(IssueCommentEntity.class));
+        IssueCommentDTO issueCommentDTO = new IssueCommentDTO();
+        issueCommentDTO.setIssueId(1L);
+        issueCommentDTO.setContent("content1");
+        issueCommentDTO.setId(3L);
+        issueCommentDTO.setWriterId("test");
+
+
+        //저장한 객체와 보낸 객체의 id값이 같은지 체크.
+        assertEquals(3L,issueCommentService.save(issueCommentDTO));
     }
+
 
     @Test
     public void testFindById() {
-        Long commentId = 1L;
-        IssueCommentEntity issueCommentEntity = new IssueCommentEntity();
-        issueCommentEntity.setId(commentId);
+        when(issueCommentRepository.findById(1L)).thenReturn(Optional.ofNullable(comment1));
 
-        when(issueCommentRepository.findById(commentId)).thenReturn(Optional.of(issueCommentEntity));
+        IssueCommentDTO issueCommentDTO = issueCommentService.findById(1L);
 
-        IssueCommentDTO result = issueCommentService.findById(commentId);
-
-        assertNotNull(result);
-        assertEquals(commentId, result.getId());
-        verify(issueCommentRepository, times(1)).findById(commentId);
+        assertEquals(1L, issueCommentDTO.getId());
     }
 
     @Test

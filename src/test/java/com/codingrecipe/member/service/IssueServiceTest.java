@@ -140,15 +140,7 @@ class IssueServiceTest {
         //verify(issueRepository, times(1)).save(any(IssueEntity.class));
     }
 
-//    @Test
-//    void testDeleteIssue() {
-//        IssueDTO issueDTO = new IssueDTO();
-//        IssueEntity issueEntity = new IssueEntity();
-//        when(issueRepository.save(any(IssueEntity.class))).thenReturn(issueEntity);
-//
-//        issueService.deleteIssue(issueDTO);
-//        verify(issueRepository, times(1)).delete(any(IssueEntity.class));
-//    }
+
 
     @Test
     void testFindByProjectId() {

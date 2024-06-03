@@ -43,11 +43,11 @@ public class IssueCommentService {
     /**
      * 특정 이슈에 댓글 추가
      */
-    public void save(IssueCommentDTO issueCommentDTO) {
+    public Long save(IssueCommentDTO issueCommentDTO) {
         IssueCommentEntity issueCommentEntity = IssueCommentEntity.toIssueCommentEntity(issueCommentDTO);
         issueCommentEntity.setIssueEntity(issueRepository.findById(issueCommentDTO.getIssueId()).get());
         issueCommentRepository.save(issueCommentEntity);
-
+        return issueCommentEntity.getId();
     }
 
     /**

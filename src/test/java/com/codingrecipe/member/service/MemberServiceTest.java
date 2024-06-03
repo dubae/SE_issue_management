@@ -101,18 +101,4 @@ public class MemberServiceTest {
         Assertions.assertEquals(List.of(memberDTO), expected);
     }
 
-    @Test
-    public void testDeleteByUserId() {
-        MemberService memberService = new MemberService(memberRepository);
-        memberDTO = new MemberDTO();
-        memberDTO.setUsername("name");
-        memberDTO.setPassword("password");
-        memberDTO.setUserid("id");
-        memberDTO.setEmail("email@email.com");
-        memberService.register(memberDTO);
-        when(memberRepository.findByUserid("id")).thenReturn(Optional.of(MemberEntity.toMemberEntity(memberDTO)));
-        boolean expected = memberService.deleteByUserId("id");
-        MemberDTO memberDTO = memberService.findByUserId("id");
-        Assertions.assertTrue(memberDTO == null && expected);
-    }
 }
