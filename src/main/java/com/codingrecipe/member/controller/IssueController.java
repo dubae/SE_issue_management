@@ -254,7 +254,7 @@ public class IssueController {
     /**
      *  특정 이슈에 대한 개발자를 추천해줌. (PL이 아직 이슈에 대해 개발자를 배정하지 않은 상황)
      *  추천 개발자는 DB의 데이터 수에 따라 1~3명을 추천.
-     *  추천된 개발자는 List<Long>에 담겨 반환됩니다.
+     *  추천된 개발자는 List<String>에 담겨 반환됩니다.
      [ 1, 3, 12] 이런 형태로 반환.
      */
     @PostMapping("/api/project/{projectId}/issue/{issueId}/suggestDev")

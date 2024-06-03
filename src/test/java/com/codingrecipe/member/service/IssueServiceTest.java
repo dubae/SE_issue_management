@@ -40,11 +40,12 @@ class IssueServiceTest {
     private ProjectEntity projectEntity1;
     List<IssueEntity> issueEntityList;
     List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
+
     @BeforeEach
     void setUp() {
         //MockitoAnnotations.openMocks(this);
         projectEntity1 = new ProjectEntity();
-        double random= Math.random();
+        double random = Math.random();
         projectEntity1.setProjectid(1L);
         projectEntity1.setProjectname(String.valueOf(random));
         projectEntity1.setProjectdescription("test2L");
@@ -52,9 +53,7 @@ class IssueServiceTest {
         projectEntity1.setProjectcreatedtime("test2L");
 
 
-
-
-        issueEntityList =new ArrayList<>();
+        issueEntityList = new ArrayList<>();
         IssueEntity issueEntity1 = IssueEntity.builder()
                 .id(1L).title("title1").writerId("1L").description("test")
                 .status("new").projectEntity(projectEntity1).component("comp1")
@@ -90,7 +89,7 @@ class IssueServiceTest {
     @AfterEach
     public void tearDown() {
         issueEntityList.clear();
-        projectEntity1=null;
+        projectEntity1 = null;
     }
 
     @Test
@@ -100,7 +99,7 @@ class IssueServiceTest {
         List<IssueDTO> expectedIssueDTOList = new ArrayList<>();
 
         //issueEntity->dto
-        for(IssueEntity issueEntity : issueRepository.findAll()){
+        for (IssueEntity issueEntity : issueRepository.findAll()) {
             expectedIssueDTOList.add(new IssueDTO(issueEntity));
 //            System.out.println(issueEntity.getId());
 
@@ -141,7 +140,6 @@ class IssueServiceTest {
     }
 
 
-
     @Test
     void testFindByProjectId() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
@@ -170,7 +168,8 @@ class IssueServiceTest {
     @Test
     void testChangeDevId() {
         when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
-        String devId = "99L"; Long id=1L;
+        String devId = "99L";
+        Long id = 1L;
         issueService.changeDevId(id, devId);
         assertEquals(devId, issueService.findById(id).getDevId());
     }
@@ -178,7 +177,7 @@ class IssueServiceTest {
     @Test
     void testFindByStatus() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-        String status="assigned";
+        String status = "assigned";
         List<IssueDTO> issueDTOs = issueService.findByStatus(status);
         assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getStatus().equals(status)).toList().size());
     }
@@ -186,7 +185,7 @@ class IssueServiceTest {
     @Test
     void testFindByComponent() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-        String component="comp1";
+        String component = "comp1";
         List<IssueDTO> issueDTOs = issueService.findByComponent(component);
         assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getComponent().equals(component)).toList().size());
     }
@@ -203,7 +202,7 @@ class IssueServiceTest {
     @Test
     void testFindIssuesByDate() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-        LocalDate date=LocalDate.now();
+        LocalDate date = LocalDate.now();
         List<IssueDTO> issueDTOs = issueService.findIssuesByDate(date);
         // findIssueByDate() 메소드로 가져온 모든 이슈의 createdAt 값이 찾으려는 값과 같으면 테스트 통과.
         assertEquals(issueDTOs.size(), issueDTOs.stream().filter(issueDTO -> issueDTO.getCreatedAt().equals(date)).toList().size());
@@ -212,7 +211,7 @@ class IssueServiceTest {
     @Test
     void testCountIssuesByDate() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-        LocalDate date=LocalDate.now();
+        LocalDate date = LocalDate.now();
         int count = issueService.countIssuesByDate(date);
         // findIssueByDate() 메소드로 가져온 모든 이슈의 createdAt 값이 찾으려는 값과 같으면 테스트 통과.
         assertEquals(count, issueEntityList.stream().filter(issueEntity -> issueEntity.getCreatedAt().equals(date)).toList().size());
@@ -220,197 +219,23 @@ class IssueServiceTest {
     }
 
     @Test
-    void testFindIssuesByMonth(){
+    void testFindIssuesByMonth() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
-        Month month=LocalDate.now().getMonth();
-        List<IssueDTO> issueDTOList=issueService.findIssuesByMonth(month);
+        Month month = LocalDate.now().getMonth();
+        List<IssueDTO> issueDTOList = issueService.findIssuesByMonth(month);
         // FindIssuesByMonth() 메소드로 가져온 모든 이슈의 createdAt 값이 찾으려는 값과 같으면 테스트 통과.
         assertEquals(issueDTOList.size(), issueDTOList.stream().filter(issueEntity -> issueEntity.getCreatedAt().getMonth().equals(month)).toList().size());
 
     }
 
     @Test
-    void testSuggestDev(){
+    void testSuggestDev() {
         when(issueRepository.findAll()).thenReturn(issueEntityList);
         when(issueRepository.findById(1L)).thenReturn(Optional.ofNullable(issueEntityList.get(0)));
 
-        assertEquals(issueService.suggestDev(1L).get(0),"2L");
-        assertEquals(issueService.suggestDev(1L).get(1),"1L");
+        assertEquals(issueService.suggestDev(1L).get(0), "2L");
+        assertEquals(issueService.suggestDev(1L).get(1), "1L");
 
         System.out.println(issueService.suggestDev(1L));
     }
-
-
-
-
-//    @Test
-//    void testSuggestDev() {
-//        List<IssueDTO> closedIssues = new ArrayList<>();
-//        IssueDTO issueDTO1 = new IssueDTO();
-//        issueDTO1.setComponent("backend");
-//        issueDTO1.setDevId(1L);
-//        closedIssues.add(issueDTO1);
-//
-//        when(issueService.findByStatus("closed")).thenReturn(closedIssues);
-//
-//        IssueDTO newIssue = new IssueDTO();
-//        newIssue.setComponent("backend");
-//
-//        Long suggestedDev = issueService.suggestDev(newIssue);
-//        assertEquals(1L, suggestedDev);
-//    }
 }
-
-
-
-
-
-
-
-
-
-
-//package com.codingrecipe.member.service;
-//
-//import com.codingrecipe.member.dto.IssueDTO;
-//import com.codingrecipe.member.entity.IssueCommentEntity;
-//import com.codingrecipe.member.entity.IssueEntity;
-//import com.codingrecipe.member.entity.ProjectEntity;
-//import com.codingrecipe.member.repository.IssueRepository;
-//import com.codingrecipe.member.repository.ProjectRepository;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDate;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyList;
-//import static org.mockito.Mockito.when;
-//
-//
-//@SpringBootTest
-//@Transactional
-//public class IssueServiceTest{
-//
-//    @Autowired
-//    private IssueRepository issueRepository;
-//
-//    @Autowired
-//    private ProjectRepository projectRepository;
-//
-//    @Autowired
-//    private IssueService issueService=new IssueService(issueRepository,projectRepository);
-//
-//    @BeforeEach
-//    public void setUp(){
-//
-//         ProjectEntity projectEntity1 = new ProjectEntity();
-//         double random= Math.random();
-//         projectEntity1.setProjectname(String.valueOf(random));
-//         projectEntity1.setProjectdescription("test2L");
-//         projectEntity1.setProjectstatus("Not Started");
-//         projectEntity1.setProjectcreatedtime("test2L");
-//
-//
-//         List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
-//         List<IssueEntity> list = new ArrayList<>();
-//         IssueEntity issueEntity1 = IssueEntity.builder()
-//         .title("title").writerId("1L").description("test")
-//         .status("new").projectEntity(projectEntity1)
-//         .comments(issueCommentEntityList).build();
-//
-//         IssueEntity issueEntity2 = IssueEntity.builder()
-//         .title("title").writerId("1L").description("test")
-//         .status("new").projectEntity(projectEntity1)
-//         .comments(issueCommentEntityList).build();
-//
-//         list.add(issueEntity1);
-//         list.add(issueEntity2);
-//
-//         projectEntity1.setIssueEntityList(list);
-//
-//      //  projectRepository.save(projectEntity1);
-//         issueRepository.saveAll(list);
-//    }
-//
-//    public List<IssueEntity> makeIssueEntityList(ProjectEntity projectEntity) {
-//        List<IssueEntity> list = new ArrayList<>();
-//        List<IssueCommentEntity> issueCommentEntityList = new ArrayList<>();
-//
-//        IssueEntity issueEntity1 = IssueEntity.builder()
-//                .title("title").writerId("1L").description("test")
-//                .status("new").projectEntity(projectEntity)
-//                .comments(issueCommentEntityList).build();
-//
-//        IssueEntity issueEntity2 = IssueEntity.builder()
-//                .title("title").writerId("1L").description("test")
-//                .status("new").projectEntity(projectEntity)
-//                .comments(issueCommentEntityList).build();
-//
-//        IssueEntity issueEntity3 = IssueEntity.builder()
-//                .title("title").writerId("1L").description("test")
-//                .status("new").projectEntity(projectEntity)
-//                .comments(issueCommentEntityList).build();
-//
-//        list.add(issueEntity1);
-//        list.add(issueEntity2);
-//        list.add(issueEntity3);
-//
-//        return list;
-//    }
-//
-//    @AfterEach
-//    public void tearDown() {
-//       // projectRepository.deleteAll();
-//
-//    }
-//
-//    @Test
-//    public void common(){
-//        System.out.println("pj rps size:" + projectRepository.findAll().get(0).getProjectid());
-//    }
-//
-//    @Test
-//    public void testFindAllIssue() {
-//        /**
-//         * findAllIssue()와 실제 DB의 entity를 비교함.
-//         */
-//        List<IssueDTO> issueDTOList = issueService.findAllIssue();
-//        List<IssueDTO> expectedIssueDTOList = new ArrayList<>();
-//        for(IssueEntity issueEntity : issueRepository.findAll()){
-//            expectedIssueDTOList.add(new IssueDTO(issueEntity));
-//            System.out.println(issueEntity.getId());
-//
-//        }
-//        System.out.println(issueDTOList.toString());
-//        Assertions.assertEquals(expectedIssueDTOList, issueDTOList);
-//    }
-//
-//    @Test
-//    public void testCountByDate() {
-//        // Add logic to mock countIssuesByDate method
-//    }
-//
-//    @Test
-//    public void testSuggestDev() {
-//        // Add logic to mock suggestDev method
-//    }
-//
-//    @Test
-//    public void testFindByTitle() {
-//        System.out.println(issueService.findByTitle("title").size());
-//    }
-//}
