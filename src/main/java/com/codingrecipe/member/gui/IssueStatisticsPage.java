@@ -1,21 +1,38 @@
 package com.codingrecipe.member.gui;
 
+import com.codingrecipe.member.service.IssueCommentService;
 import com.codingrecipe.member.service.IssueService;
+import com.codingrecipe.member.service.MemberService;
+import com.codingrecipe.member.service.ProjectService;
 import com.codingrecipe.member.statistics.IssueStatistics;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class IssueStatisticsPage {
     private JFrame frame;
     private IssueStatistics issueStatistics;
 
-    public IssueStatisticsPage(IssueService issueService) {
+    private MemberService memberService;
+    private IssueService issueService;
+    private ProjectService projectService;
+    private IssueCommentService issueCommentService;
+    private String username;
+    private String password;
+
+    public IssueStatisticsPage(IssueService issueService, IssueCommentService issueCommentService, ProjectService projectService, MemberService memberService, String username, String password) {
         this.issueStatistics = new IssueStatistics(issueService);
+        this.issueService = issueService;
+        this.issueCommentService = issueCommentService;
+        this.projectService = projectService;
+        this.memberService = memberService;
+        this.username = username;
+        this.password = password;
         initialize();
     }
 
@@ -53,9 +70,19 @@ public class IssueStatisticsPage {
             textArea.setText(sb.toString());
         });
 
+        JButton btnBack = new JButton("뒤로가기");
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                UserPage userPage = new UserPage(issueService, issueCommentService, projectService, memberService, username, password);
+                userPage.showFrame();
+                frame.dispose();
+            }
+        });
+
         JPanel panel = new JPanel();
         panel.add(btnShowDailyTrend);
         panel.add(btnShowMonthlyTrend);
+        panel.add(btnBack); // 뒤로가기 버튼을 같은 패널에 추가
 
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
     }

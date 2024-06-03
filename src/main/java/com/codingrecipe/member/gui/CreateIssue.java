@@ -11,7 +11,6 @@ import com.codingrecipe.member.service.ProjectService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -83,7 +82,7 @@ public class CreateIssue {
         comboBoxAssignee.setBounds(150, 240, 250, 25);
         frame.getContentPane().add(comboBoxAssignee);
 
-        comboBoxAssignee.addItem("No Assignee"); // 이슈추가만 하고 assignee 등록 안하는 경우
+        comboBoxAssignee.addItem("No Assignee"); // 이슈 추가만 하고 assignee 등록 안하는 경우
         List<MemberDTO> members = memberService.findAll();
         for (MemberDTO member : members) {
             comboBoxAssignee.addItem(member.getUserid());
@@ -136,7 +135,7 @@ public class CreateIssue {
                     issueDTO.setPriority(priority);
                     issueDTO.setStatus(assignee.equals("No Assignee") ? "new" : "assigned"); // 상태 설정
                     issueDTO.setProjectId(selectedProjectId); // projectId
-                    issueDTO.setWriterId("1L"); // writerId
+                    issueDTO.setWriterId(username); // writerId를 username으로 설정
                     issueDTO.setDevId(assignee.equals("No Assignee") ? null : assignee); // devId
                     issueDTO.setFixerId(null); // fixerId
                     issueDTO.setComponent(null); // component
@@ -146,6 +145,9 @@ public class CreateIssue {
 
                     // IssueService를 통해 이슈 추가
                     issueService.addNewIssue(issueDTO);
+
+                    // 디버그 메시지
+                    System.out.println("New Issue Created: " + issueDTO);
 
                     // 생성된 이슈 페이지로 이동
                     UserPage userPage = new UserPage(issueService, issueCommentService, projectService, memberService, username, password);
@@ -157,7 +159,7 @@ public class CreateIssue {
             }
         });
 
-        JButton btnBack = new JButton("Back");
+        JButton btnBack = new JButton("뒤로가기");
         btnBack.setBounds(50, 420, 100, 30);
         frame.getContentPane().add(btnBack);
 

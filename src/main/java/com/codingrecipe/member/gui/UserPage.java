@@ -76,7 +76,7 @@ public class UserPage {
 
         btnViewStatistics.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                IssueStatisticsPage issueStatisticsPage = new IssueStatisticsPage(issueService);
+                IssueStatisticsPage issueStatisticsPage = new IssueStatisticsPage(issueService, issueCommentService,projectService, memberService, username, password);
                 issueStatisticsPage.showFrame();
                 frame.dispose();
             }
